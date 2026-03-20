@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,31 +38,55 @@ public class VentaServiceImpl implements VentaService {
         Cliente cliente = clienteRepository.findById(ventaRequest.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        // Calcular monto total y construir descripción
+        // Obtener las listas originales
+        List<Long> idProductosOriginal = ventaRequest.getIdProductos();
+        List<Integer> cantidadesOriginal = ventaRequest.getCantidades();
+        
+        // Procesar duplicados: combinar productos con el mismo ID
+        Map<Long, Integer> productosMap = new LinkedHashMap<>(); // Mantiene el orden de primera aparición
+        
+        for (int i = 0; i < idProductosOriginal.size(); i++) {
+            Long idProducto = idProductosOriginal.get(i);
+            Integer cantidad = cantidadesOriginal.get(i);
+            
+            // Si el producto ya existe en el mapa, sumamos la cantidad
+            if (productosMap.containsKey(idProducto)) {
+                productosMap.put(idProducto, productosMap.get(idProducto) + cantidad);
+                System.out.println("Producto duplicado encontrado - ID: " + idProducto + 
+                                ", sumando " + cantidad + " unidades. Total: " + productosMap.get(idProducto));
+            } else {
+                productosMap.put(idProducto, cantidad);
+            }
+        }
+        
+        // Crear nuevas listas sin duplicados
+        List<Long> idProductosUnicos = new ArrayList<>(productosMap.keySet());
+        List<Integer> cantidadesUnicas = new ArrayList<>(productosMap.values());
+        
+        // Calcular monto total y construir descripción con los datos ya procesados
         Double montoTotal = 0.0;
         StringBuilder descripcion = new StringBuilder();
-
-        List<Long> idProductos = ventaRequest.getIdProductos();
-        List<Integer> cantidades = ventaRequest.getCantidades();
-
-        for (int i = 0; i < idProductos.size(); i++) {
-            final int index = i;
-            Producto producto = productoRepository.findById(idProductos.get(index))
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + idProductos.get(index)));
-
-            int cantidad = cantidades.get(index);
+        
+        for (int i = 0; i < idProductosUnicos.size(); i++) {
+            Long idProducto = idProductosUnicos.get(i);
+            Integer cantidad = cantidadesUnicas.get(i);
+            
+            // Buscar el producto en la base de datos
+            Producto producto = productoRepository.findById(idProducto)
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + idProducto));
+            
             Double precioProducto = producto.getPrecio();
-
+            
             // Sumar al monto total
             montoTotal += cantidad * precioProducto;
-
+            
             // Construir descripción
-            if (index > 0) {
+            if (i > 0) {
                 descripcion.append(" + ");
             }
             descripcion.append(cantidad).append(" ").append(producto.getNombre());
         }
-
+        
         // Crear y guardar la venta
         Venta venta = new Venta();
         venta.setCliente(cliente);
@@ -69,8 +96,9 @@ public class VentaServiceImpl implements VentaService {
         venta.setObservaciones(ventaRequest.getObservaciones());
         venta.setFecha(LocalDateTime.now());
         venta.setDia(LocalDate.now().getDayOfWeek()
-                       .getDisplayName(TextStyle.FULL, 
-                       new Locale("es", "ES")));
+                    .getDisplayName(TextStyle.FULL, 
+                    new Locale("es", "ES")));
+        
         return ventaRepository.save(venta);
     }
 
