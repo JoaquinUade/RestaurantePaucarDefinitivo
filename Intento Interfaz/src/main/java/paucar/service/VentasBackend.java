@@ -72,12 +72,6 @@ public class VentasBackend {
             String observaciones) {
 
         try {
-            //if (idCliente == null || idProductos.isEmpty() || cantidades.isEmpty()) {/*valida los requerimientos
-            //minimos de un pedido valido */
-            // System.err.println("Venta inválida");
-            // return false;
-            // }
-
             var estadoEfectivo = (estado == null ? TipoDePago.DEBE : estado);
             var obsSeguras = (observaciones == null ? "" : observaciones);
 
@@ -228,34 +222,36 @@ public class VentasBackend {
                         TipoDePago estado = TipoDePago.EFECTIVO;/*asigna el valor EFECTIVO al campo estado */
 
                         if (n.hasNonNull("estado")) {/*si el JSON tiene un campo llamado estado */
-                                estado = TipoDePago.valueOf(n.get("estado").asText());/*convierte el valor del campo estado del JSON
+                            estado = TipoDePago.valueOf(n.get("estado").asText());/*convierte el valor del campo estado del JSON
                                                                                                  en un valor del enum TipoDePago*/
                         }
                         Long idCliente = null;/*inicializa la variable idCliente con null, que se usará para almacenar el ID
                                               del cliente asociado a la venta */
-                        if (n.hasNonNull("idCliente")) {
-                            idCliente = n.get("idCliente").asLong();
-                        } else if (n.hasNonNull("cliente")
-                                && n.get("cliente").isObject()
-                                && n.get("cliente").hasNonNull("idCliente")) {
-                            idCliente = n.get("cliente").get("idCliente").asLong();
+
+
+                        if (n.hasNonNull("cliente")/* si el JSON tiene un campo cliente */
+                                && n.get("cliente").isObject()/*y ademas ese campo cliente es un objeto JSON valido */
+                                && n.get("cliente").hasNonNull("idCliente")) {/*y ademas ese objeto cliente tiene un campo idCliente no nulo entra*/
+
+                            idCliente = n.get("cliente").get("idCliente").asLong();/*convierte el valor del campo idCliente que esta dentro del objeto
+                                                                                                        cliente del JSON a un Long y lo asigna a la variable idCliente*/
                         }
-                        TipoCliente tipoCli = null;
-                        if (n.hasNonNull("tipoCliente")) {
-                            tipoCli = TipoCliente.valueOf(n.get("tipoCliente").asText());
-                        } else if (n.hasNonNull("cliente")
-                                && n.get("cliente").isObject()
-                                && n.get("cliente").hasNonNull("tipoCliente")) {
-                            tipoCli = TipoCliente.valueOf(n.get("cliente").get("tipoCliente").asText());
-                        } else if (nombre.toLowerCase().startsWith("mesa ")) {
-                            tipoCli = TipoCliente.MESA;
+                        TipoCliente tipoCli = null;/*inicializa la variable tipoCli con null, que se usará para almacenar el tipo de cliente */
+
+                        if (n.hasNonNull("cliente")/* si el JSON tiene un campo cliente */
+                                && n.get("cliente").isObject()/*y ademas ese campo cliente es un objeto JSON valido */
+                                && n.get("cliente").hasNonNull("tipoCliente")) {/*y ademas ese objeto cliente tiene un campo tipoCliente no nulo, entra*/
+
+                            tipoCli = TipoCliente.valueOf(n.get("cliente").get("tipoCliente").asText());/*convierte el valor del campo tipoCliente del JSON
+                                                                                                     en un valor del enum TipoCliente*/
                         }
-                        Long idVenta = null;
-                        if (n.hasNonNull("idVenta")) {
-                            idVenta = n.get("idVenta").asLong();
+                        Long idVenta = null;/*inicializa la variable idVenta con null, que se usará para almacenar el ID de la venta */
+                        if (n.hasNonNull("idVenta")) {/* si el JSON tiene un campo llamado idVenta */
+
+                            idVenta = n.get("idVenta").asLong();/*convierte el valor del campo idVenta del JSON a un Long y lo asigna a la variable idVenta*/
                         }
 
-                        var fila = new java.util.HashMap<String, Object>();
+                        var fila = new java.util.HashMap<String, Object>();/*inicializa la variable fila con un nuevo HashMap */
                         fila.put("nombre", nombre);
                         fila.put("descripcion", desc);
                         fila.put("monto", monto);
@@ -264,16 +260,17 @@ public class VentasBackend {
                         fila.put("idCliente", idCliente);
                         fila.put("tipoCliente", tipoCli);
                         fila.put("idVenta", idVenta);
-                        out.add(fila);
+                        out.add(fila);/*agrega la fila a la lista de ventas */
                     }
                 }
-                return out;
+                return out;/*devuelve la lista de filas de ventas obtenidas del JSON, donde cada fila es un mapa con los
+                            datos de la venta*/
             }
 
         } catch (java.io.IOException | InterruptedException e) {
             System.err.println("Error recargar ventas: " + e.getMessage());
         }
-        return List.of();
+        return List.of();/*devuelve una lista vacía en caso de error */
     }
 
     // =====================
@@ -343,28 +340,32 @@ public class VentasBackend {
             return false;
         }
     }
+
     public boolean actualizarEstadoVenta(Long idVenta, TipoDePago estado) {
-    try {
-        // cuerpo JSON
-        var bodyMap = new java.util.HashMap<String, Object>();
-        bodyMap.put("estado", estado);
+        try {
+            var bodyMap = new java.util.HashMap<String, Object>();/*crea un nuevo HashMap llamado bodyMap que se usará para construir el cuerpo de la solicitud PATCH*/
+            bodyMap.put("estado", estado);/*Guarda en el mapa bodyMap el valor de la variable estado usando "estado" como nombre del dato */
 
-        String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
+            String bodyJson = TraductorJSON.writeValueAsString(bodyMap);/*Convierte el mapa bodyMap a una cadena JSON y lo guarda en la variable bodyJson*/
 
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
-                .header("Content-Type", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))
-                .build();
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
+                    .header("Content-Type", "application/json")/*Especifica el tipo de contenido de la solicitud como JSON*/
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))/*Especifica el método de la solicitud como PATCH(osea para
+                                                                                       modificar solo una parte de los datos que ya existen) y el
+                                                                                       cuerpo de la solicitud como una cadena JSON*/
+                    .build();
 
-        var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = http.send(request, HttpResponse.BodyHandlers.ofString());/*Envía la solicitud HTTP y espera la respuesta del servidor,
+                                                                                especifica que el cuerpo de la respuesta sea un string*/
 
-        return response.statusCode() >= 200 && response.statusCode() < 300;
+            return response.statusCode() >= 200 && response.statusCode() < 300;/*Si el código de estado de la respuesta está en el rango de 200 a 
+                                                                            299, significa que la actualización fue exitosa, sino devuelve false*/
 
-    
-} catch (java.io.IOException | InterruptedException e) {  
-System.err.println("Error actualizando estado de venta: " + e.getMessage());
-    return false;
+
+        } catch (java.io.IOException | InterruptedException e) {
+            System.err.println("Error actualizando estado de venta: " + e.getMessage());
+            return false;
+        }
     }
-}
 }

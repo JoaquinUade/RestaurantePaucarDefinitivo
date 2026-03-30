@@ -1,5 +1,7 @@
 package paucar;
 
+import com.uade.tpo.demo.entity.dto.VentaRequest;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,11 +17,16 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import paucar.resumen.Resumen;
+import paucar.service.ClientesService;
+import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
 
 public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
+    private static final String API_BASE = "http://localhost:4002/api";
+    private VentasBackend backend;
 
     @Override
     public void start(Stage stage) {
@@ -28,6 +35,10 @@ public class Aplicacion extends Application {
         BorderPane root = new BorderPane();
 
         Scene scene = new Scene(root, 1000, 700);
+
+        VentaRequest venta = new VentaRequest();
+        ClientesService clientesService = new ClientesService(API_BASE, venta);
+        backend = new VentasBackend(API_BASE, clientesService, venta);
 
         // Cargar CSS (asegurate que app.css esté en resources)
         scene.getStylesheets().add(
@@ -110,7 +121,6 @@ public class Aplicacion extends Application {
         menuScroll.setFocusTraversable(false); // no roba el foco al iniciar
 
         root.setLeft(menuScroll);
-        VBox home = contenido;
         root.setCenter(contenido);
         vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya escrita en ventas
 
@@ -122,8 +132,9 @@ public class Aplicacion extends Application {
         // ===== Demo: al hacer clic cambiamos el “activo” =====
         btnResumen.setOnAction(e -> {
             marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula);
-            root.setCenter(home); // volvemos a “Bienvenido UwU”
+            root.setCenter(new Resumen(backend));
         });
+
         btnGastos.setOnAction(e -> marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula));
         btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula));
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock));
