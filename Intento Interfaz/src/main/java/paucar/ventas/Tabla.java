@@ -17,18 +17,26 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @SuppressWarnings("unused")
 public class Tabla extends VBox {
 
-    private final TableView<Ventas.Fila> tabla = new TableView<>();
-    private final Button btnEliminar = new Button("Eliminar Venta");
-    private final Consumer<Ventas.Fila> onEliminar;
+    private final TableView<Ventas.Fila> tabla = new TableView<>();/*crea una tabla para mostrar las ventas, con filas del tipo Ventas.Fila*/
+
+    private final Button btnEliminar = new Button("Eliminar Venta");/*crea un botón para eliminar una venta seleccionada en la tabla*/
+
+    private final Consumer<Ventas.Fila> OnEliminar;/*declara un campo OnEliminar que es una función que acepta una fila de venta y
+                                                   no devuelve nada, se usará para manejar la eliminación de ventas*/
+
+    private final BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado;
     private final NumberFormat moneda;
 
-    public Tabla(ObservableList<Ventas.Fila> items, Locale locale, Consumer<Ventas.Fila> onEliminar) {
+    public Tabla(ObservableList<Ventas.Fila> items, Locale locale, Consumer<Ventas.Fila> onEliminar,
+            BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado) {
         this.moneda = NumberFormat.getCurrencyInstance(locale);
-        this.onEliminar = onEliminar;
+        this.OnEliminar = onEliminar;
+        this.onCambiarEstado = onCambiarEstado;
 
         setSpacing(8);
         setPadding(new Insets(0));
@@ -37,15 +45,15 @@ public class Tabla extends VBox {
         tabla.setItems(items);
         tabla.getColumns().setAll(crearColumnas());
 
-btnEliminar.disableProperty()
-    .bind(Bindings.isNull(tabla.getSelectionModel().selectedItemProperty()));
+        btnEliminar.disableProperty()
+                .bind(Bindings.isNull(tabla.getSelectionModel().selectedItemProperty()));
 
-btnEliminar.setOnAction(e -> {
-    var sel = tabla.getSelectionModel().getSelectedItem();
-    if (sel != null && onEliminar != null) {
-        onEliminar.accept(sel); // ✅ avisa a Ventas
-    }
-});
+        btnEliminar.setOnAction(e -> {
+            var sel = tabla.getSelectionModel().getSelectedItem();
+            if (sel != null && onEliminar != null) {
+                onEliminar.accept(sel); // ✅ avisa a Ventas
+            }
+        });
 
         VBox.setVgrow(tabla, Priority.ALWAYS);
         getChildren().addAll(tabla, btnEliminar);
@@ -53,11 +61,11 @@ btnEliminar.setOnAction(e -> {
 
     private List<TableColumn<Ventas.Fila, ?>> crearColumnas() {
         return List.of(
-            colNombre(),
-            colDescripcion(),
-            colMonto(),
-            colEstado(),
-            colObservaciones()
+                colNombre(),
+                colDescripcion(),
+                colMonto(),
+                colEstado(),
+                colObservaciones()
         );
     }
 
@@ -77,12 +85,15 @@ btnEliminar.setOnAction(e -> {
         col.setCellValueFactory(c -> c.getValue().descripcionProperty());
         col.setCellFactory(tc -> new TableCell<>() {
             private final javafx.scene.text.Text text = new javafx.scene.text.Text();
+
             {
                 text.wrappingWidthProperty().bind(tc.widthProperty().subtract(16));
                 setGraphic(text);
                 setPrefHeight(Region.USE_COMPUTED_SIZE);
             }
-            @Override protected void updateItem(String item, boolean empty) {
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     text.setText(null);
@@ -104,11 +115,11 @@ btnEliminar.setOnAction(e -> {
 
     private TableColumn<Ventas.Fila, String> colMonto() {
         var col = new TableColumn<Ventas.Fila, String>("Monto");
-        col.setCellValueFactory(c ->
-            Bindings.createStringBinding(
-                () -> formatMoneda(c.getValue().getMonto()),
-                c.getValue().montoProperty()
-            )
+        col.setCellValueFactory(c
+                -> Bindings.createStringBinding(
+                        () -> formatMoneda(c.getValue().getMonto()),
+                        c.getValue().montoProperty()
+                )
         );
         col.setCellFactory(TextFieldTableCell.forTableColumn());
         col.setEditable(false);
@@ -123,18 +134,29 @@ btnEliminar.setOnAction(e -> {
         col.setCellValueFactory(c -> c.getValue().estadoProperty());
         col.setCellFactory(tc -> new TableCell<>() {
             private final ComboBox<TipoDePago> combo = new ComboBox<>();
+
             {
                 combo.getItems().setAll(TipoDePago.values());
-                combo.valueProperty().addListener((o, a, b) -> {
+                combo.valueProperty().addListener((obs, anterior, nuevo) -> {
                     if (getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
-                        getTableView().getItems().get(getIndex()).setEstado(b);
+
+                        Ventas.Fila fila = getTableView().getItems().get(getIndex());
+                        fila.setEstado(nuevo);
+
+                        if (onCambiarEstado != null && fila.getIdVenta() != null) {
+                            onCambiarEstado.accept(fila, nuevo);
+                        }
                     }
                 });
             }
-            @Override protected void updateItem(TipoDePago item, boolean empty) {
+
+            @Override
+            protected void updateItem(TipoDePago item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : combo);
-                if (!empty) combo.setValue(item);
+                if (!empty) {
+                    combo.setValue(item);
+                }
             }
         });
         col.setPrefWidth(180);
@@ -148,12 +170,15 @@ btnEliminar.setOnAction(e -> {
         col.setCellValueFactory(c -> c.getValue().observacionesProperty());
         col.setCellFactory(tc -> new TableCell<>() {
             private final javafx.scene.text.Text text = new javafx.scene.text.Text();
+
             {
                 text.wrappingWidthProperty().bind(tc.widthProperty().subtract(16));
                 setGraphic(text);
                 setPrefHeight(Region.USE_COMPUTED_SIZE);
             }
-            @Override protected void updateItem(String item, boolean empty) {
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null || item.isBlank()) {
                     text.setText(null);
@@ -173,7 +198,9 @@ btnEliminar.setOnAction(e -> {
     }
 
     private String formatMoneda(BigDecimal v) {
-        if (v == null) return "$ 0,00";
+        if (v == null) {
+            return "$ 0,00";
+        }
         return moneda.format(v);
     }
 

@@ -147,6 +147,7 @@ public final class Ventas extends BorderPane {
         public StringProperty observacionesProperty() {
             return observaciones;
         }
+
         public Long getIdVenta() {
             return idVenta.get();
         }
@@ -204,7 +205,8 @@ public final class Ventas extends BorderPane {
         var pane = new Tabla(
                 RenglonDeLaTabla,
                 LOCALE_AR,
-                fila -> eliminarVentaDesdeBackend(fila)
+                fila -> eliminarVentaDesdeBackend(fila),
+                (fila, nuevoEstado) -> actualizarEstadoEnBackend(fila, nuevoEstado)
         );
         return pane; // o pane.asNode() si tu clase expone ese método
     }
@@ -288,7 +290,24 @@ public final class Ventas extends BorderPane {
             }
         }));
     }
+private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
 
+    CompletableFuture
+        .supplyAsync(() ->
+            backend.actualizarEstadoVenta(
+                fila.getIdVenta(),
+                nuevoEstado
+            )
+        )
+        .thenAccept(ok -> Platform.runLater(() -> {
+            if (!ok) {
+                new Alert(
+                    Alert.AlertType.ERROR,
+                    "No se pudo guardar el estado"
+                ).showAndWait();
+            }
+        }));
+}
     public void recargarDelBackend() {
         CompletableFuture /*CompletableFuture es una herramienta de Java que te permite ejecutar código en
                           segundo plano sin trabar la interfaz gráfica (UI)*/
@@ -320,13 +339,13 @@ public final class Ventas extends BorderPane {
                                                                                   TipoDePago.DEBE como valor por defecto; luego convierte ese valor al tipo
                                                                                   TipoDePago y se lo asigna al campo estado de la Fila f */
                 f.setObservaciones((String) dto.getOrDefault("observaciones", ""));
-                
+
                 f.setIdVenta((Long) dto.get("idVenta"));
 
                 nuevas.add(f);/*Agrega la fila f (que acabás de construir con los datos de una venta)
                               dentro de la lista nuevas */
             }
-         
+
             RenglonDeLaTabla.setAll(nuevas);
             MontoTotalActual();
         }));

@@ -172,40 +172,67 @@ public class VentasBackend {
 
             var response = http.send(solicitud, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                var array = TraductorJSON.readTree(response.body());
-                var out = new ArrayList<java.util.Map<String, Object>>();
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {/*Verifica que la respuesta
+                                                                             del servidor haya sido exitosa
+                                                                             (códigos HTTP 200–299)*/
 
-                if (array.isArray()) {
-                    for (var n : array) {
-                        String nombre
-                                = n.hasNonNull("nombreEmpresa") ? n.get("nombreEmpresa").asText()
-                                : n.hasNonNull("nombreCliente") ? n.get("nombreCliente").asText()
-                                : n.hasNonNull("nombreMesa") ? n.get("nombreMesa").asText()
-                                : "";
-                        if ((nombre == null || nombre.isBlank())
-                                && n.hasNonNull("cliente")
-                                && n.get("cliente").isObject()
-                                && n.get("cliente").hasNonNull("nombre")) {
-                            nombre = n.get("cliente").get("nombre").asText("").trim();
-                        } else {
-                            nombre = (nombre == null ? "" : nombre.trim());
-                        }
-                        var desc = n.hasNonNull("descripcion") ? n.get("descripcion").asText() : "";
-                        var obs = n.hasNonNull("observaciones") ? n.get("observaciones").asText() : "";
-                        BigDecimal monto = BigDecimal.ZERO;
-                        if (n.hasNonNull("monto")) {
-                            monto = new BigDecimal(n.get("monto").asText())
-                                    .setScale(2, RoundingMode.HALF_UP);
-                        }
-                        TipoDePago estado = TipoDePago.EFECTIVO;
-                        if (n.hasNonNull("estado")) {
-                            try {
-                                estado = TipoDePago.valueOf(n.get("estado").asText());
-                            } catch (Exception ignore) {
+                var array = TraductorJSON.readTree(response.body());/*Toma el texto que vino del servidor
+                                                                   (normalmente  string JSON) y lo
+                                                                   convierte en un objeto java (un árbol
+                                                                   JSON) que se puede leer por campos*/
+
+                var out = new ArrayList<java.util.Map<String, Object>>();/*Lista donde se van a guardar
+                                                                         los datos de las ventas obtenidas
+                                                                         de forma ordenada */
+
+                if (array.isArray()) {/*Si lo que me devolvió el backend es una lista de elementos,
+                                      entonces vamos a recorrerla uno por uno */
+
+                    for (var n : array) {/*Recorre cada elemento del array JSON recibido */
+                        String nombre = "";
+
+                        if (n.hasNonNull("cliente") && n.get("cliente").isObject()) {/*Verifica que exista el campo "cliente" y que además sea un objeto JSON válido*/
+                            var cli = n.get("cliente");/*guarda en la variable cli el objeto JSON
+                                                                  cliente de la venta */
+
+                            if (cli.hasNonNull("nombre") && cli.hasNonNull("tipoCliente")) {/*si cli tiene un campo llamado nombre
+                                                                                                                  valido y ademas un campo llamado
+                                                                                                                  tipocliente */
+                                String base = cli.get("nombre").asText().trim();/*toma el valor del campo nombre del cliente, lo
+                                                                                           convierte a texto y le quita los espacios de
+                                                                                           adelante y de atrás*/
+                                TipoCliente tipo = TipoCliente.valueOf(cli.get("tipoCliente").asText());/*convierte el texto del campo tipoCliente
+                                                                                                                  del JSON en un valor del enum TipoCliente*/
+                                switch (tipo) {
+                                    case EMPRESA ->
+                                        nombre = base;
+                                    case CLIENTE ->
+                                        nombre = base;
+                                    case MESA ->
+                                        nombre = base;
+                                }
                             }
                         }
-                        Long idCliente = null;
+                        var desc = n.hasNonNull("descripcion") ? n.get("descripcion").asText() : "";/*Obtiene la descripción de la venta desde el JSON
+                                                                                                                         si existe, y si no asigna una cadena vacía para
+                                                                                                                         evitar valores null */
+                        var obs = n.hasNonNull("observaciones") ? n.get("observaciones").asText() : "";/*Obtiene las observaciones de la venta desde el JSON
+                                                                                                                         si existe, y si no asigna una cadena vacía para
+                                                                                                                         evitar valores null */
+                        BigDecimal monto = BigDecimal.ZERO;/*le asigna el valor cero a monto */
+                        if (n.hasNonNull("monto")) {/*si el JSON tiene un campo llamado monto */
+                            monto = new BigDecimal(n.get("monto").asText())
+                                    .setScale(2, RoundingMode.HALF_UP);/*convierte el valor del campo monto del JSON a un BigDecimal
+                                                                                 con 2 decimales, redondeando hacia arriba si es necesario */
+                        }
+                        TipoDePago estado = TipoDePago.EFECTIVO;/*asigna el valor EFECTIVO al campo estado */
+
+                        if (n.hasNonNull("estado")) {/*si el JSON tiene un campo llamado estado */
+                                estado = TipoDePago.valueOf(n.get("estado").asText());/*convierte el valor del campo estado del JSON
+                                                                                                 en un valor del enum TipoDePago*/
+                        }
+                        Long idCliente = null;/*inicializa la variable idCliente con null, que se usará para almacenar el ID
+                                              del cliente asociado a la venta */
                         if (n.hasNonNull("idCliente")) {
                             idCliente = n.get("idCliente").asLong();
                         } else if (n.hasNonNull("cliente")
@@ -316,4 +343,28 @@ public class VentasBackend {
             return false;
         }
     }
+    public boolean actualizarEstadoVenta(Long idVenta, TipoDePago estado) {
+    try {
+        // cuerpo JSON
+        var bodyMap = new java.util.HashMap<String, Object>();
+        bodyMap.put("estado", estado);
+
+        String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))
+                .build();
+
+        var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.statusCode() >= 200 && response.statusCode() < 300;
+
+    
+} catch (java.io.IOException | InterruptedException e) {  
+System.err.println("Error actualizando estado de venta: " + e.getMessage());
+    return false;
+    }
+}
 }
