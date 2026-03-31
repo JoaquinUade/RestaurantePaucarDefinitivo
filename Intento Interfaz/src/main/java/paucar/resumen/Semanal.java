@@ -28,12 +28,12 @@ public class Semanal extends BorderPane {
     private final VentasBackend backend;
     private final VBox contenido = new VBox(8);
 
-    public Semanal(VentasBackend backend, int anio, int mes) {
+    public Semanal(VentasBackend backend, LocalDate fechaBase) {
         this.backend = backend;
 
         setPadding(new Insets(16));
         initUI();
-        cargarSemanaActual(anio, mes);
+        cargarSemanaDesde(fechaBase);
     }
 
     private void initUI() {
@@ -47,15 +47,10 @@ public class Semanal extends BorderPane {
         setCenter(scroll);
     }
 
-    private void cargarSemanaActual(int anio, int mes) {
-    cargarSemanaDesde(LocalDate.now());
-}
-
-
     private void agregarDia(LocalDate fecha) {
-    VBox bloque = crearBloqueDia(fecha);
-    contenido.getChildren().add(bloque);
-}
+        VBox bloque = crearBloqueDia(fecha);
+        contenido.getChildren().add(bloque);
+    }
 
     private BigDecimal safeBD(Object o) {
         if (o instanceof BigDecimal bd) {
@@ -79,80 +74,83 @@ public class Semanal extends BorderPane {
         }
         return TipoDePago.DEBE;
     }
+
     public void cargarSemanaDesde(LocalDate diaBuscado) {
 
-    contenido.getChildren().clear();
+        contenido.getChildren().clear();
 
-    // buscar el lunes de la semana del día buscado
-    LocalDate lunes = diaBuscado;
-    while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {
-        lunes = lunes.minusDays(1);
-    }
-
-    List<LocalDate> semana = List.of(
-            lunes,
-            lunes.plusDays(1),
-            lunes.plusDays(2),
-            lunes.plusDays(3),
-            lunes.plusDays(4)
-    );
-
-    int indice = semana.indexOf(diaBuscado);
-    if (indice == -1) {
-        // si es sábado o domingo, mostramos la semana normal
-        for (LocalDate d : semana) {
-            agregarDia(d);
+        // buscar el lunes de la semana del día buscado
+        LocalDate lunes = diaBuscado;
+        while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {
+            lunes = lunes.minusDays(1);
         }
-        return;
+
+        List<LocalDate> semana = List.of(
+                lunes,
+                lunes.plusDays(1),
+                lunes.plusDays(2),
+                lunes.plusDays(3),
+                lunes.plusDays(4)
+        );
+
+        int indice = semana.indexOf(diaBuscado);
+        if (indice == -1) {
+            // si es sábado o domingo, mostramos la semana normal
+            for (LocalDate d : semana) {
+                agregarDia(d);
+            }
+            return;
+        }
+
+        // día buscado primero
+        agregarDia(diaBuscado);
+
+        // anteriores (arriba)
+        for (int i = indice - 1; i >= 0; i--) {
+            agregarDiaArriba(semana.get(i));
+        }
+
+        // posteriores (abajo)
+        for (int i = indice + 1; i < semana.size(); i++) {
+            agregarDia(semana.get(i));
+        }
     }
 
-    // día buscado primero
-    agregarDia(diaBuscado);
-
-    // anteriores (arriba)
-    for (int i = indice - 1; i >= 0; i--) {
-        agregarDiaArriba(semana.get(i));
+    private void agregarDiaArriba(LocalDate fecha) {
+        VBox bloque = crearBloqueDia(fecha);
+        contenido.getChildren().add(0, bloque);
     }
 
-    // posteriores (abajo)
-    for (int i = indice + 1; i < semana.size(); i++) {
-        agregarDia(semana.get(i));
+    private VBox crearBloqueDia(LocalDate fecha) {
+
+        Label tituloDia = new Label(
+                fecha.getDayOfWeek() + " "
+                + fecha.getDayOfMonth() + "/"
+                + fecha.getMonthValue() + "/"
+                + fecha.getYear()
+        );
+        tituloDia.getStyleClass().add("title-md");
+
+        ObservableList<Ventas.Fila> filas = FXCollections.observableArrayList();
+        List<Map<String, Object>> ventas = backend.cargarVentasDelDia(fecha);
+
+        for (Map<String, Object> dto : ventas) {
+            Ventas.Fila f = new Ventas.Fila();
+            f.setNombre((String) dto.getOrDefault("nombre", ""));
+            f.setDescripcion((String) dto.getOrDefault("descripcion", ""));
+            f.setMonto(safeBD(dto.get("monto"))); // ✅ usar safeBD
+            f.setEstado(safeTipo(dto.get("estado")));
+            f.setObservaciones((String) dto.getOrDefault("observaciones", ""));
+            filas.add(f);
+        }
+
+        Tabla tabla = new Tabla(
+                filas,
+                LOCALE_AR,
+                null,
+                null
+        );
+
+        return new VBox(6, tituloDia, tabla);
     }
-}
-private void agregarDiaArriba(LocalDate fecha) {
-    VBox bloque = crearBloqueDia(fecha);
-    contenido.getChildren().add(0, bloque);
-}
-private VBox crearBloqueDia(LocalDate fecha) {
-
-    Label tituloDia = new Label(
-            fecha.getDayOfWeek() + " " +
-            fecha.getDayOfMonth() + "/" +
-            fecha.getMonthValue() + "/" +
-            fecha.getYear()
-    );
-    tituloDia.getStyleClass().add("title-md");
-
-    ObservableList<Ventas.Fila> filas = FXCollections.observableArrayList();
-    List<Map<String, Object>> ventas = backend.cargarVentasDelDia(fecha);
-
-    for (Map<String, Object> dto : ventas) {
-        Ventas.Fila f = new Ventas.Fila();
-        f.setNombre((String) dto.getOrDefault("nombre", ""));
-        f.setDescripcion((String) dto.getOrDefault("descripcion", ""));
-        f.setMonto(safeBD(dto.get("monto"))); // ✅ usar safeBD
-        f.setEstado(safeTipo(dto.get("estado")));
-        f.setObservaciones((String) dto.getOrDefault("observaciones", ""));
-        filas.add(f);
-    }
-
-    Tabla tabla = new Tabla(
-            filas,
-            LOCALE_AR,
-            null,
-            null
-    );
-
-    return new VBox(6, tituloDia, tabla);
-}
 }

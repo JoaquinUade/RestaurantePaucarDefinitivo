@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -25,58 +27,82 @@ import paucar.service.VentasBackend;
 
 public class Mensual extends BorderPane {
 
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");
-    private static final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);
+    private static final Locale LOCALE_AR = Locale.of("es", "AR");/*Locale es una clase que representa una configuración
+                                                                                     regional específica, se utiliza para formatear los
+                                                                                     números como moneda en formato argentino*/
+
+    private static final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);/*NumberFormat es una clase que se utiliza para
+                                                                                           formatear números como moneda, aqui se utiliza
+                                                                                           para formatear los valores en formato argentino*/
 
     private final VentasBackend backend;
 
     // Contenedor principal scrolleable
-    private final VBox contenido = new VBox(6);
+    private final VBox contenido = new VBox(0);/*VBox es un layout que organiza los elementos en
+                                                        una columna vertical, aqui se utiliza para
+                                                        organizar las filas del resumen mensual*/
 
     // Acumuladores del mes
-    private BigDecimal totalMes = BigDecimal.ZERO;
-    private BigDecimal debeMes = BigDecimal.ZERO;
-    private BigDecimal debitoMes = BigDecimal.ZERO;
-    private BigDecimal creditoMes = BigDecimal.ZERO;
-    private BigDecimal transferenciaMes = BigDecimal.ZERO;
-    private BigDecimal mpMes = BigDecimal.ZERO;
-    private BigDecimal efectivoMes = BigDecimal.ZERO;
+    private BigDecimal totalMes = BigDecimal.ZERO;/*inicializo la variable totalmes con el valor de cero,
+                                                  esta variable se utiliza para acumular el total de
+                                                  ventas del mes*/
+
+    private BigDecimal debeMes = BigDecimal.ZERO;/*empieza en cero */
+    private BigDecimal debitoMes = BigDecimal.ZERO;/*empieza en cero */
+    private BigDecimal creditoMes = BigDecimal.ZERO;/*empieza en cero */
+    private BigDecimal transferenciaMes = BigDecimal.ZERO;/*empieza en cero */
+    private BigDecimal mpMes = BigDecimal.ZERO;/*empieza en cero */
+    private BigDecimal efectivoMes = BigDecimal.ZERO;/*empieza en cero */
 
     public Mensual(VentasBackend backend, int anio, int mes) {
         this.backend = backend;
         setPadding(new Insets(16));
+
+        getStylesheets().add(
+                getClass().getResource("/stylemensual.css").toExternalForm()
+        );
+
         initUI();
         cargarMes(anio, mes);
     }
 
-    // =========================
-    // UI base
-    // =========================
     private void initUI() {
 
-        Label titulo = new Label("Resumen Mensual");
-        titulo.getStyleClass().add("title-xl");
+        Label titulo = new Label("Resumen Mensual");/*Label es un componente que muestra un texto,
+                                                         aqui se utiliza para mostrar el título del
+                                                         resumen mensual*/
+        titulo.getStyleClass().add("title-xl");/*agrega la clase CSS "title-xl" al título para darle
+                                                  un estilo específico*/
 
-        // barra superior con título y separador (opcional: selector de mes/año luego)
-        var sep = new Region();
-        HBox.setHgrow(sep, Priority.ALWAYS);
-        var header = new HBox(12, titulo, sep);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(0, 0, 10, 0));
+        var sep = new Region();/*Region es un componente vacío que se utiliza como separador entre el
+                               título y otros elementos en la barra superior*/
 
-        ScrollPane scroll = new ScrollPane(contenido);
-        scroll.setFitToWidth(true);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        HBox.setHgrow(sep, Priority.ALWAYS);/*el espacio vacio a lado del titulo resumen mensual estiralo
+                                            para que ocupe todo el espacio sobrante*/
 
-        setTop(header);
-        setCenter(scroll);
+        var header = new HBox(12, titulo, sep);/*ubica el titulo horizontalmente con  12 pixeles
+                                                        de distancia con otros elementos y el otro es sep
+                                                        que hace que complete el resto del espacio de la
+                                                        pantalla, y todo eso se guarda en header*/
+
+        header.setAlignment(Pos.CENTER_LEFT);/*posiciona el header a la izquierda */
+
+        ScrollPane scroll = new ScrollPane(contenido);/*crea una barra de desplazamiento para el contenido
+                                                      del resumen mensual*/
+        scroll.setFitToWidth(true);/*Hace que el contenido del ScrollPane se estire y ocupe todo el
+                                         ancho de la pantalla*/
+
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);/*oculta la barra de desplazamiento
+                                                               horizontal*/
+
+        setTop(header);/*coloca el header en la parte superior del BorderPane, que es el contenedor
+                       principal de la interfaz*/
+
+        setCenter(scroll);/*coloca el scroll en la parte central del BorderPane*/
     }
 
-    // =========================
-    // Carga del mes (pide a backend día x día y arma filas)
-    // =========================
     private void cargarMes(int anio, int mes) {
-        contenido.getChildren().clear();
+        //contenido.getChildren().clear();/*Borra todo lo que hay dentro de contenido para iniciar vacio */
 
         // Resetear acumuladores mensuales
         totalMes = BigDecimal.ZERO;
@@ -88,44 +114,49 @@ public class Mensual extends BorderPane {
         efectivoMes = BigDecimal.ZERO;
 
         // Encabezado tipo Excel
-        contenido.getChildren().add(crearEncabezado());
+        contenido.getChildren().add(crearEncabezado());/*añade la fila de titulos de cada columna al
+                                                       contenido*/
 
-        LocalDate fecha = LocalDate.of(anio, mes, 1);
+        LocalDate fecha = LocalDate.of(anio, mes, 1);/*Crea una variable fecha que guarda el
+                                                                 primer día del mes seleccionado, y se usa
+                                                                como punto de partida para recorrer todos
+                                                                los días hábiles de ese mes*/
 
-        while (fecha.getMonthValue() == mes) {
+        while (fecha.getMonthValue() == mes) {/*mientras el mes de la variable fecha sea igual al mes
+                                              seleccionado, se ejecuta el while*/
             // saltear fines de semana
             if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY
-                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {/*si el día de la semana de la variable
+                                                                  fecha no es sábado ni domingo, entonces
+                                                                  se llama al método agregarDia para
+                                                                  agregar una fila al resumen mensual*/
                 agregarDia(fecha);
             }
-            fecha = fecha.plusDays(1);
+            fecha = fecha.plusDays(1);/*avanza al siguiente día*/
         }
-
-        // Fila TOTAL MES
-        contenido.getChildren().add(crearFilaTotalMes());
+        contenido.getChildren().add(crearFilaTotalMes());/*agrega la fila con los totales del mes*/
     }
 
-    // =========================
-    // Encabezado (nombres de columnas)
-    // =========================
     private GridPane crearEncabezado() {
-        GridPane grid = baseGrid();
-        // Columnas: Fecha + 7 montos
-        int c = 0;
-        grid.add(celdaHeader("Fecha"), c++, 0);
-        grid.add(celdaHeader("V. Total"), c++, 0);
-        grid.add(celdaHeader("Debe"), c++, 0);
-        grid.add(celdaHeader("Débito"), c++, 0);
-        grid.add(celdaHeader("Crédito"), c++, 0);
-        grid.add(celdaHeader("Transferencia"), c++, 0);
-        grid.add(celdaHeader("MERCADO_PAGO"), c++, 0);
-        grid.add(celdaHeader("Efectivo"), c, 0);
-        return grid;
+        GridPane grid = baseGrid();/*Creá una grilla con la configuración base y guardala en la variable
+                                   grid */
+        int columna = 0;/*inicializa la variable c en cero, esta variable se utiliza para llevar el conteo
+                        de las columnas*/
+
+        grid.add(celdaHeader("Fecha"), columna++, 0);/*Agrega una celda con el texto “Fecha”
+                                                                   en la columna actual del GridPane y luego
+                                                                    avanza a la siguiente columna */
+
+        grid.add(celdaHeader("V. Total"), columna++, 0);/*lo mismo con las demás columnas */
+        grid.add(celdaHeader("Debe"), columna++, 0);
+        grid.add(celdaHeader("Débito"), columna++, 0);
+        grid.add(celdaHeader("Crédito"), columna++, 0);
+        grid.add(celdaHeader("Transferencia"), columna++, 0);
+        grid.add(celdaHeader("MERCADO_PAGO"), columna++, 0);
+        grid.add(celdaHeader("Efectivo"), columna, 0);
+        return grid;/*retorna la grid */
     }
 
-    // =========================
-    // Agregar una fila de día (cálculo real + render)
-    // =========================
     private void agregarDia(LocalDate fecha) {
         // 1) Traer ventas del día (List<Map<String,Object>>) desde VentasBackend
         List<Map<String, Object>> ventasDelDia = backend.cargarVentasDelDia(fecha);
@@ -197,12 +228,13 @@ public class Mensual extends BorderPane {
     // =========================
     private GridPane crearFilaTotalMes() {
         GridPane fila = baseGrid();
-        fila.setStyle("-fx-background-color: #fff2cc; -fx-font-weight: bold;"); // amarillo suave
+        fila.getStyleClass().add("fila-total");
 
         int c = 0;
         Label lbl = new Label("TOTAL MES");
-        lbl.setPadding(new Insets(4, 8, 4, 8));
+        lbl.getStyleClass().add("celda");
         fila.add(lbl, c++, 0);
+
         fila.add(celdaMonto(totalMes), c++, 0);
         fila.add(celdaMontoRoja(debeMes), c++, 0);
         fila.add(celdaMonto(debitoMes), c++, 0);
@@ -214,45 +246,62 @@ public class Mensual extends BorderPane {
         return fila;
     }
 
+    private void configurarColumnas(GridPane grid) {
+        grid.getColumnConstraints().clear();
+
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // Fecha
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // V. Total
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // Debe
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // Débito
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // Crédito
+        grid.getColumnConstraints().add(new ColumnConstraints(100)); // Transferencia
+        grid.getColumnConstraints().add(new ColumnConstraints(130)); // Mercado Pago
+        grid.getColumnConstraints().add(new ColumnConstraints(100));  // Efectivo
+    }
+
     // =========================
     // Helpers visuales
     // =========================
     private GridPane baseGrid() {
         GridPane grid = new GridPane();
-        grid.setHgap(6);
-        grid.setVgap(2);
-        grid.setPadding(new Insets(2));
-        // 8 columnas: fijamos anchos mínimos para aspecto tabla
-        // (opcional: ajustar a gusto o mover a CSS)
+        grid.getStyleClass().add("tabla-grid");
+
+        grid.setHgap(0);
+        grid.setVgap(0);
+
+        configurarColumnas(grid);
         return grid;
     }
 
     private Label celdaHeader(String text) {
         Label l = new Label(text);
-        l.setStyle("-fx-font-weight: bold; -fx-background-color: #e6e6e6; -fx-padding: 6 8;");
+        l.getStyleClass().add("header-celda");
+        l.setMaxWidth(Double.MAX_VALUE);
+        l.setAlignment(Pos.CENTER);
         return l;
     }
 
     private Label celdaFecha(LocalDate f) {
-        String s = String.format("%02d-%s",
-                f.getDayOfMonth(),
-                f.getMonth().name().substring(0, 3).toLowerCase(LOCALE_AR));
+
+        String mes = f.getMonth()
+                .getDisplayName(TextStyle.SHORT, LOCALE_AR);
+        String s = String.format("%02d-%s", f.getDayOfMonth(), mes);
+
         Label l = new Label(s);
-        l.setStyle("-fx-padding: 6 8; -fx-font-weight: bold; -fx-background-color: #f5f5f5;");
+        l.getStyleClass().addAll("celda", "celda-fecha");
         return l;
+
     }
 
     private Label celdaMonto(BigDecimal v) {
         Label l = new Label(format(v));
-        l.setStyle("-fx-padding: 6 8; -fx-background-color: white;");
-        l.setAlignment(Pos.CENTER_RIGHT);
+        l.getStyleClass().addAll("celda", "celda-monto");
         return l;
     }
 
     private Label celdaMontoRoja(BigDecimal v) {
         Label l = new Label(format(v));
-        l.setStyle("-fx-padding: 6 8; -fx-background-color: #fde2e1; -fx-text-fill: #9b2226; -fx-font-weight: bold;");
-        l.setAlignment(Pos.CENTER_RIGHT);
+        l.getStyleClass().addAll("celda", "celda-monto", "celda-debe");
         return l;
     }
 

@@ -1,0 +1,97 @@
+/* =========================
+   CONTENEDOR GENERAL
+   ========================= */
+
+.root {
+    -fx-background-color: #f4f4f4;
+}
+
+/* El VBox que contiene todas las filas */
+.vbox {
+    -fx-spacing: 0;
+}
+
+/* =========================
+   GRID (tabla)
+   ========================= */
+
+.tabla-grid {
+    -fx-hgap: 0;
+    -fx-vgap: 0;
+}
+
+/* =========================
+   HEADER (copiado de TableView)
+   ========================= */
+
+.header-celda {
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 6 10;
+
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #fdfdfd,
+            #e6e6e6
+        );
+
+    -fx-border-color: #bdbdbd;
+    -fx-border-width: 1 1 1 1;
+}
+
+/* =========================
+   CELDAS NORMALES
+   ========================= */
+
+.celda {
+    -fx-padding: 6 10;
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 0 1 1 1;
+}
+
+/* =========================
+   TEXTO
+   ========================= */
+
+.celda-fecha {
+    -fx-font-weight: bold;
+    -fx-alignment: center-left;
+}
+
+.celda-monto {
+    -fx-alignment: center-right;
+}
+
+/* =========================
+   DEBE (igual sobriedad TableView)
+   ========================= */
+
+.celda-debe {
+    -fx-text-fill: #a00000;
+    -fx-font-weight: bold;
+}
+
+/* =========================
+   FILAS ALTERNADAS (ZEBRA)
+   ========================= */
+
+/* Filas pares */
+.fila-par .celda {
+    -fx-background-color: white;
+}
+
+/* Filas impares */
+.fila-impar .celda {
+    -fx-background-color: #f7f7f7;
+}
+
+/* =========================
+   TOTAL MES
+   ========================= */
+
+.fila-total .celda {
+    -fx-background-color: #fff2cc;
+    -fx-font-weight: bold;
+}
