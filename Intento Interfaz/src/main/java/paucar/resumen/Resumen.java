@@ -14,9 +14,7 @@ import paucar.service.VentasBackend;
 
 public class Resumen extends BorderPane {
 
-    private final VentasBackend backend;/*VentanasBackend es una clase que se encarga de comunicarse con el backend para obtener los datos de las ventas, 
-                                        esta clase se utiliza para mostrar el resumen mensual o semanal en la pestaña Resumen*/
-
+    private final VentasBackend backend;
     // filtros
     private final ComboBox<String> ResumenTipo = new ComboBox<>();/*ComboBox es un componente para seleccionar
                                                                    una opción de una lista desplegable, aqui se
@@ -91,10 +89,9 @@ public class Resumen extends BorderPane {
             );
         } else {/* si el tipo de resumen es semanal */
 
-            Semanal semanal = new Semanal(backend, fecha);/*crea una instancia de la clase Semanal con
-                                                          los parámetros correspondientes*/
-            contenedorResultado.setCenter(semanal);/*establece el contenedorResultado como el centro del
-                                                   BorderPane */
+            Semanal semanal = new Semanal(backend);
+            semanal.mostrarSemana(fecha);
+            contenedorResultado.setCenter(semanal);
         }
     }
 

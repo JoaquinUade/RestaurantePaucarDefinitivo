@@ -28,13 +28,12 @@ public class Semanal extends BorderPane {
     private final VentasBackend backend;
     private final VBox contenido = new VBox(8);
 
-    public Semanal(VentasBackend backend, LocalDate fechaBase) {
-        this.backend = backend;
+    public Semanal(VentasBackend backend) {
+    this.backend = backend;
 
-        setPadding(new Insets(16));
-        initUI();
-        cargarSemanaDesde(fechaBase);
-    }
+    setPadding(new Insets(16));
+    initUI();
+}
 
     private void initUI() {
         Label titulo = new Label("Resumen Semanal");
@@ -74,7 +73,9 @@ public class Semanal extends BorderPane {
         }
         return TipoDePago.DEBE;
     }
-
+public void mostrarSemana(LocalDate fechaBase) {
+    cargarSemanaDesde(fechaBase);
+}
     public void cargarSemanaDesde(LocalDate diaBuscado) {
 
         contenido.getChildren().clear();
