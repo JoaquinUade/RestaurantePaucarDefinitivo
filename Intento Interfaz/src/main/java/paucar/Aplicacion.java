@@ -43,6 +43,9 @@ public class Aplicacion extends Application {
         // Cargar CSS (asegurate que app.css esté en resources)
         scene.getStylesheets().add(
                 getClass().getResource("/app.css").toExternalForm());
+        scene.getStylesheets().add(
+                getClass().getResource("/stylemensual.css").toExternalForm()
+        );
         // =====================
         // BARRA LATERAL IZQUIERDA
         // =====================
