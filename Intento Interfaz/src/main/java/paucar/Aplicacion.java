@@ -46,6 +46,9 @@ public class Aplicacion extends Application {
         scene.getStylesheets().add(
                 getClass().getResource("/stylemensual.css").toExternalForm()
         );
+        scene.getStylesheets().add(
+                getClass().getResource("/stylesemanal.css").toExternalForm()
+        );
         // =====================
         // BARRA LATERAL IZQUIERDA
         // =====================
@@ -100,7 +103,7 @@ public class Aplicacion extends Application {
         contenido.setAlignment(Pos.TOP_CENTER);
 
         Label titulo = new Label("Bienvenido UwU");
-        titulo.getStyleClass().add("title-xl");
+        titulo.getStyleClass().add("titulo-welcome");
 
         VBox lineas = new VBox(20);
         for (int i = 0; i < 4; i++) {

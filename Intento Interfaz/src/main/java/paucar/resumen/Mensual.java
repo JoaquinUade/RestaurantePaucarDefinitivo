@@ -47,8 +47,8 @@ public class Mensual extends BorderPane {
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
         tabla.setEditable(false);
-        Label titulo = new Label("Resumen mensual");
-        titulo.getStyleClass().add("titulo-xl");/*agrega la clase CSS "title-xl" al título para aplicar estilos específicos a esa etiqueta */
+        Label titulo = new Label("Resumen Mensual");
+        titulo.getStyleClass().add("titulo-xl");/*agrega la clase CSS "titulo-xl" al título para aplicar estilos específicos a esa etiqueta */
 
         setTop(titulo);
         setCenter(tabla);

@@ -32,6 +32,8 @@ public class Tabla extends VBox {
     private final BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado;
     private final NumberFormat moneda;
 
+    private boolean soloLectura = false;
+
     public Tabla(ObservableList<Ventas.Fila> items, Locale locale, Consumer<Ventas.Fila> onEliminar,
             BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado) {
         this.moneda = NumberFormat.getCurrencyInstance(locale);
@@ -44,6 +46,9 @@ public class Tabla extends VBox {
         tabla.setEditable(true);
         tabla.setItems(items);
         tabla.getColumns().setAll(crearColumnas());
+        tabla.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
+        );
 
         btnEliminar.disableProperty()
                 .bind(Bindings.isNull(tabla.getSelectionModel().selectedItemProperty()));
@@ -132,14 +137,21 @@ public class Tabla extends VBox {
     private TableColumn<Ventas.Fila, TipoDePago> colEstado() {
         var col = new TableColumn<Ventas.Fila, TipoDePago>("Estado");
         col.setCellValueFactory(c -> c.getValue().estadoProperty());
+
         col.setCellFactory(tc -> new TableCell<>() {
+
             private final ComboBox<TipoDePago> combo = new ComboBox<>();
+            private final Label label = new Label();
 
             {
                 combo.getItems().setAll(TipoDePago.values());
-                combo.valueProperty().addListener((obs, anterior, nuevo) -> {
-                    if (getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
 
+                combo.valueProperty().addListener((obs, anterior, nuevo) -> {
+                    if (Tabla.this.soloLectura) {
+                        return;
+                    }
+
+                    if (getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
                         Ventas.Fila fila = getTableView().getItems().get(getIndex());
                         fila.setEstado(nuevo);
 
@@ -153,12 +165,22 @@ public class Tabla extends VBox {
             @Override
             protected void updateItem(TipoDePago item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : combo);
-                if (!empty) {
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                if (Tabla.this.soloLectura) {
+                    label.setText(item.name());
+                    setGraphic(label);
+                } else {
                     combo.setValue(item);
+                    setGraphic(combo);
                 }
             }
         });
+
         col.setPrefWidth(180);
         col.setSortable(false);
 
@@ -210,5 +232,13 @@ public class Tabla extends VBox {
 
     public Node asNode() {
         return this;
+    }
+
+    public void setSoloLectura(boolean soloLectura) {
+        this.soloLectura = soloLectura;
+
+        // desactiva botón eliminar también
+        btnEliminar.setVisible(!soloLectura);
+        btnEliminar.setManaged(!soloLectura);
     }
 }

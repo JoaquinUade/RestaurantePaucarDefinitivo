@@ -1,0 +1,33 @@
+.title-xl {
+     -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-fill: rgba(0, 0, 0, 0.774);
+    -fx-padding: 3 28;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+}
+.scroll-semanal {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.resumen-semanal .button {
+    -fx-visible: false;
+    -fx-managed: false;
+}
+
+/* Header (títulos) */
+.table-view.tabla-total-dorada .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #f9d976, #f4c430);
+}
+
+.table-view.tabla-total-dorada .column-header {
+    -fx-background-color: transparent;
+}
+
+/* Fila TOTAL */
+.table-view.tabla-total-dorada .table-row-cell {
+    -fx-background-color: #fff2cc;
+    -fx-font-weight: bold;
+}
+

@@ -15,18 +15,9 @@
     -shadow: dropshadow(gaussian, rgba(0,0,0,0.35), 18, 0.2, 0, 6);
 }
 
-/* ===== Base ===== */
-.root {
-    /*-fx-background-color: -color-bg;*/
-    -fx-font-family: "Segoe UI", "Inter", "Roboto", "Helvetica", Arial, sans-serif;
-    -fx-text-fill: -color-text;
-}
-
 /* ===== Menú navtab ===== */
 .menu {
     -fx-background-color: linear-gradient(to bottom, #0d1324, -color-panel);/*color de navtab*/
-    -fx-padding: 20;
-    -fx-effect: -shadow;
 }
 
 /* Botón del menú = estilo flat, moderno */
@@ -64,11 +55,11 @@
 }
 
 /* letrero de welcome */
-.title-xl {
-    -fx-font-size: 42px;
+.titulo-welcome {
+    -fx-font-size: 32px;
     -fx-font-weight: 800;
     -fx-text-fill: -color-text;
-    -fx-padding: 18 28;
+    -fx-padding: 3 28;
     -fx-background-color: rgba(255,255,255,0.05);/*color del letrero de welcome*/
     -fx-background-radius: 14px;
     -fx-border-color: -color-outline;
@@ -102,8 +93,4 @@
     -fx-opacity: 0;
     -fx-pref-width: 0;
     -fx-background-color: transparent;
-}
-
-.dialog-pane > *.content {
-    -fx-background-color: #f7f7f7 !important;
 }

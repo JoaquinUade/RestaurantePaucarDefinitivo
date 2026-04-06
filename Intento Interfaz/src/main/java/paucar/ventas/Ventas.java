@@ -220,8 +220,8 @@ public final class Ventas extends BorderPane {
                                                                                            en argentina*/
 
         var lblTitulo = new Label(dow + " " + hoy.getDayOfMonth() + "/" + hoy.getMonthValue() + "/" + hoy.getYear());/*parte visual de la fecha grande en la pantalla */
-        lblTitulo.getStyleClass().add("title-xl");/*Aplicále al Label todos los estilos definidos para
-                                                    la clase .title-xl de mi css */
+        lblTitulo.getStyleClass().add("titulo-xl");/*Aplicále al Label todos los estilos definidos para
+                                                    la clase .titulo-xl de mi css */
 
         btnAgregar.getStyleClass().add("btn-success");/*ponele los estilos de mi css llamado btn
                                                          success */
