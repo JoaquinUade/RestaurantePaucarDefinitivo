@@ -1,4 +1,4 @@
-package paucar.resumen;
+package paucar.resumen.general;
 
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
@@ -22,7 +22,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import paucar.service.VentasBackend;
 
-public class Mensual extends BorderPane {
+public class MensualGeneral extends BorderPane {
 
     private static final Locale LOCALE_AR = Locale.of("es", "AR");/*variable que guarda la configuración regional de Argentina para
                                                                                     formatear fechas y monedas de acuerdo a las convenciones locales*/
@@ -38,7 +38,7 @@ public class Mensual extends BorderPane {
 
     private final ObservableList<VentaResumenDiarioDTO> RenglonResumenDiario = FXCollections.observableArrayList();/*variable que guarda la lista observable de los datos resumidos diarios */
 
-    public Mensual(VentasBackend backend, int anio, int mes) {
+    public MensualGeneral(VentasBackend backend, int anio, int mes) {
         this.ventasBackend = backend;
 
         tabla.setItems(RenglonResumenDiario);

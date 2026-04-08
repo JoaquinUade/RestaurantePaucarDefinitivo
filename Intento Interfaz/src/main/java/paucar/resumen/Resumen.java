@@ -10,6 +10,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import paucar.resumen.empresas.MensualEmpresas;
+import paucar.resumen.empresas.SemanalEmpresas;
+import paucar.resumen.general.MensualGeneral;
+import paucar.resumen.general.SemanalGeneral;
 import paucar.service.VentasBackend;
 
 public class Resumen extends BorderPane {
@@ -30,6 +34,7 @@ public class Resumen extends BorderPane {
                                                                     en: top, bottom, left, right y center. Aqui es
                                                                     para mostrar el resumen mensual o semanal en el
                                                                     centro de la ventana*/
+    private final ComboBox<String> tipoResumen = new ComboBox<>();
 
     public Resumen(VentasBackend backend) {
         this.backend = backend;
@@ -51,6 +56,13 @@ public class Resumen extends BorderPane {
                                                                          "Semanal" a ResumenTipo*/
         ResumenTipo.setValue("Mensual");/* establece el valor por default*/
 
+        tipoResumen.getItems().addAll(
+                "General",
+                "Empresas"
+        // "Clientes" después
+        );
+        tipoResumen.setValue("General");
+
         pickerFecha.setValue(LocalDate.now());/* establece la fecha actual por default */
     }
 
@@ -64,6 +76,7 @@ public class Resumen extends BorderPane {
         HBox barraFiltros = new HBox(10,
                 ResumenTipo,
                 pickerFecha,
+                tipoResumen,
                 btnVer
         );/*crea un contenedor horizontal con los filtros*/
 
@@ -73,25 +86,38 @@ public class Resumen extends BorderPane {
         return barraFiltros;/*retorna la barra de filtros*/
     }
 
-    private void aplicarFiltros() {
+private void aplicarFiltros() {
 
-        String tipo = ResumenTipo.getValue();/* obtiene el tipo de resumen seleccionado mensual o semanal*/
-        LocalDate fecha = pickerFecha.getValue();/*obtiene la fecha seleccionada*/
+    String periodo = ResumenTipo.getValue();  // Mensual o Semanal
+    String tipo = tipoResumen.getValue();     // General o Empresas
+    LocalDate fecha = pickerFecha.getValue();
 
-        if ("Mensual".equals(tipo)) {/* si el tipo de resumen es mensual */
+    switch (periodo) {
 
-            int anio = fecha.getYear();/* obtiene el año de la fecha seleccionada */
-            int mes = fecha.getMonthValue();/* obtiene el mes de la fecha seleccionada */
+        case "Mensual" -> {
+            int anio = fecha.getYear();
+            int mes = fecha.getMonthValue();
 
-            contenedorResultado.setCenter(
-                    new Mensual(backend, anio, mes)/* crea una instancia de la clase Mensual con los
-                                                      parámetros correspondientes */
-            );
-        } else {/* si el tipo de resumen es semanal */
+            switch (tipo) {
+                case "General" -> contenedorResultado.setCenter(
+                    new MensualGeneral(backend, anio, mes)
+                );
+                case "Empresas" -> contenedorResultado.setCenter(
+                    new MensualEmpresas(backend, anio, mes)
+                );
+            }
+        }
 
-            Semanal semanal = new Semanal(backend, fecha);
-            contenedorResultado.setCenter(semanal);
+        case "Semanal" -> {
+            switch (tipo) {
+                case "General" -> contenedorResultado.setCenter(
+                    new SemanalGeneral(backend, fecha)
+                );
+                case "Empresas" -> contenedorResultado.setCenter(
+                    new SemanalEmpresas(backend, fecha)
+                );
+            }
         }
     }
-
+}
 }

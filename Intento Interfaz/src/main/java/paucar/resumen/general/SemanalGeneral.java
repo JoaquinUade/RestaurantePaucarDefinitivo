@@ -1,4 +1,4 @@
-package paucar.resumen;
+package paucar.resumen.general;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,7 +32,7 @@ import paucar.service.VentasBackend;
 import paucar.ventas.Tabla;
 import paucar.ventas.Ventas;
 
-public class Semanal extends BorderPane {
+public class SemanalGeneral extends BorderPane {
 
     private static final Locale LOCALE_AR = Locale.of("es", "AR");
 
@@ -48,7 +48,7 @@ public class Semanal extends BorderPane {
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
 
-    public Semanal(VentasBackend backend, LocalDate fechaBase) {
+    public SemanalGeneral(VentasBackend backend, LocalDate fechaBase) {
         this.backend = backend;
 
         initUI();
@@ -312,12 +312,12 @@ private LocalDate obtenerLunes(LocalDate fecha) {
     private TableColumn<VentaResumenDiarioDTO, LocalDate> colFecha() {
         TableColumn<VentaResumenDiarioDTO, LocalDate> col = new TableColumn<>("Fecha");/*Columna que muestra la fecha del día */
 
-        col.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(
-                c.getValue().getFecha()));/*Para cada fila de la tabla, obtené el objeto
-                                                  VentaResumenDiarioDTO, sacale la fecha, y usá esa fecha 
-                                                  como valor de la celda de esta columna*/
+        col.setCellValueFactory(filaDeTotales -> new javafx.beans.property.SimpleObjectProperty<>(
+                filaDeTotales.getValue().getFecha()));/*Para cada fila de la tabla, obtené el objeto
+                                                      VentaResumenDiarioDTO, sacale la fecha, y usá esa fecha 
+                                                      como valor de la celda de esta columna*/
 
-        col.setCellFactory(tc -> new TableCell<>() {/*A esta columna le defino yo cómo se crea y cómo se
+        col.setCellFactory(ColumnaDeTabla -> new TableCell<>() {/*A esta columna le defino yo cómo se crea y cómo se
                                                     ve cada celda*/
             @Override
             protected void updateItem(LocalDate fecha, boolean empty) {/*Este método se llama cada vez que
@@ -366,7 +366,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                                                  VentaResumenDiarioDTO, sacale el valor del debe, y usá
                                                  ese valor como valor de la celda de esta columna*/
 
-        col.setCellFactory(tc -> new TableCell<>() {/*A esta columna le defino yo cómo se ve cada celda*/
+        col.setCellFactory(ColumnaDeTabla -> new TableCell<>() {/*A esta columna le defino yo cómo se ve cada celda*/
             @Override
             protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
                                                                 celda necesita actualizar su contenido*/
@@ -412,7 +412,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                                                                            a esta columna desde el resumen
                                                                            del día*/
 
-        col.setCellFactory(tc -> new TableCell<>() {/*Define cómo se muestra cada celda de esta columna*/
+        col.setCellFactory(ColumnaDeTabla -> new TableCell<>() {/*Define cómo se muestra cada celda de esta columna*/
             @Override
             protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
                                                                 celda necesita actualizar su contenido*/
