@@ -1,0 +1,4 @@
+.table-view .scroll-bar:vertical {
+    -fx-opacity: 1;
+    -fx-pref-width: 14px;
+}

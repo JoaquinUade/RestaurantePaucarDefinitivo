@@ -319,5 +319,4 @@ public class Mensual extends BorderPane {
 
         footerTotal.setCenter(grid);/* agrega el GridPane al centro del pie de página de los totales */
     }
-
 }

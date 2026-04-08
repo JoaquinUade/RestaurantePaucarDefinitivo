@@ -89,8 +89,7 @@ public class Resumen extends BorderPane {
             );
         } else {/* si el tipo de resumen es semanal */
 
-            Semanal semanal = new Semanal(backend);
-            semanal.mostrarSemana(fecha);
+            Semanal semanal = new Semanal(backend, fecha);
             contenedorResultado.setCenter(semanal);
         }
     }

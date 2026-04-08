@@ -48,10 +48,13 @@ public class Semanal extends BorderPane {
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
 
-    public Semanal(VentasBackend backend) {
+    public Semanal(VentasBackend backend, LocalDate fechaBase) {
         this.backend = backend;
 
         initUI();
+
+        LocalDate lunes = obtenerLunes(fechaBase);
+        cargarSemanaDesdeLunes(lunes);
 
         tablaTotalSemanal.setItems(filaTotalSemana);
         tablaTotalSemanal.getColumns().addAll(crearColumnas());
@@ -64,7 +67,6 @@ public class Semanal extends BorderPane {
         tablaTotalSemanal.setSelectionModel(null);
         tablaTotalSemanal.getStyleClass().add("tabla-total-dorada");
         setBottom(tablaTotalSemanal);
-
     }
 
     private void initUI() {
@@ -88,7 +90,27 @@ public class Semanal extends BorderPane {
         setCenter(scroll);
 
     }
+private void cargarSemanaDesdeLunes(LocalDate lunes) {
+    contenido.getChildren().clear();/*Borrá de la pantalla todos los días que estaban mostrados antes*/
 
+    actualizarTotalSemana(lunes);/*Actualiza el total de la semana*/
+
+    for (int i = 0; i < 5; i++) {/*for que da 5 vueltas, una por cada día de la semana */
+
+        LocalDate dia = lunes.plusDays(i);/*Calcula una fecha sumando i días al lunes y la guarda en la
+                                          variable dia */
+        agregarDia(dia);/*Agrega el día a la pantalla */
+    }
+}
+private LocalDate obtenerLunes(LocalDate fecha) {
+    LocalDate lunes = fecha;/*Inicializa la variable lunes con la fecha proporcionada */
+    while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {/*Mientras que el día de la semana que tenga la
+                                                      variable lunes no sea monday*/
+        lunes = lunes.minusDays(1);/*iremos retrocediendo en 1 dia la fecha obviamente con
+                                                   un maximo de 5 veces*/
+    }
+    return lunes;/*Devuelve la fecha del lunes de esa semana */
+}
     private List<TableColumn<VentaResumenDiarioDTO, ?>> crearColumnas() {/*Este método define las columnas
                                                                         de la tabla y qué información del 
                                                                         resumen diario va en cada columna*/
@@ -122,7 +144,7 @@ public class Semanal extends BorderPane {
                                             contenedor, mostrando el lunes arriba y el viernes abajo*/
     }
 
-private VBox crearBloqueDia(LocalDate fecha) {
+    private VBox crearBloqueDia(LocalDate fecha) {
         BigDecimal totalDia = BigDecimal.ZERO;/*Variable que acumula el total de ventas del día,
                                               inicializada en cero. Acumula todos los tipos de pago
                                               excepto el debe*/
@@ -153,155 +175,138 @@ private VBox crearBloqueDia(LocalDate fecha) {
                                                 descripcion empanada estado debito) guardada en ventas,
                                                 el código entra al bloque */
 
-            BigDecimal monto = safeBD(dto.get("monto"));/*Toma el monto de la venta y se asegura de
-                                                            convertirlo correctamente a un número usable
-                                                            en la tabla*/
+            BigDecimal monto = ConvertirABigDecimal(dto.get("monto"));/*Toma el monto de la venta y se asegura de
+                                                                          convertirlo correctamente a un número usable
+                                                                          en la tabla*/
 
-            TipoDePago tipo = safeTipo(dto.get("estado"));/*Toma el estado de la venta (que es el tipo de pago) y se asegura de convertirlo
-                                                            correctamente a un valor del enum TipoDePago*/
+            TipoDePago tipo = ConvertirATipoDePago(dto.get("estado"));/*Toma el estado de la venta (que es el tipo de pago) y se asegura de convertirlo
+                                                               correctamente a un valor del enum TipoDePago*/
 
             Ventas.Fila f = new Ventas.Fila();/*Crea una nueva fila vacía (f) que va a representar una
                                               venta en la tabla */
 
-            f.setNombre((String) dto.getOrDefault("nombre", ""));/*Le asigna a la fila el nombre de la venta, tomando el valor del Map con la clave "nombre" y asegurándose de que sea una cadena de texto, o dejando una cadena vacía si no existe esa clave*/
-            f.setDescripcion((String) dto.getOrDefault("descripcion", ""));
-            f.setMonto(monto);
-            f.setEstado(tipo);
-            f.setObservaciones((String) dto.getOrDefault("observaciones", ""));
+            f.setNombre((String) dto.getOrDefault("nombre", ""));/*Agarra el valor que
+                                                                                  tenga el campo nombre en
+                                                                                  esta venta y guardalo en
+                                                                                  la fila de la tabla*/
 
-            filas.add(f);
+            f.setDescripcion((String) dto.getOrDefault("descripcion", ""));/*Agarra el valor que tenga el
+                                                                                             campo descripcion en esta venta
+                                                                                             y guardalo en la fila de la tabla*/
+            f.setMonto(monto);/*Pone el monto que se calculó antes en la fila de la tabla*/
+            f.setEstado(tipo);/*Pone el estado que se calculó antes en la fila de la tabla*/
+            f.setObservaciones((String) dto.getOrDefault("observaciones", ""));/*Agarra el valor que tenga el
+                                                                                             campo observaciones en esta venta
+                                                                                             y guardalo en la fila de la tabla*/
 
-            // ✅ SUMAR SOLO SI NO ES DEBE
-            if (tipo != TipoDePago.DEBE) {
-                totalDia = totalDia.add(monto);
+            filas.add(f);/*Agrega la fila f a la lista de filas que se van a mostrar en la tabla*/
+
+            if (tipo != TipoDePago.DEBE) {/*si el tipo de pago no es "DEBE" */
+
+                totalDia = totalDia.add(monto);/*entonces sumá el monto de esta venta al total del día,
+                                               porque el "DEBE" no es plata que entra ese día, sino que
+                                               es plata que se va a cobrar después, entonces no se cuenta
+                                               en el total del día*/
             }
 
         }
 
-        Tabla tabla = new Tabla(
-                filas,
-                LOCALE_AR,
-                null,
-                null
-        );
-        tabla.setSoloLectura(true);
+        Tabla tabla = new Tabla(filas, LOCALE_AR,
+                null, null);/*Creá una tabla nueva que muestre estas ventas,
+                                                         usando formato argentino, sin acciones especiales
+                                                         ni configuraciones extra */
+        tabla.setSoloLectura(true);/*Establece que la tabla sea de solo lectura asi evitar
+                                                cualquier modificacion*/
 
-        Label lblTotalDia = new Label("Total: " + MONEDA.format(totalDia));
-        lblTotalDia.setMaxWidth(Double.MAX_VALUE);
-        lblTotalDia.setAlignment(Pos.CENTER_RIGHT);
-        lblTotalDia.getStyleClass().add("total-dia");
+        Label lblTotalDia = new Label("Total: " + MONEDA.format(totalDia));/*Creá un Label que muestre el
+                                                                           total de ventas del día,
+                                                                           formateado como moneda argentina*/
+        lblTotalDia.setMaxWidth(Double.MAX_VALUE);/*le dice al label que se expanda para utilizar todo el
+                                                  espacio disponible*/
 
-        return new VBox(6, tituloDia, tabla, lblTotalDia);
+        lblTotalDia.setAlignment(Pos.CENTER_RIGHT);/*alinea el texto del label para que se muestre alineado
+                                                   a la derecha, centrado en vertical*/
+
+        lblTotalDia.getStyleClass().add("total-dia");/*Agrega la clase CSS "total-dia" al label para
+                                                        aplicarle estilos*/
+
+        return new VBox(6, tituloDia, tabla, lblTotalDia);/*Devuelve un contenedor vertical (VBox)
+                                                                   que contiene el título del día, la
+                                                                   tabla y el label del total*/
     }
 
-    private BigDecimal safeBD(Object o) {
-        if (o instanceof BigDecimal bd) {
-            return bd.setScale(2, RoundingMode.HALF_UP);
+    private BigDecimal ConvertirABigDecimal(Object o) {
+        if (o instanceof BigDecimal bd) {/*si el parametro que se me pasa es un big decimal */
+
+            return bd.setScale(2, RoundingMode.HALF_UP);/*lo formateo para que tenga 2 decimales
+                                                                  y lo devuelvo */
         }
-        if (o instanceof Number n) {
-            return BigDecimal.valueOf(n.doubleValue()).setScale(2, RoundingMode.HALF_UP);
+        if (o instanceof Number n) {/*si el parametro que se me pasa es un número y no un big decimal */
+            return BigDecimal.valueOf(n.doubleValue()).setScale(2, RoundingMode.HALF_UP);/*lo convierto en un big decimal
+                                                                                                  con 2 decimales y lo devuelvo */
         }
-        return BigDecimal.ZERO;
+        return BigDecimal.ZERO;/*si el parametro no es ni un big decimal ni un número, devuelvo cero para
+                               evitar errores*/
     }
 
-    private TipoDePago safeTipo(Object o) {
-        if (o instanceof TipoDePago t) {
-            return t;
+    private TipoDePago ConvertirATipoDePago(Object o) {
+        if (o instanceof TipoDePago t) {/*si el parametro que se me pasa es un tipo de pago */
+            return t;/*lo retorno tal cual */
         }
-        if (o instanceof String s) {
-            try {
-                return TipoDePago.valueOf(s);
-            } catch (Exception e) {
-            }
+        if (o instanceof String s) {/*si el parametro que se me pasa es un string */
+
+            return TipoDePago.valueOf(s);/*intenta convertir el string en un valor del enum TipoDePago,
+                                             por ejemplo "DEBITO" se convierte en TipoDePago.DEBITO */
         }
-        return TipoDePago.DEBE;
-    }
-
-    public void mostrarSemana(LocalDate fechaBase) {
-        cargarSemanaDesde(fechaBase);
-    }
-
-    public void cargarSemanaDesde(LocalDate diaBuscado) {
-
-        contenido.getChildren().clear();
-
-        // buscar el lunes de la semana del día buscado
-        LocalDate lunes = diaBuscado;
-        while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {
-            lunes = lunes.minusDays(1);
-        }
-        actualizarTotalSemana(lunes);
-
-        List<LocalDate> semana = List.of(
-                lunes,
-                lunes.plusDays(1),
-                lunes.plusDays(2),
-                lunes.plusDays(3),
-                lunes.plusDays(4)
-        );
-
-        int indice = semana.indexOf(diaBuscado);
-        if (indice == -1) {
-            // si es sábado o domingo, mostramos la semana normal
-            for (LocalDate d : semana) {
-                agregarDia(d);
-            }
-            return;
-        }
-
-        // día buscado primero
-        agregarDia(diaBuscado);
-
-        // anteriores (arriba)
-        for (int i = indice - 1; i >= 0; i--) {
-            agregarDiaArriba(semana.get(i));
-        }
-
-        // posteriores (abajo)
-        for (int i = indice + 1; i < semana.size(); i++) {
-            agregarDia(semana.get(i));
-        }
-    }
-
-    private void agregarDiaArriba(LocalDate fecha) {
-        VBox bloque = crearBloqueDia(fecha);
-        contenido.getChildren().add(0, bloque);
+        return TipoDePago.DEBE;/*si el parametro no es ni un tipo de pago ni un string, devuelvo el valor
+                               por defecto */
     }
 
     private void actualizarTotalSemana(LocalDate lunes) {
 
-        VentaResumenDiarioDTO total = new VentaResumenDiarioDTO(null); // 👈 clave
+        VentaResumenDiarioDTO total = new VentaResumenDiarioDTO(null);/*crea un objeto que se va a
+                                                                            usar para acumular (sumar) los
+                                                                            totales de toda la semana */
 
-        for (int i = 0; i < 5; i++) {
-            LocalDate dia = lunes.plusDays(i);
+        for (int i = 0; i < 5; i++) {/*for que da 5 vueltas, una para cada día de la semana */
 
-            for (var v : backend.cargarVentasDelDia(dia)) {
+            LocalDate dia = lunes.plusDays(i);/*Hace que, en cada vuelta del for, el día vaya avanzando
+                                              desde el lunes hacia los siguientes días de la semana */
 
-                double monto = ((Number) v.get("monto")).doubleValue();
-                TipoDePago tipo = (TipoDePago) v.get("estado");
+            for (var ventaIndividual : backend.cargarVentasDelDia(dia)) {/*recorre una por una todas las ventas que hubo
+                                                           en un día específico */
 
-                switch (tipo) {
-                    case EFECTIVO ->
-                        total.setEfectivo(total.getEfectivo() + monto);
-                    case DEBITO ->
-                        total.setDebito(total.getDebito() + monto);
-                    case CREDITO ->
-                        total.setCredito(total.getCredito() + monto);
-                    case TRANSFERENCIA ->
-                        total.setTransferencia(total.getTransferencia() + monto);
-                    case MERCADO_PAGO ->
-                        total.setMercadoPago(total.getMercadoPago() + monto);
-                    case DEBE ->
-                        total.setDebe(total.getDebe() + monto);
+                double monto = ((Number) ventaIndividual.get("monto")).doubleValue();/*obtiene el monto de una venta y
+                                                                                         lo transforma en un número usable */
+                TipoDePago tipo = (TipoDePago) ventaIndividual.get("estado");/*obtiene el tipo de pago de una venta */
+
+                switch (tipo) {/*Según el tipo de pago de la venta, se suma el monto al total correspondiente*/
+
+                    case EFECTIVO ->/*si es efectivo */
+                        total.setEfectivo(total.getEfectivo() + monto);/*Si la venta fue en efectivo, se
+                                                                       suma al total de efectivo */
+                    case DEBITO ->/*si es débito */
+                        total.setDebito(total.getDebito() + monto);/*se suma al total de débito */
+                    case CREDITO ->/*si es crédito */
+                        total.setCredito(total.getCredito() + monto);/*se suma al total de crédito */
+                    case TRANSFERENCIA ->/*si es transferencia */
+                        total.setTransferencia(total.getTransferencia() + monto);/*se suma al total de
+                                                                                 transferencia */
+                    case MERCADO_PAGO ->/*si es Mercado Pago */
+                        total.setMercadoPago(total.getMercadoPago() + monto);/*se suma al total de Mercado
+                                                                             Pago */
+                    case DEBE ->/*si es deuda */
+                        total.setDebe(total.getDebe() + monto);/*Si aun no se ha pagado, se suma al total
+                                                               de deuda */
                 }
+                if (tipo != TipoDePago.DEBE) {/*si el tipo de pago no es debe */
 
-                if (tipo != TipoDePago.DEBE) {
-                    total.setVentaTotal(total.getVentaTotal() + monto);
+                    total.setVentaTotal(total.getVentaTotal() + monto);/*se suma al total de ventas */
                 }
             }
         }
-
-        filaTotalSemana.setAll(total);
+        filaTotalSemana.setAll(total);/*La lista que usa la tabla del total semanal ahora debe mostrar
+                                      este nuevo total calculado*/
     }
 
     private TableColumn<VentaResumenDiarioDTO, LocalDate> colFecha() {
@@ -351,60 +356,79 @@ private VBox crearBloqueDia(LocalDate fecha) {
 
     private TableColumn<VentaResumenDiarioDTO, Double> colDebe() {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>("Debe");
+        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>("Debe");/*Crea una columna nueva de la tabla,
+                                                                                         llamada “Debe”, que va a mostrar números
+                                                                                         (Double) del resumen diario */
 
-        col.setCellValueFactory(c
+        col.setCellValueFactory(filaDeTotales
                 -> new javafx.beans.property.SimpleObjectProperty<>(
-                        c.getValue().getDebe()
-                )
-        );
+                        filaDeTotales.getValue().getDebe()));/*Para cada fila de la tabla, obtené el objeto
+                                                 VentaResumenDiarioDTO, sacale el valor del debe, y usá
+                                                 ese valor como valor de la celda de esta columna*/
 
-        col.setCellFactory(tc -> new TableCell<>() {
+        col.setCellFactory(tc -> new TableCell<>() {/*A esta columna le defino yo cómo se ve cada celda*/
             @Override
-            protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                setAlignment(Pos.CENTER);
+            protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
+                                                                celda necesita actualizar su contenido*/
 
-                if (empty || v == null) {
-                    setText("");
-                    setTextFill(null); // limpia color previo
-                } else {
-                    setText(MONEDA.format(v));
-                    if (v > 0) {
-                        setTextFill(javafx.scene.paint.Color.RED);
-                    } else {
-                        setTextFill(javafx.scene.paint.Color.BLACK);
+                super.updateItem(v, empty);/*Llama al método de la clase padre para actualizar el contenido
+                                           de la celda*/
+                setAlignment(Pos.CENTER);/*Alinea el texto al centro de la celda*/
+
+                if (empty || v == null) {/*si la celda está vacía o el valor es null*/
+
+                    setText("");/*deja la celda vacia*/
+
+                    setTextFill(null);/*le quita el color, para evitar que herede el color rojo si
+                                             antes tenia deuda*/
+
+                } else {/* no esta vacia osea tiene contenido */
+                    setText(MONEDA.format(v));/*lo formatea como dinero argentino */
+
+                    if (v > 0) {/* si el valor es mayor a cero*/
+                        setTextFill(javafx.scene.paint.Color.RED);/*establece el color del texto como rojo */
+                    } else {/*sino*/
+                        setTextFill(javafx.scene.paint.Color.BLACK);/*establece el color del texto como
+                                                                    negro */
                     }
                 }
             }
         });
-
-        col.setSortable(false);
-        return col;
+        col.setSortable(false);/*desactiva la opción de ordenar la tabla*/
+        return col;/*retorna la columna configurada */
     }
 
-    private TableColumn<VentaResumenDiarioDTO, Double> colMonto(
-            String titulo,
-            Function<VentaResumenDiarioDTO, Double> getter) {
+    private TableColumn<VentaResumenDiarioDTO, Double> colMonto(String titulo,
+            Function<VentaResumenDiarioDTO, Double> ExtractorDeMonto) {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>(titulo);
+        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>(titulo);/*Crea una columna*/
 
-        col.setCellValueFactory(c
-                -> new javafx.beans.property.SimpleObjectProperty<>(
-                        getter.apply(c.getValue())
-                )
-        );
+//en otras palabras, esta línea le dice a la columna qué número del resumen diario mostrar en cada fila.
+        col.setCellValueFactory(filaDeTotales->
+              new javafx.beans.property.SimpleObjectProperty<>(/*define qué valor se muestra en esta
+                                                                columna para cada fila */
 
-        col.setCellFactory(tc -> new TableCell<>() {
+                        ExtractorDeMonto.apply(filaDeTotales.getValue())));/*Extrae el monto correspondiente
+                                                                           a esta columna desde el resumen
+                                                                           del día*/
+
+        col.setCellFactory(tc -> new TableCell<>() {/*Define cómo se muestra cada celda de esta columna*/
             @Override
-            protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                setAlignment(Pos.CENTER);
-                setText(empty || v == null ? "" : MONEDA.format(v));
+            protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
+                                                                celda necesita actualizar su contenido*/
+
+                super.updateItem(v, empty);/*Llama al método de la clase padre para actualizar el
+                                           contenido de la celda*/
+
+                setAlignment(Pos.CENTER);/*Alinea el texto al centro de la celda*/
+
+                setText(empty || v == null ? "" : MONEDA.format(v));/*establece que si la celda esta vacia
+                                                                    o es null se vea "" sino formatea el
+                                                                    numero como dinero argentino */
             }
         });
 
-        col.setSortable(false);
-        return col;
+        col.setSortable(false);/*desactiva la opción de ordenar la tabla*/
+        return col;/*retorna la columna configurada */
     }
 }
