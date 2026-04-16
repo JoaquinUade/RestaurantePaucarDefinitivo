@@ -18,18 +18,18 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import paucar.service.VentasBackend;
 
-public class SemanalTablaEmpresas {
+public class TablaSemanalDebe {
 
     private final VentasBackend backend;
     private final TableView<Map<String, Object>> tabla;
 
     private static final Locale LOCALE_AR = Locale.of("es", "AR");
-    private static final DateTimeFormatter FECHA_FORMATO =
-            DateTimeFormatter.ofPattern("d MMMM yyyy", LOCALE_AR);
-    private static final NumberFormat MONEDA =
-            NumberFormat.getCurrencyInstance(LOCALE_AR);
+    private static final DateTimeFormatter FECHA_FORMATO
+            = DateTimeFormatter.ofPattern("d MMMM yyyy", LOCALE_AR);
+    private static final NumberFormat MONEDA
+            = NumberFormat.getCurrencyInstance(LOCALE_AR);
 
-    public SemanalTablaEmpresas(VentasBackend backend) {
+    public TablaSemanalDebe(VentasBackend backend) {
         this.backend = backend;
         this.tabla = new TableView<>();
         definirColumnas();
@@ -44,8 +44,8 @@ public class SemanalTablaEmpresas {
     // =========================
     private void definirColumnas() {
 
-        TableColumn<Map<String, Object>, String> colFecha =
-                new TableColumn<>("Fecha");
+        TableColumn<Map<String, Object>, String> colFecha
+                = new TableColumn<>("Fecha");
         colFecha.setCellValueFactory(c -> {
             LocalDate fecha = (LocalDate) c.getValue().get("fecha");
             return new SimpleObjectProperty<>(
@@ -53,11 +53,11 @@ public class SemanalTablaEmpresas {
             );
         });
 
-        TableColumn<Map<String, Object>, String> colDescripcion =
-                crearColumnaTexto("Descripción", "descripcion", 13);
+        TableColumn<Map<String, Object>, String> colDescripcion
+                = crearColumnaTexto("Descripción", "descripcion", 13);
 
-        TableColumn<Map<String, Object>, String> colMonto =
-                new TableColumn<>("Monto");
+        TableColumn<Map<String, Object>, String> colMonto
+                = new TableColumn<>("Monto");
         colMonto.setCellValueFactory(c -> {
             Number m = (Number) c.getValue().get("monto");
             return new SimpleObjectProperty<>(
@@ -65,17 +65,14 @@ public class SemanalTablaEmpresas {
             );
         });
 
-        TableColumn<Map<String, Object>, String> colTipo =
-                new TableColumn<>("Tipo de pago");
-        colTipo.setCellValueFactory(c -> {
-            TipoDePago estado = (TipoDePago) c.getValue().get("estado");
-            return new SimpleObjectProperty<>(
-                    estado == null ? "" : estado.name()
-            );
-        });
+        TableColumn<Map<String, Object>, String> colTipo
+                = new TableColumn<>("Tipo de pago");
+        colTipo.setCellValueFactory(c
+                -> new SimpleObjectProperty<>("DEBE")
+        );
 
-        TableColumn<Map<String, Object>, String> colObs =
-                crearColumnaTexto("Observaciones", "observaciones", 16);
+        TableColumn<Map<String, Object>, String> colObs
+                = crearColumnaTexto("Observaciones", "observaciones", 16);
 
         colFecha.setSortable(false);
         colDescripcion.setSortable(false);
@@ -88,23 +85,23 @@ public class SemanalTablaEmpresas {
         tabla.getColumns().add(colMonto);
         tabla.getColumns().add(colTipo);
         tabla.getColumns().add(colObs);
-
+        
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
     }
 
     // =========================
-    // COLUMNA TEXTO REUTILIZABLE
+    // COLUMNA DE TEXTO REUTILIZABLE
     // =========================
     private TableColumn<Map<String, Object>, String> crearColumnaTexto(
             String titulo, String key, int padding) {
 
-        TableColumn<Map<String, Object>, String> col =
-                new TableColumn<>(titulo);
+        TableColumn<Map<String, Object>, String> col
+                = new TableColumn<>(titulo);
 
-        col.setCellValueFactory(c ->
-                new SimpleObjectProperty<>((String) c.getValue().get(key))
+        col.setCellValueFactory(c
+                -> new SimpleObjectProperty<>((String) c.getValue().get(key))
         );
 
         col.setCellFactory(tc -> new TableCell<>() {
@@ -138,34 +135,28 @@ public class SemanalTablaEmpresas {
     }
 
     // =========================
-    // CARGA SEMANAL
+    // CARGA DE DEUDAS
     // =========================
-    public double cargarSemanaEmpresa(
-            String empresa,
-            LocalDate inicio,
-            LocalDate fin) {
+    public void cargarDeudasEmpresa(String empresa, LocalDate desde) {
 
         tabla.getItems().clear();
-        double total = 0;
+        LocalDate hoy = LocalDate.now();
 
-        LocalDate cursor = inicio;
-        while (!cursor.isAfter(fin)) {
+        while (!desde.isAfter(hoy)) {
 
-            var ventas = backend.cargarVentasDelDia(cursor);
+            var ventas = backend.cargarVentasDelDia(desde);
 
             for (Map<String, Object> v : ventas) {
 
                 if (v.get("tipoCliente") == TipoCliente.EMPRESA
                         && empresa.equals(v.get("nombre"))
-                        && v.get("estado") != TipoDePago.DEBE) {
+                        && v.get("estado") == TipoDePago.DEBE) {
 
-                    v.put("fecha", cursor);
+                    v.put("fecha", desde);
                     tabla.getItems().add(v);
-                    total += ((Number) v.get("monto")).doubleValue();
                 }
             }
-            cursor = cursor.plusDays(1);
+            desde = desde.plusDays(1);
         }
-        return total;
     }
 }

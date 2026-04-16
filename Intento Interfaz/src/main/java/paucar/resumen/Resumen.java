@@ -34,6 +34,7 @@ public class Resumen extends BorderPane {
                                                                     en: top, bottom, left, right y center. Aqui es
                                                                     para mostrar el resumen mensual o semanal en el
                                                                     centro de la ventana*/
+    private SemanalEmpresas vistaSemanalEmpresas;
     private final ComboBox<String> tipoResumen = new ComboBox<>();
 
     public Resumen(VentasBackend backend) {
@@ -73,6 +74,8 @@ public class Resumen extends BorderPane {
         btnVer.setOnAction(e -> aplicarFiltros());/*cuando se hace click en el botón "Ver", se llama al método aplicarFiltros() para mostrar el resumen
                                                   correspondiente según los filtros seleccionados*/
 
+        pickerFecha.setOnAction(e -> aplicarFiltros());
+
         HBox barraFiltros = new HBox(10,
                 ResumenTipo,
                 pickerFecha,
@@ -86,38 +89,47 @@ public class Resumen extends BorderPane {
         return barraFiltros;/*retorna la barra de filtros*/
     }
 
-private void aplicarFiltros() {
+    private void aplicarFiltros() {
 
-    String periodo = ResumenTipo.getValue();  // Mensual o Semanal
-    String tipo = tipoResumen.getValue();     // General o Empresas
-    LocalDate fecha = pickerFecha.getValue();
+        String periodo = ResumenTipo.getValue();  // Mensual o Semanal
+        String tipo = tipoResumen.getValue();     // General o Empresas
+        LocalDate fecha = pickerFecha.getValue();
 
-    switch (periodo) {
+        switch (periodo) {
 
-        case "Mensual" -> {
-            int anio = fecha.getYear();
-            int mes = fecha.getMonthValue();
+            case "Mensual" -> {
+                int anio = fecha.getYear();
+                int mes = fecha.getMonthValue();
 
-            switch (tipo) {
-                case "General" -> contenedorResultado.setCenter(
-                    new MensualGeneral(backend, anio, mes)
-                );
-                case "Empresas" -> contenedorResultado.setCenter(
-                    new MensualEmpresas(backend, anio, mes)
-                );
+                switch (tipo) {
+                    case "General" ->
+                        contenedorResultado.setCenter(
+                                new MensualGeneral(backend, anio, mes)
+                        );
+                    case "Empresas" ->
+                        contenedorResultado.setCenter(
+                                new MensualEmpresas(backend, anio, mes)
+                        );
+                }
             }
-        }
 
-        case "Semanal" -> {
-            switch (tipo) {
-                case "General" -> contenedorResultado.setCenter(
-                    new SemanalGeneral(backend, fecha)
-                );
-                case "Empresas" -> contenedorResultado.setCenter(
-                    new SemanalEmpresas(backend, fecha)
-                );
+            case "Semanal" -> {
+                switch (tipo) {
+                    case "General" ->
+                        contenedorResultado.setCenter(
+                                new SemanalGeneral(backend, fecha)
+                        );
+                    case "Empresas" -> {
+                        if (vistaSemanalEmpresas == null) {
+                            vistaSemanalEmpresas = new SemanalEmpresas(backend, fecha);
+                        } else {
+                            vistaSemanalEmpresas.actualizarFecha(fecha);
+                        }
+                        contenedorResultado.setCenter(vistaSemanalEmpresas);
+                    }
+
+                }
             }
         }
     }
-}
 }

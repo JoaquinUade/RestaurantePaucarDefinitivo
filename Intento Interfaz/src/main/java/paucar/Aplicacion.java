@@ -25,6 +25,7 @@ import paucar.ventas.Ventas;
 public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
+    private Resumen vistaResumen;
     private static final String API_BASE = "http://localhost:4002/api";
     private VentasBackend backend;
 
@@ -132,6 +133,7 @@ public class Aplicacion extends Application {
         root.setLeft(menuScroll);
         root.setCenter(contenido);
         vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya escrita en ventas
+        vistaResumen = new Resumen(backend);
 
         stage.setTitle("Interfaz");
         stage.setScene(scene);
@@ -140,9 +142,9 @@ public class Aplicacion extends Application {
 
         // ===== Demo: al hacer clic cambiamos el “activo” =====
         btnResumen.setOnAction(e -> {
-            marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula);
-            root.setCenter(new Resumen(backend));
-        });
+    marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula);
+    root.setCenter(vistaResumen);
+});
 
         btnGastos.setOnAction(e -> marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula));
         btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula));

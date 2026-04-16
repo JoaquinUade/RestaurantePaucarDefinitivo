@@ -30,4 +30,12 @@
     -fx-background-color: #fff2cc;
     -fx-font-weight: bold;
 }
+.lbl-total {
+    -fx-font-weight: bold;
+}
+.lbl-debe{
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
 
