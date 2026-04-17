@@ -17,8 +17,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import paucar.admin.Admin;
 import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
+import paucar.service.AdminService;
 import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
 
@@ -26,6 +28,7 @@ public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
     private Resumen vistaResumen;
+    private Admin vistaAdmin;
     private static final String API_BASE = "http://localhost:4002/api";
     private VentasBackend backend;
 
@@ -84,11 +87,12 @@ public class Aplicacion extends Application {
         Button btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png");
         Button btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
         Button btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
+        Button btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
 
         // Marcar “activo” (estado visual)
         btnVentas.getStyleClass().add("active");
 
-        Button[] botones = new Button[]{btnVentas, btnResumen, btnGastos, btnStock, btnCalcula};
+        Button[] botones = new Button[]{btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin};
         for (Button b : botones) {
             b.setMaxWidth(Double.MAX_VALUE);
         }/*Esto hace que los botones tomen la medida de la navtab izquierda */
@@ -98,7 +102,8 @@ public class Aplicacion extends Application {
                 btnResumen,
                 btnGastos,
                 btnStock,
-                btnCalcula
+                btnCalcula,
+                btnAdmin
         );
 
         // ===== Contenido central =====
@@ -135,6 +140,10 @@ public class Aplicacion extends Application {
         vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya escrita en ventas
         vistaResumen = new Resumen(backend);
 
+        AdminService adminService = new AdminService(API_BASE);
+
+        vistaAdmin = new Admin(adminService);
+
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -142,15 +151,20 @@ public class Aplicacion extends Application {
 
         // ===== Demo: al hacer clic cambiamos el “activo” =====
         btnResumen.setOnAction(e -> {
-    marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula);
-    root.setCenter(vistaResumen);
-});
+            marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula, btnAdmin);
+            root.setCenter(vistaResumen);
+        });
 
-        btnGastos.setOnAction(e -> marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula));
-        btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula));
-        btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock));
+        btnGastos.setOnAction(e -> marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin));
+        btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin));
+        btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
+
+        btnAdmin.setOnAction(e -> {
+            marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
+            root.setCenter(vistaAdmin);
+        });
         btnVentas.setOnAction(e -> {
-            marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
+            marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);
             root.setCenter(vistaVentas);      // reutilizamos la misma instancia
             vistaVentas.recargarDelBackend(); // refrescamos por si hubo cambios
         });

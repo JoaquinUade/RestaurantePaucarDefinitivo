@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uade.tpo.demo.entity.Producto;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 public class ProductosService {
