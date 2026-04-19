@@ -19,8 +19,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import paucar.admin.Admin;
 import paucar.resumen.Resumen;
-import paucar.service.ClientesService;
 import paucar.service.AdminService;
+import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
 
@@ -28,7 +28,6 @@ public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
     private Resumen vistaResumen;
-    private Admin vistaAdmin;
     private static final String API_BASE = "http://localhost:4002/api";
     private VentasBackend backend;
 
@@ -48,19 +47,16 @@ public class Aplicacion extends Application {
         scene.getStylesheets().add(
                 getClass().getResource("/app.css").toExternalForm());
         scene.getStylesheets().add(
-                getClass().getResource("/stylemensual.css").toExternalForm()
-        );
+                getClass().getResource("/stylemensual.css").toExternalForm());
         scene.getStylesheets().add(
-                getClass().getResource("/stylesemanal.css").toExternalForm()
-        );
+                getClass().getResource("/stylesemanal.css").toExternalForm());
         scene.getStylesheets().add(
-                getClass().getResource("/styletabla.css").toExternalForm()
-        );
+                getClass().getResource("/styletabla.css").toExternalForm());
         // =====================
         // BARRA LATERAL IZQUIERDA
         // =====================
 
-// ===== Menú lateral =====
+        // ===== Menú lateral =====
         VBox menu = new VBox(12);
         menu.getStyleClass().add("menu"); // estilo del panel izquierdo
         menu.setPadding(new Insets(20));
@@ -69,17 +65,17 @@ public class Aplicacion extends Application {
         // ===== Logo decorativo como primer "ítem" del menú =====
         Image logoImg = new Image(getClass().getResourceAsStream("/img/logo paucar.png"));
         ImageView logoView = new ImageView(logoImg);
-        logoView.setFitWidth(110);            // ajustá a gusto
+        logoView.setFitWidth(110); // ajustá a gusto
         logoView.setPreserveRatio(true);
         logoView.setSmooth(true);
         logoView.setCache(true);
-        logoView.setMouseTransparent(true);  // no capta clics, es decorativo
+        logoView.setMouseTransparent(true); // no capta clics, es decorativo
 
         StackPane logoItem = new StackPane(logoView);
         logoItem.getStyleClass().add("menu-logo"); // clase CSS para espaciar/centrar
         StackPane.setAlignment(logoView, Pos.CENTER);
 
-// Insertar el logo antes que los botones
+        // Insertar el logo antes que los botones
         menu.getChildren().add(logoItem);
 
         Button btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png");
@@ -92,10 +88,10 @@ public class Aplicacion extends Application {
         // Marcar “activo” (estado visual)
         btnVentas.getStyleClass().add("active");
 
-        Button[] botones = new Button[]{btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin};
+        Button[] botones = new Button[] { btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin };
         for (Button b : botones) {
             b.setMaxWidth(Double.MAX_VALUE);
-        }/*Esto hace que los botones tomen la medida de la navtab izquierda */
+        } /* Esto hace que los botones tomen la medida de la navtab izquierda */
 
         menu.getChildren().addAll(
                 btnVentas,
@@ -103,8 +99,7 @@ public class Aplicacion extends Application {
                 btnGastos,
                 btnStock,
                 btnCalcula,
-                btnAdmin
-        );
+                btnAdmin);
 
         // ===== Contenido central =====
         VBox contenido = new VBox(30);
@@ -118,9 +113,9 @@ public class Aplicacion extends Application {
         for (int i = 0; i < 4; i++) {
             Region linea = new Region();
             linea.getStyleClass().add("line");
-            linea.setPrefHeight(50);//grosor de linea
-            linea.setMaxWidth(600);//ancho maximo de la linea
-            //lineas.getChildren().add(linea);
+            linea.setPrefHeight(50);// grosor de linea
+            linea.setMaxWidth(600);// ancho maximo de la linea
+            // lineas.getChildren().add(linea);
         }
 
         contenido.getChildren().addAll(titulo, lineas);
@@ -128,21 +123,20 @@ public class Aplicacion extends Application {
         // Armado final (con scroll en la navtab)
         ScrollPane menuScroll = new ScrollPane(menu);
         menuScroll.setFitToWidth(true); // el VBox ocupa el ancho del scroll
-        menuScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);   // sin barra horizontal
+        menuScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // sin barra horizontal
         menuScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // barra vertical solo si hace falta
 
-// (opcional pero recomendado) sin borde del ScrollPane
+        // (opcional pero recomendado) sin borde del ScrollPane
         menuScroll.setPannable(true); // permite “arrastrar” con el mouse (agradable)
         menuScroll.setFocusTraversable(false); // no roba el foco al iniciar
 
         root.setLeft(menuScroll);
         root.setCenter(contenido);
-        vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya escrita en ventas
+        vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
+                                   // escrita en ventas
         vistaResumen = new Resumen(backend);
 
         AdminService adminService = new AdminService(API_BASE);
-
-        vistaAdmin = new Admin(adminService);
 
         stage.setTitle("Interfaz");
         stage.setScene(scene);
@@ -161,11 +155,11 @@ public class Aplicacion extends Application {
 
         btnAdmin.setOnAction(e -> {
             marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
-            root.setCenter(vistaAdmin);
+            root.setCenter(new Admin(adminService)); // ← NUEVA instancia cada vez
         });
         btnVentas.setOnAction(e -> {
             marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(vistaVentas);      // reutilizamos la misma instancia
+            root.setCenter(vistaVentas); // reutilizamos la misma instancia
             vistaVentas.recargarDelBackend(); // refrescamos por si hubo cambios
         });
 

@@ -1,12 +1,11 @@
 package paucar.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-
-import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uade.tpo.demo.entity.Producto;

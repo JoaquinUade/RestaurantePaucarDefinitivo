@@ -1,0 +1,35 @@
+/* Pantalla Admin */
+.root {
+    -fx-background-color: #0f172a;
+}
+
+/* Tarjeta única (PLATOS) */
+.admin-card {
+    -fx-min-width: 200;
+    -fx-min-height: 180;
+
+    -fx-background-color: #111827;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.12);
+
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+
+    -fx-alignment: CENTER;
+    -fx-graphic-text-gap: 12;
+
+    -fx-cursor: hand;
+}
+
+/* ❌ sin hover */
+.admin-card:hover {
+    -fx-background-color: #111827;
+}
+
+/* ❌ sin empuje / sin efecto raro */
+.admin-card:pressed {
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}

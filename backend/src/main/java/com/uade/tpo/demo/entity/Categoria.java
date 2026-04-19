@@ -1,5 +1,6 @@
 package com.uade.tpo.demo.entity;
 
+
 public enum Categoria {
     ENTRADA("Entrada"),
     BEBIDA("Bebida"),
@@ -13,7 +14,8 @@ public enum Categoria {
     PASTAS("Pastas"),
     ENSALADAS("Ensaladas"),
     MILANESAS("Milanesas"),
-    VINOS("Vinos");
+    VINOS("Vinos"),
+    CARNE("Carnes");
 
     private final String descripcion;
 

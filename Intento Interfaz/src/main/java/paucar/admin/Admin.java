@@ -1,237 +1,65 @@
 package paucar.admin;
 
-import com.uade.tpo.demo.entity.Producto;
-
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import paucar.service.AdminService;
 
 public class Admin extends BorderPane {
+        private final AdminService adminService;
 
-    private final TableView<Producto> tabla;
-    private final AdminService adminService;
-
-    // 🔹 Recibe el service desde Aplicacion
-    public Admin(AdminService adminService) {
-        this.adminService = adminService;
-
-        Label titulo = new Label("Administración de Productos");
-
-        tabla = new TableView<>();
-        configurarTabla();
-        cargarProductos();
-
-        Button btnCrear = new Button("Crear");
-        btnCrear.setOnAction(e -> abrirDialogCrear());
-
-        Button btnEditar = new Button("Editar");
-        btnEditar.setOnAction(e -> editarProductoSeleccionado());
-
-        Button btnEliminar = new Button("Eliminar");
-        btnEliminar.setOnAction(e -> eliminarProductoSeleccionado());
-
-        HBox botones = new HBox(10, btnCrear, btnEditar, btnEliminar);
-        botones.setPadding(new Insets(10));
-
-        VBox contenedor = new VBox(20, titulo, tabla, botones);
-        contenedor.setPadding(new Insets(20));
-
-        setCenter(contenedor);
-    }
-
-    // ===== columnas =====
-    private void configurarTabla() {
-
-        TableColumn<Producto, String> colNombre
-                = new TableColumn<>("Nombre");
-
-        colNombre.setCellValueFactory(
-                p -> new ReadOnlyStringWrapper(p.getValue().getNombre())
-        );
-
-        TableColumn<Producto, String> colPrecio
-                = new TableColumn<>("Precio");
-
-        colPrecio.setCellValueFactory(
-                p -> new ReadOnlyStringWrapper(
-                        String.format("$ %s", p.getValue().getPrecio())
-                )
-        );
-
-        TableColumn<Producto, String> colCategoria
-                = new TableColumn<>("Categoría");
-
-        colCategoria.setCellValueFactory(
-                p -> new ReadOnlyStringWrapper(
-                        p.getValue().getCategoria().name()
-                )
-        );
-
-        tabla.getColumns().add(colNombre);
-        tabla.getColumns().add(colPrecio);
-        tabla.getColumns().add(colCategoria);
-
-        tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-    }
-
-    // ===== datos =====
-    private void cargarProductos() {
-        tabla.getItems().setAll(
-                adminService.obtenerProductosAdmin()
-        );
-    }
-
-    private void abrirDialogCrear() {
-
-        Dialog<Producto> dialog = new Dialog<>();
-        dialog.setTitle("Crear producto");
-
-        // Botones del dialog
-        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
-
-        // Campos del formulario
-        TextField txtNombre = new TextField();
-        txtNombre.setPromptText("Nombre");
-
-        TextField txtPrecio = new TextField();
-        txtPrecio.setPromptText("Precio");
-
-        ComboBox<String> cmbCategoria = new ComboBox<>();
-        cmbCategoria.getItems().addAll("OTROS","ENTRADA","BEBIDA", "MILANESAS", "WOKS",
-                                      "SANDWICHES", "ENSALADAS", "FAJITAS", "PASTAS", "VINOS",
-                                      "DESAYUNO", "GUARNICIONES");
-                                      
-        VBox form = new VBox(10,
-                new Label("Nombre"), txtNombre,
-                new Label("Precio"), txtPrecio,
-                new Label("Categoría"), cmbCategoria
-        );
-        form.setPadding(new Insets(10));
-
-        dialog.getDialogPane().setContent(form);
-
-        // Convertir el resultado del dialog en Producto
-        dialog.setResultConverter(btn -> {
-            if (btn == btnGuardar) {
-                Producto p = new Producto();
-                p.setNombre(txtNombre.getText());
-                p.setPrecio(Double.valueOf(txtPrecio.getText()));
-                p.setCategoria(
-                        com.uade.tpo.demo.entity.Categoria.valueOf(
-                                cmbCategoria.getValue()
-                        )
-                );
-                return p;
-            }
-            return null;
-        });
-
-        dialog.showAndWait().ifPresent(producto -> {
-            adminService.crearProducto(producto);
-            cargarProductos();
-        });
-    }
-
-    private void editarProductoSeleccionado() {
-
-        Producto seleccionado = tabla.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
-            new Alert(Alert.AlertType.WARNING,
-                    "Seleccioná un producto para editar").showAndWait();
-            return;
+        public Admin(AdminService adminService) {
+                this.adminService = adminService;
+                getStylesheets()
+                                .add(getClass().getResource("/admin.css").toExternalForm());/* Cargar CSS específico
+                                                                                                  para Admin*/
+                botones();/* Crea los botones de la interfaz de administración */
         }
 
-        abrirDialogEditar(seleccionado);
-    }
+        private void botones() {
+                GridPane grid = new GridPane();/*Crea un contenedor GridPane para organizar componentes
+                                                en forma de grilla (filas y columnas)*/
 
-    private void abrirDialogEditar(Producto producto) {
+                grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
-        Dialog<Producto> dialog = new Dialog<>();
-        dialog.setTitle("Editar producto");
+                grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
 
-        ButtonType btnGuardar = new ButtonType("Guardar",
-                ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes()
-                .addAll(btnGuardar, ButtonType.CANCEL);
+                Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
+                                                                                              platos*/
 
-        TextField txtNombre = new TextField(producto.getNombre());
+                btnPlatos.setOnAction(click -> {/* cuando se presione el boton platos */
+                        setCenter(new Platos(adminService));/* entra en la vista de platos */
+                });
 
-        TextField txtPrecio = new TextField(
-                String.valueOf(producto.getPrecio())
-        );
-
-        ComboBox<String> cmbCategoria = new ComboBox<>();
-        cmbCategoria.getItems().addAll("COMIDA", "BEBIDA", "OTROS");
-        cmbCategoria.setValue(producto.getCategoria().name());
-
-        VBox form = new VBox(10,
-                new Label("Nombre"), txtNombre,
-                new Label("Precio"), txtPrecio,
-                new Label("Categoría"), cmbCategoria
-        );
-        form.setPadding(new Insets(10));
-
-        dialog.getDialogPane().setContent(form);
-
-        dialog.setResultConverter(btn -> {
-            if (btn == btnGuardar) {
-                producto.setNombre(txtNombre.getText());
-                producto.setPrecio(Double.valueOf(txtPrecio.getText()));
-                producto.setCategoria(
-                        com.uade.tpo.demo.entity.Categoria.valueOf(
-                                cmbCategoria.getValue()
-                        )
-                );
-                return producto;
-            }
-            return null;
-        });
-
-        dialog.showAndWait().ifPresent(p -> {
-            adminService.editarProducto(p);
-            cargarProductos();
-        });
-    }
-
-    private void eliminarProductoSeleccionado() {
-
-        Producto seleccionado = tabla.getSelectionModel().getSelectedItem();
-
-        if (seleccionado == null) {
-            new Alert(Alert.AlertType.WARNING,
-                    "Seleccioná un producto para eliminar").showAndWait();
-            return;
+                grid.add(btnPlatos, 0, 0);
+                setCenter(grid);
         }
 
-        Alert confirmacion = new Alert(
-                Alert.AlertType.CONFIRMATION,
-                "¿Seguro que querés eliminar el producto \""
-                + seleccionado.getNombre() + "\"?",
-                ButtonType.YES,
-                ButtonType.NO
-        );
+        private Button crearTarjeta(String titulo, String rutaIcono) {
+                Image img = new Image(getClass().getResourceAsStream(rutaIcono));/* Carga la imagen del icono */
 
-        confirmacion.showAndWait().ifPresent(respuesta -> {
-            if (respuesta == ButtonType.YES) {
-                adminService.eliminarProducto(seleccionado.getIdProducto());
-                cargarProductos();
-            }
-        });
-    }
+                ImageView icono = new ImageView(img);/* Crea un ImageView para mostrar el icono */
+
+                icono.setFitWidth(70);/* Establece el ancho fit del icono */
+                icono.setFitHeight(70);/* Establece el alto fit del icono */
+
+                icono.setPreserveRatio(true);/* Mantiene la proporción de la imagen evitando que
+                                                    se deforme*/
+
+                Button btn = new Button(titulo);/* Crea un botón con el texto especificado */
+
+                btn.setGraphic(icono);/* Establece el icono como gráfico del botón */
+
+                btn.setContentDisplay(ContentDisplay.TOP);/* Establece la posición del contenido del botón */
+
+                btn.getStyleClass().add("admin-card");/* Agrega la clase CSS para el estilo de la
+                                                         tarjeta */
+
+                return btn;
+        }
 }
