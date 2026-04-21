@@ -1,35 +1,51 @@
 /* Pantalla Admin */
 .root {
-    -fx-background-color: #0f172a;
+    -fx-background-color: #0b1220;;
 }
 
-/* Tarjeta única (PLATOS) */
-.admin-card {
-    -fx-min-width: 200;
-    -fx-min-height: 180;
-
-    -fx-background-color: #111827;
-    -fx-background-radius: 18;
-    -fx-border-radius: 18;
-    -fx-border-color: rgba(255,255,255,0.12);
-
+.boton .admin-card {
+    -fx-background-color: #0b1220, #0b1220;
+    -fx-background-insets: 0,1;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
     -fx-text-fill: white;
     -fx-font-size: 15px;
-    -fx-font-weight: 700;
-
+    -fx-font-weight: 600;
     -fx-alignment: CENTER;
-    -fx-graphic-text-gap: 12;
-
+    -fx-padding: 12 14;
+    -fx-min-width: 200;
+    -fx-min-height: 180;
     -fx-cursor: hand;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
 }
 
-/* ❌ sin hover */
-.admin-card:hover {
-    -fx-background-color: #111827;
+
+/* ===============================
+   Hover (opcional, suave)
+   =============================== */
+.boton .admin-card:hover {
+    -fx-background-color: #0b1220, rgba(255,255,255,0.07);
+    -fx-background-insets: 0,1;
+    /* NO cambia, se mantiene */
 }
 
-/* ❌ sin empuje / sin efecto raro */
-.admin-card:pressed {
-    -fx-scale-x: 1;
-    -fx-scale-y: 1;
+/* ===============================
+   Presionado (click físico)
+   =============================== */
+.boton .admin-card:armed {
+    
+    -fx-background-color:  #0b1220,  rgba(214, 40, 40, 0.45);
+    -fx-background-insets: 0,1;
+    -fx-background-radius: 18,17;
+}
+
+/* ===============================
+   Activo (seleccionado)
+   =============================== */
+.boton .admin-card.active {
+    -fx-background-color:
+        rgba(199, 0, 43, 0.18),  #0b1220;
+    -fx-background-insets:0,1;
+    -fx-text-fill: white;
+    -fx-border-color: -color-primary;
 }

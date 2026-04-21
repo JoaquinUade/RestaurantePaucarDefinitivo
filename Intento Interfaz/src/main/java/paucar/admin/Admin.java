@@ -15,24 +15,24 @@ public class Admin extends BorderPane {
 
         public Admin(AdminService adminService) {
                 this.adminService = adminService;
-                getStylesheets()
-                                .add(getClass().getResource("/admin.css").toExternalForm());/* Cargar CSS específico
-                                                                                                  para Admin*/
+                getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
+                                                                                                   para Admin*/
                 botones();/* Crea los botones de la interfaz de administración */
         }
 
         private void botones() {
                 GridPane grid = new GridPane();/*Crea un contenedor GridPane para organizar componentes
                                                 en forma de grilla (filas y columnas)*/
-
+                grid.getStyleClass().add("boton");
                 grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
                 grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
 
                 Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
-                                                                                              platos*/
+                                                                                                platos*/
 
                 btnPlatos.setOnAction(click -> {/* cuando se presione el boton platos */
+                        marcarActivo(btnPlatos);/* Marca el botón de platos como activo (cambia su estilo) */
                         setCenter(new Platos(adminService));/* entra en la vista de platos */
                 });
 
@@ -45,11 +45,11 @@ public class Admin extends BorderPane {
 
                 ImageView icono = new ImageView(img);/* Crea un ImageView para mostrar el icono */
 
-                icono.setFitWidth(70);/* Establece el ancho fit del icono */
-                icono.setFitHeight(70);/* Establece el alto fit del icono */
+                icono.setFitWidth(90);/* Establece el ancho fit del icono */
+                icono.setFitHeight(90);/* Establece el alto fit del icono */
 
-                icono.setPreserveRatio(true);/* Mantiene la proporción de la imagen evitando que
-                                                    se deforme*/
+                icono.setPreserveRatio(true);/*Mantiene la proporción de la imagen evitando que
+                                                   se deforme*/
 
                 Button btn = new Button(titulo);/* Crea un botón con el texto especificado */
 
@@ -57,9 +57,17 @@ public class Admin extends BorderPane {
 
                 btn.setContentDisplay(ContentDisplay.TOP);/* Establece la posición del contenido del botón */
 
-                btn.getStyleClass().add("admin-card");/* Agrega la clase CSS para el estilo de la
-                                                         tarjeta */
-
+                btn.getStyleClass().add("admin-card");/*Agrega la clase CSS para el estilo de la
+                                                         tarjeta*/
                 return btn;
+        }
+
+        private void marcarActivo(Button activo, Button... otros) {
+                if (!activo.getStyleClass().contains("active")) {
+                        activo.getStyleClass().add("active");
+                }
+                for (Button b : otros) {
+                        b.getStyleClass().remove("active");
+                }
         }
 }

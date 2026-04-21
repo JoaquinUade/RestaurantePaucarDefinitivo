@@ -1,7 +1,6 @@
 package paucar.admin;
 
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +20,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -36,7 +34,7 @@ public class Platos extends BorderPane {
 
     private final AdminService adminService;
     private final List<TableView<Producto>> tablas = new ArrayList<>();
-    private SplitPane filaSeleccionada;
+    private GridPane filaSeleccionada;
     Locale localeAR = Locale.forLanguageTag("es-AR");
     private final NumberFormat formatoAR = NumberFormat.getCurrencyInstance(localeAR);
 
@@ -44,9 +42,9 @@ public class Platos extends BorderPane {
 
     public Platos(AdminService adminService) {
         this.adminService = adminService;
-
+        getStyleClass().add("platos-root");
         Label titulo = new Label("Administración de Productos");
-
+        titulo.getStyleClass().add("administracion-de-productos");
         GridPane grid = new GridPane();
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(33.33);
@@ -102,10 +100,12 @@ public class Platos extends BorderPane {
                     fila);
         }
         ScrollPane scroll = new ScrollPane(grid);
+        scroll.getStyleClass().add("platos-scroll");
         scroll.setFitToWidth(true);
         scroll.setPannable(false);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
         Button btnCrear = new Button("Crear");
         btnCrear.setOnAction(e -> abrirDialogCrear());
 
@@ -122,9 +122,24 @@ public class Platos extends BorderPane {
             }
 
             abrirDialogEditar(seleccionado);
+             refrescarTodasLasTablas();
         });
 
         Button btnEliminar = new Button("Eliminar");
+        btnEliminar.setOnAction(e -> {
+
+            Producto seleccionado = productoSeleccionado.get();
+
+            if (seleccionado == null) {
+                new Alert(
+                        Alert.AlertType.WARNING,
+                        "Seleccioná un producto para eliminar").showAndWait();
+                return;
+            }
+            Long idProducto = seleccionado.getIdProducto();
+            adminService.eliminarProducto(idProducto);
+            refrescarTodasLasTablas();
+        });
 
         HBox botones = new HBox(10, btnCrear, btnEditar, btnEliminar);
         botones.setPadding(new Insets(10));
@@ -150,9 +165,9 @@ public class Platos extends BorderPane {
                 .filter(p -> p.getCategoria() == categoria)
                 .forEach(p -> {
 
-                    SplitPane split = crearFilaProducto(p);
+                    GridPane fila = crearFilaProducto(p);
 
-                    split.setOnMouseClicked(e -> {
+                    fila.setOnMouseClicked(e -> {
 
                         if (filaSeleccionada != null) {
                             filaSeleccionada.setStyle("""
@@ -161,61 +176,74 @@ public class Platos extends BorderPane {
                                     """);
                         }
 
-                        split.setStyle("""
+                        fila.setStyle("""
                                     -fx-background-color: #cce5ff;
                                     -fx-border-color: #88bfff;
                                     -fx-border-width: 0 0 1 0;
                                 """);
 
-                        filaSeleccionada = split;
+                        filaSeleccionada = fila;
                         productoSeleccionado.set(p);
                     });
-                    listaProductos.getChildren().add(split);
+                    listaProductos.getChildren().add(fila);
                 });
 
         VBox contenedor = new VBox(8, lblTitulo, listaProductos);
         contenedor.setPadding(new Insets(10));
         contenedor.setMaxWidth(Double.MAX_VALUE);
+        contenedor.setFocusTraversable(false);
         contenedor.setStyle("""
                     -fx-background-color: white;
                     -fx-border-color: #cccccc;
                     -fx-border-radius: 6;
                     -fx-background-radius: 6;
                 """);
-
         return contenedor;
     }
 
-    private SplitPane crearFilaProducto(Producto p) {
+    private GridPane crearFilaProducto(Producto p) {
 
-        Label lblNombre = new Label(p.getNombre());/* Crea una etiqueta para el nombre del producto */
+        Label lblNombre = new Label(p.getNombre());
+        lblNombre.setWrapText(true);
+        lblNombre.setMaxWidth(Double.MAX_VALUE);
 
-        lblNombre.setWrapText(true);/*Permite que el texto del Label se muestre en varias líneas
-                                           automáticamente cuando no entra en el ancho disponible*/
+        Label lblPrecio = new Label(formatoAR.format(p.getPrecio()));
+        lblPrecio.setAlignment(Pos.CENTER_RIGHT);
 
-        Label lblPrecio = new Label(formatoAR.format(p.getPrecio()));/* Crea una etiqueta para el precio
-                                                                     del producto */
+        GridPane fila = new GridPane();
+        fila.setHgap(10);
+        fila.setPadding(new Insets(4, 2, 4, 2));
 
-        lblPrecio.setAlignment(Pos.TOP_RIGHT);/* Alinea el texto a la derecha */
+        ColumnConstraints colNombre = new ColumnConstraints();
+        colNombre.setHgrow(Priority.ALWAYS);
 
-        lblPrecio.setWrapText(true);/* Permite que el texto se muestre en varias líneas */
+        ColumnConstraints colPrecio = new ColumnConstraints();
+        colPrecio.setMinWidth(90);
+        colPrecio.setHgrow(Priority.NEVER);
 
-        lblPrecio.setMinWidth(80); /* Establece el ancho mínimo del label */
+        fila.getColumnConstraints().addAll(colNombre, colPrecio);
 
-        
-    SplitPane split = new SplitPane();
-    split.getItems().addAll(lblNombre, lblPrecio);
+        fila.add(lblNombre, 0, 0);
+        fila.add(lblPrecio, 1, 0);
 
-    split.setDividerPositions(0.75); // 75% nombre / 25% precio
-    split.setPrefWidth(Double.MAX_VALUE);
-    split.setMinHeight(35);
+        // ✅ ESTA ES LA CLAVE
+        GridPane.setHalignment(lblPrecio, javafx.geometry.HPos.RIGHT);
 
-    split.setStyle("""
-        -fx-border-color: #dddddd;
-        -fx-border-width: 0 0 1 0;
-    """);
+        fila.setStyle("""
+                    -fx-border-color: #dddddd;
+                    -fx-border-width: 0 0 1 0;
+                """);
 
-    return split;
+        fila.setOnMouseClicked(e -> {
+            productoSeleccionado.set(p);
+            fila.setStyle("""
+                        -fx-background-color: #cce5ff;
+                        -fx-border-color: #88bfff;
+                        -fx-border-width: 0 0 1 0;
+                    """);
+        });
+
+        return fila;
     }
 
     private void abrirDialogCrear() {
@@ -259,22 +287,19 @@ public class Platos extends BorderPane {
                 Producto p = new Producto();
                 p.setNombre(txtNombre.getText());
 
+                String textoPrecio = txtPrecio.getText()
+                        .replace(".", "") // elimina separadores de miles
+                        .replace(",", "."); // coma decimal → punto
+
+                double precio;
                 try {
-                    String textoPrecio = txtPrecio.getText();
-
-                    if (textoPrecio.toUpperCase().contains("E")) {
-                        new Alert(Alert.AlertType.ERROR,
-                                "Usá un número normal. Ej: 1000 o 12,50").showAndWait();
-                        return null;
-                    }
-
-                    Number n = formatoAR.parse(textoPrecio);
-                    p.setPrecio(n.doubleValue());
-
-                } catch (ParseException e) {
+                    precio = Double.parseDouble(textoPrecio);
+                } catch (NumberFormatException ex) {
                     new Alert(Alert.AlertType.ERROR, "Precio inválido").showAndWait();
                     return null;
                 }
+
+                p.setPrecio(precio);
 
                 p.setCategoria(Categoria.valueOf(cmbCategoria.getValue()));
                 return p;
@@ -302,9 +327,8 @@ public class Platos extends BorderPane {
         TextField txtNombre = new TextField(producto.getNombre());
 
         TextField txtPrecio = new TextField(
-                formatoAR.format(producto.getPrecio())
-                        .replace("$", "")
-                        .trim());
+    String.valueOf(producto.getPrecio()).replace(".", ",")
+);
         ComboBox<String> cmbCategoria = new ComboBox<>();
         cmbCategoria.getItems().addAll("OTROS", "ENTRADA", "BEBIDA", "MILANESAS", "WOKS",
                 "SANDWICHES", "ENSALADAS", "FAJITAS", "PASTAS",
@@ -323,22 +347,17 @@ public class Platos extends BorderPane {
             if (btn == btnGuardar) {
                 producto.setNombre(txtNombre.getText());
 
+                String textoPrecio = txtPrecio.getText()
+                        .replace(".", "") // elimina separadores de miles
+                        .replace(",", "."); // coma decimal → punto
+                double precio;
                 try {
-                    String textoPrecio = txtPrecio.getText();
-
-                    if (textoPrecio.toUpperCase().contains("E")) {
-                        new Alert(Alert.AlertType.ERROR,
-                                "Usá un número normal. Ej: 1000 o 12,50").showAndWait();
-                        return null;
-                    }
-
-                    Number n = formatoAR.parse(textoPrecio);
-                    producto.setPrecio(n.doubleValue());
-
-                } catch (ParseException e) {
+                    precio = Double.parseDouble(textoPrecio);
+                } catch (NumberFormatException ex) {
                     new Alert(Alert.AlertType.ERROR, "Precio inválido").showAndWait();
                     return null;
                 }
+                producto.setPrecio(precio);
 
                 producto.setCategoria(
                         com.uade.tpo.demo.entity.Categoria.valueOf(
@@ -354,11 +373,11 @@ public class Platos extends BorderPane {
     }
 
     private void refrescarTodasLasTablas() {
-        for (TableView<Producto> tabla : tablas) {/*recorre todas las tablas */
+        for (TableView<Producto> tabla : tablas) {/* recorre todas las tablas */
             tabla.refresh();/* actualiza la tabla */
             tabla.getItems().clear();/* limpia los elementos de la tabla */
         }
-        tablas.clear();/*limpia la lista de tablas */
+        tablas.clear();/* limpia la lista de tablas */
     }
 
 }

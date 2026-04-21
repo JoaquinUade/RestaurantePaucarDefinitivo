@@ -1,0 +1,11 @@
+.platos-scroll{
+    -fx-background-color: transparent;
+}
+.administracion-de-productos{
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgb(255, 255, 255);
+}
+.platos-root,.platos-scroll .viewport {
+    -fx-background-color: #a10030;
+}
