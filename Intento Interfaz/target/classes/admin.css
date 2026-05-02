@@ -15,8 +15,8 @@
     -fx-min-width: 200;
     -fx-min-height: 180;
     -fx-cursor: hand;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
 }
 
 
@@ -36,9 +36,15 @@
     
     -fx-background-color:  #0b1220,  rgba(214, 40, 40, 0.45);
     -fx-background-insets: 0,1;
-    -fx-background-radius: 18,17;
 }
-
+.boton .admin-card:pressed{
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+.boton .admin-card:focused {
+    -fx-border-color: -color-primary;
+    -fx-effect: dropshadow(gaussian, rgba(214, 40, 40, 0.45), 10, 0.3, 0, 0);
+}
 /* ===============================
    Activo (seleccionado)
    =============================== */
