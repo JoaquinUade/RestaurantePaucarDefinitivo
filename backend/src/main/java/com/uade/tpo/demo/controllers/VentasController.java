@@ -31,7 +31,7 @@ public class VentasController {
         return ResponseEntity.ok(mod);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("deuda/{id}")
     public ResponseEntity<Venta> PagarDeuda(@PathVariable Long id, @RequestBody Venta venta) {
         Venta mod = ventaService.modificarVenta(id, venta);
         return ResponseEntity.ok(mod);

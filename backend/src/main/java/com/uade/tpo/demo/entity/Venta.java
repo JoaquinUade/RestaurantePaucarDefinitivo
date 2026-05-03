@@ -14,6 +14,9 @@ public class Venta {
     @Column(name = "id_venta")
     private Long idVenta;
 
+    @Column(name = "factura", nullable = true)
+    private Double Factura;
+
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
 
