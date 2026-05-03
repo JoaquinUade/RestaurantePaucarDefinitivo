@@ -234,7 +234,7 @@ public List<VentaResumenDiarioDTO> obtenerResumenDiarioPorTipoPago(Integer mes, 
                 LocalDate fecha = entry.getKey();
                 List<Venta> ventasDelDia = entry.getValue();
 
-                // ✅ USAMOS EL DÍA DE LA BASE DE DATOS
+                // USAMOS EL DÍA DE LA BASE DE DATOS
                 String dia = ventasDelDia.get(0).getDia(); // Todas tienen el mismo día
                 
                 VentaResumenDiarioDTO resumen = new VentaResumenDiarioDTO(fecha);
@@ -250,6 +250,9 @@ public List<VentaResumenDiarioDTO> obtenerResumenDiarioPorTipoPago(Integer mes, 
                             break;
                         case DEBE:
                             resumen.setDebe(resumen.getDebe() + monto);
+                            break;
+                        case DEUDA_PAGADA:
+                            resumen.setDeudaPagada(resumen.getDeudaPagada() + monto);
                             break;
                         case EFECTIVO:
                             resumen.setEfectivo(resumen.getEfectivo() + monto);

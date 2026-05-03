@@ -12,6 +12,7 @@ public class VentaResumenDiarioDTO {
     private Double mercadoPago;
     private Double debito;
     private Double credito;
+    private double deudaPagada; // Nuevo campo para DEUDA_PAGADA
 
     // Constructores existentes...
     public VentaResumenDiarioDTO() {
@@ -45,7 +46,7 @@ public class VentaResumenDiarioDTO {
         this.fecha = fecha;
     }
 
-    // ✅ NUEVO: Getter y Setter para dia
+    
     public String getDia() {
         return dia;
     }
@@ -108,5 +109,13 @@ public class VentaResumenDiarioDTO {
 
     public void setCredito(Double credito) {
         this.credito = credito;
+    }
+
+    public double getDeudaPagada() {
+        return deudaPagada;
+    }
+
+    public void setDeudaPagada(double deudaPagada) {
+        this.deudaPagada = deudaPagada;
     }
 }
