@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "gastos")
@@ -20,8 +21,8 @@ public class Gastos {
     @Column(name = "descripcion", nullable = false)
     private String descripcion;
 
-    @Column(name = "monto", nullable = false)
-    private Double monto;
+    @Column(name = "monto", nullable = false, precision = 19, scale = 2)
+    private BigDecimal monto;
 
     @Column(name = "pagar", nullable = true)
     private Boolean pagar;
@@ -38,7 +39,7 @@ public class Gastos {
     public Gastos() {
     }
 
-    public Gastos(String nombre, String descripcion, Double monto, Boolean pagar, String observacion, LocalDateTime fecha) {
+    public Gastos(String nombre, String descripcion, BigDecimal monto, Boolean pagar, String observacion, LocalDateTime fecha) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.monto = monto;
@@ -74,11 +75,11 @@ public class Gastos {
         this.descripcion = descripcion;
     }
 
-    public Double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.math.BigDecimal;
 
 @Service
 public class VentaServiceImpl implements VentaService {
@@ -64,7 +65,7 @@ public class VentaServiceImpl implements VentaService {
         List<Integer> cantidadesUnicas = new ArrayList<>(productosMap.values());
         
         // Calcular monto total y construir descripción con los datos ya procesados
-        Double montoTotal = 0.0;
+        BigDecimal montoTotal = BigDecimal.ZERO;
         StringBuilder descripcion = new StringBuilder();
         
         for (int i = 0; i < idProductosUnicos.size(); i++) {
@@ -75,10 +76,10 @@ public class VentaServiceImpl implements VentaService {
             Producto producto = productoRepository.findById(idProducto)
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + idProducto));
             
-            Double precioProducto = producto.getPrecio();
+            BigDecimal precioProducto = producto.getPrecio();
             
             // Sumar al monto total
-            montoTotal += cantidad * precioProducto;
+            montoTotal = montoTotal.add(precioProducto.multiply(new BigDecimal(cantidad)));
             
             // Construir descripción
             if (i > 0) {
@@ -241,30 +242,30 @@ public List<VentaResumenDiarioDTO> obtenerResumenDiarioPorTipoPago(Integer mes, 
                 resumen.setDia(dia); // Asignamos el día desde la BD
 
                 for (Venta venta : ventasDelDia) {
-                    Double monto = venta.getMonto();
-                    resumen.setVentaTotal(resumen.getVentaTotal() + monto);
+                    BigDecimal monto = venta.getMonto();
+                    resumen.setVentaTotal(resumen.getVentaTotal().add(monto));
 
                     switch (venta.getEstado()) {
                         case TRANSFERENCIA:
-                            resumen.setTransferencia(resumen.getTransferencia() + monto);
+                            resumen.setTransferencia(resumen.getTransferencia().add(monto));
                             break;
                         case DEBE:
-                            resumen.setDebe(resumen.getDebe() + monto);
+                            resumen.setDebe(resumen.getDebe().add(monto));
                             break;
                         case DEUDA_PAGADA:
-                            resumen.setDeudaPagada(resumen.getDeudaPagada() + monto);
+                            resumen.setDeudaPagada(resumen.getDeudaPagada().add(monto));
                             break;
                         case EFECTIVO:
-                            resumen.setEfectivo(resumen.getEfectivo() + monto);
+                            resumen.setEfectivo(resumen.getEfectivo().add(monto));
                             break;
                         case MERCADO_PAGO:
-                            resumen.setMercadoPago(resumen.getMercadoPago() + monto);
+                            resumen.setMercadoPago(resumen.getMercadoPago().add(monto));
                             break;
                         case DEBITO:
-                            resumen.setDebito(resumen.getDebito() + monto);
+                            resumen.setDebito(resumen.getDebito().add(monto));
                             break;
                         case CREDITO:
-                            resumen.setCredito(resumen.getCredito() + monto);
+                            resumen.setCredito(resumen.getCredito().add(monto));
                             break;
                     }
                 }

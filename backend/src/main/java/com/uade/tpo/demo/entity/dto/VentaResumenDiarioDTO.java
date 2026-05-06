@@ -1,39 +1,42 @@
 package com.uade.tpo.demo.entity.dto;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 public class VentaResumenDiarioDTO {
     private LocalDate fecha;
     private String dia;  // Campo nuevo
-    private Double ventaTotal;
-    private Double transferencia;
-    private Double debe;
-    private Double efectivo;
-    private Double mercadoPago;
-    private Double debito;
-    private Double credito;
-    private double deudaPagada; // Nuevo campo para DEUDA_PAGADA
+    private BigDecimal ventaTotal;
+    private BigDecimal transferencia;
+    private BigDecimal debe;
+    private BigDecimal efectivo;
+    private BigDecimal mercadoPago;
+    private BigDecimal debito;
+    private BigDecimal credito;
+    private BigDecimal deudaPagada; // Nuevo campo para DEUDA_PAGADA
 
     // Constructores existentes...
     public VentaResumenDiarioDTO() {
-        this.ventaTotal = 0.0;
-        this.transferencia = 0.0;
-        this.debe = 0.0;
-        this.efectivo = 0.0;
-        this.mercadoPago = 0.0;
-        this.debito = 0.0;
-        this.credito = 0.0;
+        this.ventaTotal = BigDecimal.ZERO;
+        this.transferencia = BigDecimal.ZERO;
+        this.debe = BigDecimal.ZERO;
+        this.efectivo = BigDecimal.ZERO;
+        this.mercadoPago = BigDecimal.ZERO;
+        this.debito = BigDecimal.ZERO;
+        this.credito = BigDecimal.ZERO;
+        this.deudaPagada = BigDecimal.ZERO;
     }
 
     public VentaResumenDiarioDTO(LocalDate fecha) {
         this.fecha = fecha;
-        this.ventaTotal = 0.0;
-        this.transferencia = 0.0;
-        this.debe = 0.0;
-        this.efectivo = 0.0;
-        this.mercadoPago = 0.0;
-        this.debito = 0.0;
-        this.credito = 0.0;
+        this.ventaTotal = BigDecimal.ZERO;
+        this.transferencia = BigDecimal.ZERO;
+        this.debe = BigDecimal.ZERO;
+        this.efectivo = BigDecimal.ZERO;
+        this.mercadoPago = BigDecimal.ZERO;
+        this.debito = BigDecimal.ZERO;
+        this.credito = BigDecimal.ZERO;
+        this.deudaPagada = BigDecimal.ZERO;
     }
 
     // GETTERS Y SETTERS PARA TODOS LOS CAMPOS (incluyendo dia)
@@ -55,67 +58,67 @@ public class VentaResumenDiarioDTO {
         this.dia = dia;
     }
 
-    public Double getVentaTotal() {
+    public BigDecimal getVentaTotal() {
         return ventaTotal;
     }
 
-    public void setVentaTotal(Double ventaTotal) {
+    public void setVentaTotal(BigDecimal ventaTotal) {
         this.ventaTotal = ventaTotal;
     }
 
-    public Double getTransferencia() {
+    public BigDecimal getTransferencia() {
         return transferencia;
     }
 
-    public void setTransferencia(Double transferencia) {
+    public void setTransferencia(BigDecimal transferencia) {
         this.transferencia = transferencia;
     }
 
-    public Double getDebe() {
+    public BigDecimal getDebe() {
         return debe;
     }
 
-    public void setDebe(Double debe) {
+    public void setDebe(BigDecimal debe) {
         this.debe = debe;
     }
 
-    public Double getEfectivo() {
+    public BigDecimal getEfectivo() {
         return efectivo;
     }
 
-    public void setEfectivo(Double efectivo) {
+    public void setEfectivo(BigDecimal efectivo) {
         this.efectivo = efectivo;
     }
 
-    public Double getMercadoPago() {
+    public BigDecimal getMercadoPago() {
         return mercadoPago;
     }
 
-    public void setMercadoPago(Double mercadoPago) {
+    public void setMercadoPago(BigDecimal mercadoPago) {
         this.mercadoPago = mercadoPago;
     }
 
-    public Double getDebito() {
+    public BigDecimal getDebito() {
         return debito;
     }
 
-    public void setDebito(Double debito) {
+    public void setDebito(BigDecimal debito) {
         this.debito = debito;
     }
 
-    public Double getCredito() {
+    public BigDecimal getCredito() {
         return credito;
     }
 
-    public void setCredito(Double credito) {
+    public void setCredito(BigDecimal credito) {
         this.credito = credito;
     }
 
-    public double getDeudaPagada() {
+    public BigDecimal getDeudaPagada() {
         return deudaPagada;
     }
 
-    public void setDeudaPagada(double deudaPagada) {
+    public void setDeudaPagada(BigDecimal deudaPagada) {
         this.deudaPagada = deudaPagada;
     }
 }

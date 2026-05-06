@@ -1,6 +1,7 @@
 package com.uade.tpo.demo.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "productos")
@@ -14,8 +15,8 @@ public class Producto {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(name = "precio", nullable = false)
-    private Double precio;
+    @Column(name = "precio", nullable = false, precision = 19, scale = 2)
+    private BigDecimal precio;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "categoria", nullable = false)
@@ -24,12 +25,12 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String nombre, Double precio) {
+    public Producto(String nombre, BigDecimal precio) {
         this.nombre = nombre;
         this.precio = precio;
     }
 
-    public Producto(String nombre, Double precio, Categoria categoria) {
+    public Producto(String nombre, BigDecimal precio, Categoria categoria) {
         this.nombre = nombre;
         this.precio = precio;
         this.categoria = categoria;
@@ -51,11 +52,11 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public Double getPrecio() {
+    public BigDecimal getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 

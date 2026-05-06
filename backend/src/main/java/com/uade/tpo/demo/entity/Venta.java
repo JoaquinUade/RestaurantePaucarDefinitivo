@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "ventas")
@@ -14,8 +15,8 @@ public class Venta {
     @Column(name = "id_venta")
     private Long idVenta;
 
-    @Column(name = "factura", nullable = true)
-    private Double Factura;
+    @Column(name = "factura", nullable = true, precision = 19, scale = 2)
+    private BigDecimal Factura;
 
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
@@ -30,8 +31,8 @@ public class Venta {
     @Column(name = "descripcion", nullable = false)
     private String descripcion;
 
-    @Column(name = "monto", nullable = false)
-    private Double monto;
+    @Column(name = "monto", nullable = false, precision = 19, scale = 2)
+    private BigDecimal monto;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
@@ -43,7 +44,7 @@ public class Venta {
     public Venta() {
     }
 
-    public Venta(Cliente cliente, String descripcion, Double monto, TipoDePago estado, String observaciones, LocalDateTime fecha) {
+    public Venta(Cliente cliente, String descripcion, BigDecimal monto, TipoDePago estado, String observaciones, LocalDateTime fecha) {
         this.cliente = cliente;
         this.descripcion = descripcion;
         this.monto = monto;
@@ -63,6 +64,14 @@ public class Venta {
         this.idVenta = idVenta;
     }
 
+    public BigDecimal getFactura() {
+        return Factura;
+    }
+
+    public void setFactura(BigDecimal Factura) {
+        this.Factura = Factura;
+    }
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -79,11 +88,11 @@ public class Venta {
         this.descripcion = descripcion;
     }
 
-    public Double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 

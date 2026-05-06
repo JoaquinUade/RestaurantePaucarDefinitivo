@@ -3,19 +3,20 @@ package com.uade.tpo.demo.entity.dto;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.math.BigDecimal;
 
 public class VentaDTO {
     private LocalDateTime fecha;
     private String dia;  
     private String nombreCliente;
     private String descripcion;
-    private Double monto;
+    private BigDecimal monto;
 
     public VentaDTO() {
     }
 
     // Constructor actualizado
-    public VentaDTO(LocalDateTime fecha, String dia, String nombreCliente, String descripcion, Double monto) {
+    public VentaDTO(LocalDateTime fecha, String dia, String nombreCliente, String descripcion, BigDecimal monto) {
         this.fecha = fecha;
         this.dia = dia;
         this.nombreCliente = nombreCliente;
@@ -24,7 +25,7 @@ public class VentaDTO {
     }
 
     // Constructor alternativo que calcula el día automáticamente
-    public VentaDTO(LocalDateTime fecha, String nombreCliente, String descripcion, Double monto) {
+    public VentaDTO(LocalDateTime fecha, String nombreCliente, String descripcion, BigDecimal monto) {
         this.fecha = fecha;
         this.dia = fecha.getDayOfWeek()
                        .getDisplayName(TextStyle.FULL, 
@@ -68,11 +69,11 @@ public class VentaDTO {
         this.descripcion = descripcion;
     }
 
-    public Double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 }
