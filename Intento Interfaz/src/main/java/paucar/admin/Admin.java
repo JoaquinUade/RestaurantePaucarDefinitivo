@@ -63,11 +63,11 @@ public class Admin extends BorderPane {
         }
 
         private void marcarActivo(Button activo, Button... otros) {
-                if (!activo.getStyleClass().contains("active")) {
-                        activo.getStyleClass().add("active");
+                if (!activo.getStyleClass().contains("active")) {/*si no esta activo el color del boton */
+                        activo.getStyleClass().add("active");/*le activa el color */
                 }
                 for (Button b : otros) {
-                        b.getStyleClass().remove("active");
+                        b.getStyleClass().remove("active");/*desactiva los otros botones*/
                 }
         }
 }

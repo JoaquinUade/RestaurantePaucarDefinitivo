@@ -28,3 +28,15 @@
     -fx-border-color: #88bfff;
     -fx-border-width: 0 0 1 0;
 }
+
+.categoria-listaproductos {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.raya-fila {
+    -fx-border-color: #dddddd;
+    -fx-border-width: 0 0 1 0;
+}

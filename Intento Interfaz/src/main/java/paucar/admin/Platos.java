@@ -1,5 +1,6 @@
 package paucar.admin;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -209,72 +210,81 @@ public class Platos extends BorderPane {
                         if (filaSeleccionada != null) {/*si hay una fila seleccionada*/
                             filaSeleccionada.getStyleClass().remove("fila-seleccionada");
                             filaSeleccionada.getStyleClass().add("fila-deseleccionada");/*le da estilo a la 
-                                                                                    fila seleccionada */
+                                                                                          fila seleccionada */
                         }
-                        fila.getStyleClass().remove("fila-deseleccionada");
-                        fila.getStyleClass().add("fila-seleccionada");
-                        filaSeleccionada = fila;
-                        productoSeleccionado.set(p);
+                        fila.getStyleClass().remove("fila-deseleccionada");/*Se elimina el estilo de "no seleccionada" */
+                        fila.getStyleClass().add("fila-seleccionada");/*se agrega el estilo de fila seleccionada*/
+
+                        filaSeleccionada = fila;/*Guarda la fila actual como la fila seleccionada */
+
+                        productoSeleccionado.set(p);/*Guardar p como el producto que está seleccionado ahora */
                     });
-                    listaProductos.getChildren().add(fila);
+                    listaProductos.getChildren().add(fila);/*Añade la fila a listaProductos, haciéndola
+                                                           visible en pantalla*/
                 });
 
-        VBox contenedor = new VBox(8, lblTitulo, listaProductos);
-        contenedor.setPadding(new Insets(10));
-        contenedor.setMaxWidth(Double.MAX_VALUE);
-        contenedor.setFocusTraversable(false);
-        contenedor.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #cccccc;
-                    -fx-border-radius: 6;
-                    -fx-background-radius: 6;
-                """);
-        return contenedor;
+        VBox contenedor = new VBox(8, lblTitulo, listaProductos);/*crea un vbox que muestra la
+                                                                         listaproductos visible con su
+                                                                         titulo, teniendo un espaciado
+                                                                         entre ellos de 8px */
+
+        contenedor.setPadding(new Insets(10));/*añade relleno de 10px alrededor del
+                                                                 vbox*/
+        contenedor.setMaxWidth(Double.MAX_VALUE);/*Permite que el contenedor se estire al máximo ancho
+                                                  disponible */
+        contenedor.setFocusTraversable(false);/*evita que el contenedor entero pueda ser focuseable
+                                                    (se ve mal creeme) */
+        contenedor.getStyleClass().add("categoria-listaproductos");/*le da estilo a la categoria con la
+                                                                      lista de productos */
+        return contenedor;/*retorna el contenedor */
     }
 
     private GridPane crearFilaProducto(Producto p) {
 
-        Label lblNombre = new Label(p.getNombre());
-        lblNombre.setWrapText(true);
-        lblNombre.setMaxWidth(Double.MAX_VALUE);
+        Label lblNombre = new Label(p.getNombre());/*crea un texto visible con el nombre del producto */
 
-        Label lblPrecio = new Label(formatoAR.format(p.getPrecio()));
-        lblPrecio.setAlignment(Pos.CENTER_RIGHT);
+        lblNombre.setWrapText(true);/*Permite que el texto del label se divida en varias líneas */
+        lblNombre.setMaxWidth(Double.MAX_VALUE);/*hace que el lbl nombre del producto abarque el mayor
+                                                tamaño posible */
 
-        GridPane fila = new GridPane();
-        fila.setHgap(10);
+        Label lblPrecio = new Label(formatoAR.format(p.getPrecio()));/* Crea un texto (Label) con el
+                                                                     precio del producto formateado */
+        lblPrecio.setAlignment(Pos.CENTER_RIGHT);/*Alinea el texto del precio hacia la derecha y centrado
+                                                 verticalmente */
+
+        GridPane fila = new GridPane();/*crea un gridpane llamado fila */
+        fila.setHgap(0);/*define una distancia de 10px entre los elementos del gridpane */
         fila.setPadding(new Insets(4, 2, 4, 2));
 
-        ColumnConstraints colNombre = new ColumnConstraints();
-        colNombre.setHgrow(Priority.ALWAYS);
+        ColumnConstraints colNombre = new ColumnConstraints();/*Configura la columna del nombre del producto */
 
-        ColumnConstraints colPrecio = new ColumnConstraints();
-        colPrecio.setMinWidth(90);
-        colPrecio.setHgrow(Priority.NEVER);
+        colNombre.setHgrow(Priority.ALWAYS);/*hace que la columna del nombre se expanda y ocupe todo el
+                                            espacio disponible */
 
-        fila.getColumnConstraints().addAll(colNombre, colPrecio);
+        ColumnConstraints colPrecio = new ColumnConstraints();/*configura la columna del precio */
 
-        fila.add(lblNombre, 0, 0);
-        fila.add(lblPrecio, 1, 0);
+        colPrecio.setMinWidth(90);/*evita que la columna del precio se haga más chica que 90 píxeles*/
 
-        // ✅ ESTA ES LA CLAVE
-        GridPane.setHalignment(lblPrecio, javafx.geometry.HPos.RIGHT);
+        colPrecio.setHgrow(Priority.NEVER);/*La columna mantiene su tamaño fijo y no crece */
 
-        fila.setStyle("""
-                    -fx-border-color: #dddddd;
-                    -fx-border-width: 0 0 1 0;
-                """);
+        fila.getColumnConstraints().addAll(colNombre, colPrecio);/*mete en la caja fila la columna nombre
+                                                                 y columna precio */
 
-        fila.setOnMouseClicked(e -> {
-            productoSeleccionado.set(p);
-            fila.setStyle("""
-                        -fx-background-color: #cce5ff;
-                        -fx-border-color: #88bfff;
-                        -fx-border-width: 0 0 1 0;
-                    """);
+        fila.add(lblNombre, 0, 0);/*posiciona el label del nombre en la columna 0,
+                                                        fila 0 del GridPane */
+        fila.add(lblPrecio, 1, 0);/*posiciona en la columna 1 pero fila 0 al precio
+                                                        del gridpane*/
+
+        GridPane.setHalignment(lblPrecio, javafx.geometry.HPos.RIGHT);/*Ubica el label del precio alineado
+                                                                      a la derecha en la columna */
+
+        fila.getStyleClass().add("raya-fila");/*stylea la fila para que tenga una raya dividiendo los
+                                                platillos*/
+
+        fila.setOnMouseClicked(e -> {/*si el mouse hace click en una fila */
+            productoSeleccionado.set(p);/*se selecciona ese producto */
         });
-
-        return fila;
+        return fila;/*retorna fila*/
     }
 
     private void abrirDialogCrear() {
@@ -333,9 +343,9 @@ public class Platos extends BorderPane {
                                                                y las comas por puntos para convertir el texto a un
                                                                formato numérico válido */
 
-                double precio;/*declara una variable para almacenar el precio convertido a número*/
+                BigDecimal precio;/*declara una variable para almacenar el precio convertido a número*/
                 try {
-                    precio = Double.parseDouble(textoPrecio);/*intenta convertir el texto del precio a un
+                    precio = new BigDecimal(textoPrecio);/*intenta convertir el texto del precio a un
                                                              número decimal */
 
                 } catch (NumberFormatException ex) {/*si no se puede convertir el precio */
@@ -412,9 +422,9 @@ public class Platos extends BorderPane {
                         .replace(".", "")/*elimina separadores de miles */
                         .replace(",", ".");/*intercambia coma por punto para tener un
                                                                 numero valido*/
-                double precio;/*declara una variable para almacenar el precio convertido a número*/
+                BigDecimal precio;/*declara una variable para almacenar el precio convertido a número*/
                 try {
-                    precio = Double.parseDouble(textoPrecio);/*intenta convertir el texto a número */
+                    precio = new BigDecimal(textoPrecio);/*intenta convertir el texto a número */
 
                 } catch (NumberFormatException ex) {/*si no se puede convertir */
 

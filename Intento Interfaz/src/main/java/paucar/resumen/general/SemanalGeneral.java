@@ -276,32 +276,35 @@ private LocalDate obtenerLunes(LocalDate fecha) {
             for (var ventaIndividual : backend.cargarVentasDelDia(dia)) {/*recorre una por una todas las ventas que hubo
                                                            en un día específico */
 
-                double monto = ((Number) ventaIndividual.get("monto")).doubleValue();/*obtiene el monto de una venta y
+                BigDecimal monto = new BigDecimal(ventaIndividual.get("monto").toString());/*obtiene el monto de una venta y
                                                                                          lo transforma en un número usable */
+
                 TipoDePago tipo = (TipoDePago) ventaIndividual.get("estado");/*obtiene el tipo de pago de una venta */
 
                 switch (tipo) {/*Según el tipo de pago de la venta, se suma el monto al total correspondiente*/
 
                     case EFECTIVO ->/*si es efectivo */
-                        total.setEfectivo(total.getEfectivo() + monto);/*Si la venta fue en efectivo, se
+                        total.setEfectivo(total.getEfectivo().add(monto));/*Si la venta fue en efectivo, se
                                                                        suma al total de efectivo */
                     case DEBITO ->/*si es débito */
-                        total.setDebito(total.getDebito() + monto);/*se suma al total de débito */
+                        total.setDebito(total.getDebito().add(monto));/*se suma al total de débito */
                     case CREDITO ->/*si es crédito */
-                        total.setCredito(total.getCredito() + monto);/*se suma al total de crédito */
+                        total.setCredito(total.getCredito().add(monto));/*se suma al total de crédito */
                     case TRANSFERENCIA ->/*si es transferencia */
-                        total.setTransferencia(total.getTransferencia() + monto);/*se suma al total de
+                        total.setTransferencia(total.getTransferencia().add(monto));/*se suma al total de
                                                                                  transferencia */
                     case MERCADO_PAGO ->/*si es Mercado Pago */
-                        total.setMercadoPago(total.getMercadoPago() + monto);/*se suma al total de Mercado
+                        total.setMercadoPago(total.getMercadoPago().add(monto));/*se suma al total de Mercado
                                                                              Pago */
                     case DEBE ->/*si es deuda */
-                        total.setDebe(total.getDebe() + monto);/*Si aun no se ha pagado, se suma al total
+                        total.setDebe(total.getDebe().add(monto));/*Si aun no se ha pagado, se suma al total
                                                                de deuda */
+                    case DEUDA_PAGADA ->
+                        total.setDeudaPagada(total.getDeudaPagada().add(monto));
                 }
                 if (tipo != TipoDePago.DEBE) {/*si el tipo de pago no es debe */
 
-                    total.setVentaTotal(total.getVentaTotal() + monto);/*se suma al total de ventas */
+                    total.setVentaTotal(total.getVentaTotal().add(monto));/*se suma al total de ventas */
                 }
             }
         }
@@ -354,9 +357,9 @@ private LocalDate obtenerLunes(LocalDate fecha) {
         return col;/*retorna la columna configurada para mostrar la fecha en la tabla */
     }
 
-    private TableColumn<VentaResumenDiarioDTO, Double> colDebe() {
+    private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDebe() {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>("Debe");/*Crea una columna nueva de la tabla,
+        TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>("Debe");/*Crea una columna nueva de la tabla,
                                                                                          llamada “Debe”, que va a mostrar números
                                                                                          (Double) del resumen diario */
 
@@ -368,7 +371,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
         col.setCellFactory(ColumnaDeTabla -> new TableCell<>() {/*A esta columna le defino yo cómo se ve cada celda*/
             @Override
-            protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
+            protected void updateItem(BigDecimal v, boolean empty) {/*Este método se llama cada vez que una
                                                                 celda necesita actualizar su contenido*/
 
                 super.updateItem(v, empty);/*Llama al método de la clase padre para actualizar el contenido
@@ -385,7 +388,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                 } else {/* no esta vacia osea tiene contenido */
                     setText(MONEDA.format(v));/*lo formatea como dinero argentino */
 
-                    if (v > 0) {/* si el valor es mayor a cero*/
+                    if (v.compareTo(BigDecimal.ZERO) > 0) {/* si el valor es mayor a cero*/
                         setTextFill(javafx.scene.paint.Color.RED);/*establece el color del texto como rojo */
                     } else {/*sino*/
                         setTextFill(javafx.scene.paint.Color.BLACK);/*establece el color del texto como
@@ -398,10 +401,10 @@ private LocalDate obtenerLunes(LocalDate fecha) {
         return col;/*retorna la columna configurada */
     }
 
-    private TableColumn<VentaResumenDiarioDTO, Double> colMonto(String titulo,
-            Function<VentaResumenDiarioDTO, Double> ExtractorDeMonto) {
+    private TableColumn<VentaResumenDiarioDTO, BigDecimal> colMonto(String titulo,
+            Function<VentaResumenDiarioDTO, BigDecimal> ExtractorDeMonto) {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>(titulo);/*Crea una columna*/
+        TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);/*Crea una columna*/
 
 //en otras palabras, esta línea le dice a la columna qué número del resumen diario mostrar en cada fila.
         col.setCellValueFactory(filaDeTotales->
@@ -414,7 +417,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
         col.setCellFactory(ColumnaDeTabla -> new TableCell<>() {/*Define cómo se muestra cada celda de esta columna*/
             @Override
-            protected void updateItem(Double v, boolean empty) {/*Este método se llama cada vez que una
+            protected void updateItem(BigDecimal v, boolean empty) {/*Este método se llama cada vez que una
                                                                 celda necesita actualizar su contenido*/
 
                 super.updateItem(v, empty);/*Llama al método de la clase padre para actualizar el

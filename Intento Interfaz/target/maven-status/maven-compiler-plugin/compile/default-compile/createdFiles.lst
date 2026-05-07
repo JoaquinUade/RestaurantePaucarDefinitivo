@@ -25,6 +25,7 @@ paucar\service\VentasBackend$1.class
 paucar\resumen\empresas\TablaSemanal.class
 paucar\resumen\general\SemanalGeneral$2.class
 paucar\resumen\empresas\TablaSemanalDebe$1.class
+paucar\admin\Platos.class
 paucar\resumen\general\MensualGeneral.class
 paucar\service\ProductosService.class
 paucar\ventas\Ventas.class

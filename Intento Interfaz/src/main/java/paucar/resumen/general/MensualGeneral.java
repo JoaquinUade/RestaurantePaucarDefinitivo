@@ -1,5 +1,6 @@
 package paucar.resumen.general;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -80,28 +81,30 @@ public class MensualGeneral extends BorderPane {
                 var ventasDelDia = ventasBackend.cargarVentasDelDia(fecha);/*variable que guarda la lista de ventas de un día */
 
                 for (var v : ventasDelDia) {/*recorre cada venta del día */
-                    double monto = ((Number) v.get("monto")).doubleValue();/*variable que guarda el monto de la venta actual,
-                                                                            convertido a double */
+                    BigDecimal monto = new BigDecimal(v.get("monto").toString());/*variable que guarda el monto de la venta actual */
+
                     TipoDePago tipo = (TipoDePago) v.get("estado");/*variable que guarda el tipo de pago de la venta actual */
 
                     switch (tipo) {/*segun el tipo de pago */
                         case EFECTIVO ->
-                            ResumenDelDia.setEfectivo(ResumenDelDia.getEfectivo() + monto);/*si es efectivo, se acumula el monto en el campo de efectivo del resumen del día */
+                            ResumenDelDia.setEfectivo(ResumenDelDia.getEfectivo().add(monto));/*si es efectivo, se acumula el monto en el campo de efectivo del resumen del día */
                         case DEBITO ->
-                            ResumenDelDia.setDebito(ResumenDelDia.getDebito() + monto);/*si es débito, se acumula el monto en el campo de débito del resumen del día */
+                            ResumenDelDia.setDebito(ResumenDelDia.getDebito().add(monto));/*si es débito, se acumula el monto en el campo de débito del resumen del día */
                         case CREDITO ->
-                            ResumenDelDia.setCredito(ResumenDelDia.getCredito() + monto);/*si es crédito, se acumula el monto en el campo de crédito del resumen del día */
+                            ResumenDelDia.setCredito(ResumenDelDia.getCredito().add(monto));/*si es crédito, se acumula el monto en el campo de crédito del resumen del día */
                         case TRANSFERENCIA ->
-                            ResumenDelDia.setTransferencia(ResumenDelDia.getTransferencia() + monto);/*si es transferencia, se acumula el monto en el campo de transferencia
+                            ResumenDelDia.setTransferencia(ResumenDelDia.getTransferencia().add(monto));/*si es transferencia, se acumula el monto en el campo de transferencia
                                                                                                  del resumen del día */
                         case MERCADO_PAGO ->
-                            ResumenDelDia.setMercadoPago(ResumenDelDia.getMercadoPago() + monto);/*si es mercado pago, se acumula el monto en el campo de mercado pago del
+                            ResumenDelDia.setMercadoPago(ResumenDelDia.getMercadoPago().add(monto));/*si es mercado pago, se acumula el monto en el campo de mercado pago del
                                                                                              resumen del día */
                         case DEBE ->
-                            ResumenDelDia.setDebe(ResumenDelDia.getDebe() + monto);/*si es debe, se acumula el monto en el campo de debe del resumen del día */
+                            ResumenDelDia.setDebe(ResumenDelDia.getDebe().add(monto));/*si es debe, se acumula el monto en el campo de debe del resumen del día */
+                        case DEUDA_PAGADA ->
+                            ResumenDelDia.setDeudaPagada(ResumenDelDia.getDeudaPagada().add(monto));
                     }
                     if (tipo != TipoDePago.DEBE) {
-                        ResumenDelDia.setVentaTotal(ResumenDelDia.getVentaTotal() + monto);/*si no es debe, se acumula el monto en el campo de venta total del resumen
+                        ResumenDelDia.setVentaTotal(ResumenDelDia.getVentaTotal().add(monto));/*si no es debe, se acumula el monto en el campo de venta total del resumen
                                                                                        del día */
                     }
                 }
@@ -115,23 +118,23 @@ public class MensualGeneral extends BorderPane {
         VentaResumenDiarioDTO TotalMensual = new VentaResumenDiarioDTO(null);/*variable que guarda el resumen total del mes */
 
         for (VentaResumenDiarioDTO d : RenglonResumenDiario) {/*recorre cada resumen diario */
-            TotalMensual.setVentaTotal(TotalMensual.getVentaTotal() + d.getVentaTotal());/*acumula el total de ventas del mes sumando el
+            TotalMensual.setVentaTotal(TotalMensual.getVentaTotal().add(d.getVentaTotal()));/*acumula el total de ventas del mes sumando el
                                                                                          total de cada día */
 
-            TotalMensual.setDebe(TotalMensual.getDebe() + d.getDebe());/*acumula el total de deudas del mes sumando el total de cada día */
+            TotalMensual.setDebe(TotalMensual.getDebe().add(d.getDebe()));/*acumula el total de deudas del mes sumando el total de cada día */
 
-            TotalMensual.setDebito(TotalMensual.getDebito() + d.getDebito());/*acumula el total de débitos del mes sumando el total de
+            TotalMensual.setDebito(TotalMensual.getDebito().add(d.getDebito()));/*acumula el total de débitos del mes sumando el total de
                                                                              cada día */
 
-            TotalMensual.setCredito(TotalMensual.getCredito() + d.getCredito());/*acumula el total de créditos del mes sumando el total de
+            TotalMensual.setCredito(TotalMensual.getCredito().add(d.getCredito()));/*acumula el total de créditos del mes sumando el total de
                                                                                 cada día */
-            TotalMensual.setTransferencia(TotalMensual.getTransferencia() + d.getTransferencia());/*acumula el total de transferencias del
+            TotalMensual.setTransferencia(TotalMensual.getTransferencia().add(d.getTransferencia()));/*acumula el total de transferencias del
                                                                                                   mes sumando el total de cada día */
 
-            TotalMensual.setMercadoPago(TotalMensual.getMercadoPago() + d.getMercadoPago());/*acumula el total de pagos en Mercado Pago del
+            TotalMensual.setMercadoPago(TotalMensual.getMercadoPago().add(d.getMercadoPago()));/*acumula el total de pagos en Mercado Pago del
                                                                                             mes sumando el total de cada día */
 
-            TotalMensual.setEfectivo(TotalMensual.getEfectivo() + d.getEfectivo());/*acumula el total de pagos en efectivo del mes sumando
+            TotalMensual.setEfectivo(TotalMensual.getEfectivo().add(d.getEfectivo()));/*acumula el total de pagos en efectivo del mes sumando
                                                                                    el total de cada día */
         }
         RenderTotalMensual(TotalMensual);/*Muestra en la interfaz el resumen total del mes*/
@@ -206,9 +209,9 @@ public class MensualGeneral extends BorderPane {
         return col;/*retorna la columna configurada para mostrar la fecha en la tabla */
     }
 
-    private TableColumn<VentaResumenDiarioDTO, Double> colDebe() {
+    private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDebe() {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>("Debe");
+        TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>("Debe");
 
         col.setCellValueFactory(c
                 -> new javafx.beans.property.SimpleObjectProperty<>(
@@ -218,7 +221,7 @@ public class MensualGeneral extends BorderPane {
 
         col.setCellFactory(tc -> new TableCell<>() {
             @Override
-            protected void updateItem(Double v, boolean empty) {
+            protected void updateItem(BigDecimal v, boolean empty) {
                 super.updateItem(v, empty);
 
                 if (empty || v == null) {
@@ -226,7 +229,7 @@ public class MensualGeneral extends BorderPane {
                     setTextFill(null); // limpia color previo
                 } else {
                     setText(MONEDA.format(v));
-                    if (v > 0) {
+                    if (v.compareTo(BigDecimal.ZERO) > 0) {
                         setTextFill(javafx.scene.paint.Color.RED);
                     } else {
                         setTextFill(javafx.scene.paint.Color.BLACK);
@@ -239,11 +242,11 @@ public class MensualGeneral extends BorderPane {
         return col;
     }
 
-    private TableColumn<VentaResumenDiarioDTO, Double> colMonto(
+    private TableColumn<VentaResumenDiarioDTO, BigDecimal> colMonto(
             String titulo,
-            Function<VentaResumenDiarioDTO, Double> getter) {
+            Function<VentaResumenDiarioDTO, BigDecimal> getter) {
 
-        TableColumn<VentaResumenDiarioDTO, Double> col = new TableColumn<>(titulo);
+        TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
 
         col.setCellValueFactory(c
                 -> new javafx.beans.property.SimpleObjectProperty<>(
@@ -253,7 +256,7 @@ public class MensualGeneral extends BorderPane {
 
         col.setCellFactory(tc -> new TableCell<>() {
             @Override
-            protected void updateItem(Double v, boolean empty) {
+            protected void updateItem(BigDecimal v, boolean empty) {
                 super.updateItem(v, empty);
                 setText(empty || v == null ? "" : MONEDA.format(v));
             }
@@ -292,7 +295,7 @@ public class MensualGeneral extends BorderPane {
         Label totalDebe = new Label(MONEDA.format(t.getDebe()));/* crea un label con el total de debe del
                                                                 mes para mostrarlo en la fila de totales */
 
-        if (t.getDebe() > 0) {/*si el total de debe es mayor a 0*/
+        if (t.getDebe().compareTo(BigDecimal.ZERO) > 0) {/*si el total de debe es mayor a 0*/
 
             totalDebe.setTextFill(javafx.scene.paint.Color.RED);/* establece el color del texto en rojo */
         } else {/*sino */

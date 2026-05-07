@@ -10,6 +10,7 @@ com\uade\tpo\demo\entity\TipoCliente.class
 com\uade\tpo\demo\service\ClienteService.class
 com\uade\tpo\demo\service\ClienteServiceImpl.class
 com\uade\tpo\demo\controllers\ProductoController.class
+com\uade\tpo\demo\repository\GastosRepository.class
 com\uade\tpo\demo\service\ProductoServiceImpl.class
 com\uade\tpo\demo\repository\ClienteRepository.class
 com\uade\tpo\demo\entity\Categoria.class
@@ -20,5 +21,10 @@ com\uade\tpo\demo\repository\VentaRepository.class
 com\uade\tpo\demo\entity\TipoDePago.class
 com\uade\tpo\demo\service\VentaServiceImpl$1.class
 com\uade\tpo\demo\service\VentaService.class
+com\uade\tpo\demo\entity\Gastos.class
+com\uade\tpo\demo\entity\dto\GastoRequest.class
+com\uade\tpo\demo\service\GastosService.class
 com\uade\tpo\demo\exceptions\CategoryDuplicateException.class
+com\uade\tpo\demo\service\impl\GastosServiceImpl.class
 com\uade\tpo\demo\DemoApplication.class
+com\uade\tpo\demo\controllers\GastosController.class
