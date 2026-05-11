@@ -22,47 +22,37 @@ public class ResumenBackend {
         this.json = new ObjectMapper();
     }
 
-    // =========================
-    // RESUMEN DIARIO (POR MES)
-    // =========================
     public List<VentaResumenDiarioDTO> cargarResumenDiario(int anio, int mes) {
         try {
-            String url = BASE_URL
-                    + "/ventas/resumen-diario"
-                    + "?anio=" + anio
-                    + "&mes=" + mes;
+            String url = BASE_URL + "/ventas/resumen-diario" + "?anio=" + anio +
+                                    "&mes=" + mes;/*Construye la URL para solicitar el resumen diario de
+                                                  ventas según año y mes*/
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET()
+                    .build();/* construye una request http get para obtener datos */
 
-            HttpResponse<String> response =
-                    http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers
+                    .ofString());/* envia la request y guarda el codigo de la respuesta en response */
 
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                return json.readValue(
-                        response.body(),
-                        new TypeReference<List<VentaResumenDiarioDTO>>() {}
-                );
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {/*si el codigo es mayor a
+                                                                               200 y menor a 300*/
+                return json.readValue(response.body(),
+                        new TypeReference<List<VentaResumenDiarioDTO>>() {
+                        });/*Parsea el JSON recibido del backend y lo transforma
+                             en una lista de objetos VentaResumenDiarioDTO*/
             }
+            System.err.println("Error resumen-diario: HTTP " + response.statusCode());
+        } catch (java.io.IOException e) {
+            System.err.println("Error de red al cargar resumen diario");
 
-            System.err.println(
-                    "Error resumen-diario: HTTP " + response.statusCode()
-            );
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Carga de resumen diario interrumpida");
 
-        
- } catch (java.io.IOException e) {
-        System.err.println("Error de red al cargar resumen diario");
+        } catch (RuntimeException e) {
+            System.err.println("Error procesando el resumen diario (JSON)");
+        }
 
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        System.err.println("Carga de resumen diario interrumpida");
-
-    } catch (RuntimeException e) {
-        System.err.println("Error procesando el resumen diario (JSON)");
-    }
-
-        return List.of();
+        return List.of();/* Retorna una lista vacía cuando no hay datos para devolver */
     }
 }

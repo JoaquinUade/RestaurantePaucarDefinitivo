@@ -173,7 +173,8 @@ public class TablaSemanal {
 
                 if (v.get("tipoCliente") == TipoCliente.EMPRESA/*si el tipo de cliente es una empresa */
                         && empresa.equals(v.get("nombre"))/* y el nombre coincide */
-                        && v.get("estado") != TipoDePago.DEBE) {/*y ademas no es debe */
+                        && v.get("estado") != TipoDePago.DEBE
+                    && v.get("estado")!= TipoDePago.DEUDA_PAGADA) {/*y ademas no es debe */
 
                     v.put("fecha", cursor);/* Asigna la fecha al registro de venta */
                     tabla.getItems().add(v);/* Agrega el registro de venta a la tabla */

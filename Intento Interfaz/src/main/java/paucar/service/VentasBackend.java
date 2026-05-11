@@ -1,6 +1,5 @@
 package paucar.service;
 
-/*define el contenedor que agrupa clases, interfaces y subpaquetes relacionados */
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -368,4 +367,26 @@ public class VentasBackend {
             return false;
         }
     }
+public boolean pagarDeuda(Long idVenta) {
+    try {
+        var bodyMap = new java.util.HashMap<String, Object>();
+        bodyMap.put("estado", TipoDePago.EFECTIVO); // ✅ pasa de DEBE a EFECTIVO
+
+        String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))
+                .build();
+
+        var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.statusCode() >= 200 && response.statusCode() < 300;
+
+    } catch (java.io.IOException | InterruptedException e) {
+        System.err.println("Error pagando deuda: " + e.getMessage());
+        return false;
+    }
+}
 }
