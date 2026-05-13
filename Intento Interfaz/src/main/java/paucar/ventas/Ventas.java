@@ -30,6 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import paucar.resumen.empresas.TablaSemanalDebe;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
 import paucar.service.VentasBackend;
@@ -58,6 +59,7 @@ public final class Ventas extends BorderPane {
     private final ObservableList<String> clientes = FXCollections.observableArrayList();
 
     private final ObservableList<ProductosService.ProductoItem> productos = FXCollections.observableArrayList();
+    private TablaSemanalDebe tablaSemanalDebe;
 
     // ====== Modelo de Fila (UI de la tabla) ======
     public static class Fila {
@@ -305,6 +307,8 @@ private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
                     Alert.AlertType.ERROR,
                     "No se pudo guardar el estado"
                 ).showAndWait();
+            } else{
+                tablaSemanalDebe.actualizar();
             }
         }));
 }
