@@ -1,4 +1,4 @@
-package paucar.resumen.empresas;
+package paucar.resumen.empresas.semanal;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;

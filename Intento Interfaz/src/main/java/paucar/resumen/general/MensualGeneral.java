@@ -123,6 +123,8 @@ public class MensualGeneral extends BorderPane {
 
             TotalMensual.setDebe(TotalMensual.getDebe().add(d.getDebe()));/*acumula el total de deudas del mes sumando el total de cada día */
 
+            TotalMensual.setDeudaPagada(TotalMensual.getDeudaPagada().add(d.getDeudaPagada()));
+
             TotalMensual.setDebito(TotalMensual.getDebito().add(d.getDebito()));/*acumula el total de débitos del mes sumando el total de
                                                                              cada día */
 
@@ -149,6 +151,7 @@ public class MensualGeneral extends BorderPane {
                                                                         ventas del día, usando el método
                                                                         getVentaTotal del resumen diario */
                 colDebe(),
+                colDeudaPagada("Deuda Pagada", dto -> dto.getDeudaPagada()),
                 colMonto("Débito", dto -> dto.getDebito()),/*columna que muestra el total de débitos
                                                                    del día */
                 colMonto("Crédito", dto -> dto.getCredito()),/*columna que muestra el total de
@@ -156,7 +159,7 @@ public class MensualGeneral extends BorderPane {
                 colMonto("Transferencia", dto -> dto.getTransferencia()),/*columna que muestra el
                                                                                 total de transferencias del
                                                                                 día */
-                colMonto("MERCADO_PAGO", dto -> dto.getMercadoPago()),/*columna que muestra el total
+                colMonto("Mercado Pago", dto -> dto.getMercadoPago()),/*columna que muestra el total
                                                                              de pagos en Mercado Pago del
                                                                              día */
                 colMonto("Efectivo", dto -> dto.getEfectivo())/*columna que muestra el total de
@@ -241,7 +244,41 @@ public class MensualGeneral extends BorderPane {
         col.setSortable(false);
         return col;
     }
+private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
+        String titulo,
+        Function<VentaResumenDiarioDTO, BigDecimal> getter) {
 
+    TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
+
+    col.setCellValueFactory(c ->
+            new javafx.beans.property.SimpleObjectProperty<>(
+                    getter.apply(c.getValue())
+            )
+    );
+
+    col.setCellFactory(tc -> new TableCell<>() {
+        @Override
+        protected void updateItem(BigDecimal v, boolean empty) {
+            super.updateItem(v, empty);
+
+            if (empty || v == null) {
+                setText("");
+                setTextFill(null);
+            } else {
+                setText(MONEDA.format(v));
+
+                if (v.compareTo(BigDecimal.ZERO) > 0) {
+                    setTextFill(javafx.scene.paint.Color.GREEN); // ✅ VERDE
+                } else {
+                    setTextFill(javafx.scene.paint.Color.BLACK);
+                }
+            }
+        }
+    });
+
+    col.setSortable(false);
+    return col;
+}
     private TableColumn<VentaResumenDiarioDTO, BigDecimal> colMonto(
             String titulo,
             Function<VentaResumenDiarioDTO, BigDecimal> getter) {
@@ -294,6 +331,13 @@ public class MensualGeneral extends BorderPane {
 
         Label totalDebe = new Label(MONEDA.format(t.getDebe()));/* crea un label con el total de debe del
                                                                 mes para mostrarlo en la fila de totales */
+        Label totalDeudaPagada = new Label(MONEDA.format(t.getDeudaPagada()));
+
+        if (t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0) {
+            totalDeudaPagada.setTextFill(javafx.scene.paint.Color.GREEN);
+        } else {
+            totalDeudaPagada.setTextFill(javafx.scene.paint.Color.BLACK);
+        }
 
         if (t.getDebe().compareTo(BigDecimal.ZERO) > 0) {/*si el total de debe es mayor a 0*/
 
@@ -304,20 +348,20 @@ public class MensualGeneral extends BorderPane {
 
         grid.add(totalDebe, 2, 0);/* agrega el label con el total de debe en la
                                                         tercera columna y primera fila del GridPane */
-
-        grid.add(new Label(MONEDA.format(t.getDebito())), 3, 0);/* agrega un label con el total de débitos en la
+        grid.add(totalDeudaPagada, 3, 0); 
+        grid.add(new Label(MONEDA.format(t.getDebito())), 4, 0);/* agrega un label con el total de débitos en la
                                                                                           cuarta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getCredito())), 4, 0);/* agrega un label con el total de créditos en la
+        grid.add(new Label(MONEDA.format(t.getCredito())), 5, 0);/* agrega un label con el total de créditos en la
                                                                                           quinta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getTransferencia())), 5, 0);/* agrega un label con el total de transferencias en la
+        grid.add(new Label(MONEDA.format(t.getTransferencia())), 6, 0);/* agrega un label con el total de transferencias en la
                                                                                           sexta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getMercadoPago())), 6, 0);/* agrega un label con el total de pagos por Mercado Pago en la
+        grid.add(new Label(MONEDA.format(t.getMercadoPago())), 7, 0);/* agrega un label con el total de pagos por Mercado Pago en la
                                                                                           séptima columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getEfectivo())), 7, 0);/* agrega un label con el total de efectivo en la
+        grid.add(new Label(MONEDA.format(t.getEfectivo())), 8, 0);/* agrega un label con el total de efectivo en la
                                                                                           octava columna y primera fila del GridPane */
 
         footerTotal.setCenter(grid);/* agrega el GridPane al centro del pie de página de los totales */

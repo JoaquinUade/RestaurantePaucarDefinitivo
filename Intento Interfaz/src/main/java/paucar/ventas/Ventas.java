@@ -30,7 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import paucar.resumen.empresas.TablaSemanalDebe;
+import paucar.resumen.empresas.semanal.TablaSemanalDebe;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
 import paucar.service.VentasBackend;
