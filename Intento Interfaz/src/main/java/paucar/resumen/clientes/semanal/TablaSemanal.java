@@ -1,4 +1,4 @@
-package paucar.resumen.empresas.semanal;
+package paucar.resumen.clientes.semanal;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -75,6 +75,13 @@ public class TablaSemanal {
         TableColumn<Map<String, Object>, String> colTipo = new TableColumn<>("Tipo de pago");/*Esa línea crea una columna nueva en la tabla que se
                                                                                                    llama “Tipo de pago” y que va a mostrar un texto */
 
+         colTipo.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Tipo de
+                                              pago usando esta función*/
+
+            TipoDePago estado = (TipoDePago) fila.getValue().get("estado");/*Obtiene el estado de la fila actual*/
+
+            return new SimpleObjectProperty<>(estado == null ? "" : estado.name());/*si el estado es null se deja vacio, de lo contrario se muestra el nombre del estado*/
+        });
         colTipo.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Tipo de
                                              pago usando esta función*/
 
@@ -150,7 +157,7 @@ public class TablaSemanal {
         return col;/* Devuelve la columna creada */
     }
 
-    public double cargarSemanaEmpresa(String empresa, LocalDate inicio, LocalDate fin) {
+    public double cargarSemanaCliente(String cliente, LocalDate inicio, LocalDate fin) {
 
         tabla.getItems().clear();/* Limpia los elementos de la tabla */
         double total = 0;/* Variable para acumular el total de las ventas de la semana */
@@ -164,8 +171,8 @@ public class TablaSemanal {
 
             for (Map<String, Object> v : ventas) {/*recorre cada una de las ventas */
 
-                if (v.get("tipoCliente") == TipoCliente.EMPRESA/*si el tipo de cliente es una empresa */
-                        && empresa.equals(v.get("nombre"))/* y el nombre coincide */
+                if (v.get("tipoCliente") == TipoCliente.CLIENTE/*si el tipo de cliente es cliente */
+                        && cliente.equals(v.get("nombre"))/* y el nombre coincide */
                         && v.get("estado") != TipoDePago.DEBE
                     && v.get("estado")!= TipoDePago.DEUDA_PAGADA) {/*y ademas no es debe */
 

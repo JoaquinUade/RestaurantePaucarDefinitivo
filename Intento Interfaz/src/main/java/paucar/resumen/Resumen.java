@@ -11,6 +11,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import paucar.resumen.clientes.MensualClientes;
+import paucar.resumen.clientes.semanal.SemanalClientes;
 import paucar.resumen.empresas.MensualEmpresas;
 import paucar.resumen.empresas.semanal.SemanalEmpresas;
 import paucar.resumen.general.MensualGeneral;
@@ -42,9 +43,10 @@ public class Resumen extends BorderPane {
                                                                      * centro de la ventana
                                                                      */
     private SemanalEmpresas vistaSemanalEmpresas;
+    private SemanalClientes vistaSemanalClientes;
     private MensualEmpresas vistaMensualEmpresas;
     private MensualClientes vistaMensualClientes;
-    
+
     private final ComboBox<String> tipoResumen = new ComboBox<>();
 
     public Resumen(VentasBackend backend) {
@@ -151,7 +153,14 @@ public class Resumen extends BorderPane {
                         }
                         contenedorResultado.setCenter(vistaSemanalEmpresas);
                     }
-
+                    case "Clientes" -> {
+                        if (vistaSemanalClientes == null) {
+                            vistaSemanalClientes = new SemanalClientes(backend, fecha);
+                        } else {
+                            vistaSemanalClientes.actualizarFecha(fecha);
+                        }
+                        contenedorResultado.setCenter(vistaSemanalClientes);
+                    }
                 }
             }
         }

@@ -3,11 +3,13 @@ paucar\resumen\general\MensualGeneral$4.class
 paucar\ventas\Agregar$2.class
 paucar\resumen\general\SemanalGeneral$3.class
 paucar\service\AdminService.class
+paucar\resumen\empresas\MensualEmpresas$7.class
 paucar\resumen\general\SemanalGeneral.class
 paucar\resumen\general\MensualGeneral$3.class
 paucar\ventas\Agregar$3.class
 paucar\ventas\Tabla$2.class
 paucar\ventas\Agregar.class
+paucar\resumen\clientes\MensualClientes$7.class
 paucar\service\VentasBackend.class
 paucar\resumen\empresas\MensualEmpresas.class
 paucar\service\ClientesService.class
@@ -21,12 +23,12 @@ paucar\resumen\general\SemanalGeneral$2.class
 paucar\admin\Platos.class
 paucar\resumen\general\MensualGeneral.class
 paucar\service\ProductosService.class
+paucar\resumen\general\MensualGeneral$5.class
 paucar\ventas\Ventas.class
 paucar\ventas\Agregar$5.class
 paucar\Aplicacion.class
 paucar\resumen\general\SemanalGeneral$4.class
 paucar\ventas\Agregar$1.class
-paucar\resumen\clientes\SemanalClientes.class
 paucar\resumen\general\SemanalGeneral$1.class
 paucar\service\ResumenBackend.class
 paucar\resumen\clientes\MensualClientes.class
