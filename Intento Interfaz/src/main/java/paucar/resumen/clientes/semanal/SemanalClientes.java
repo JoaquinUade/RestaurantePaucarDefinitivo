@@ -36,8 +36,8 @@ public class SemanalClientes extends BorderPane {
     private ComboBox<String> comboCliente;
     private FilteredList<String> clientesFiltrados;
 
-    private TablaSemanal tablaSemanal;
-    private TablaSemanalDebe tablaDebe;
+    private TablaSemanalCliente tablaSemanal;
+    private TablaSemanalDebeCliente tablaDebe;
 
     private TableView<Map<String, Object>> tablaVentas;
     private TableView<Map<String, Object>> tablaVentasDebe;
@@ -61,8 +61,8 @@ public class SemanalClientes extends BorderPane {
     private VBox crearVistaResumenSemanal() {
         VBox contenedor = new VBox(5);
 
-        tablaSemanal = new TablaSemanal(backend);
-        tablaDebe = new TablaSemanalDebe(backend);
+        tablaSemanal = new TablaSemanalCliente(backend);
+        tablaDebe = new TablaSemanalDebeCliente(backend);
 
         tablaVentas = tablaSemanal.getTabla();
         tablaVentasDebe = tablaDebe.getTabla();

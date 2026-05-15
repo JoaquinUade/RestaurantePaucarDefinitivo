@@ -25,13 +25,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import paucar.service.VentasBackend;
 
-public class VentanaPagoDeudas {
+public class VentanaPagoDeudasCliente {
 
     private final VentasBackend backend;
     private static final Locale LOCALE_AR = Locale.of("es", "AR");
     private static final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);
 
-    public VentanaPagoDeudas(VentasBackend backend) {
+    public VentanaPagoDeudasCliente(VentasBackend backend) {
         this.backend = backend;
     }
 

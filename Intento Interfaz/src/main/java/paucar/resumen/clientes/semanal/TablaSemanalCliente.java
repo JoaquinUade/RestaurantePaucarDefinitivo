@@ -18,7 +18,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import paucar.service.VentasBackend;
 
-public class TablaSemanal {
+public class TablaSemanalCliente {
 
     private final VentasBackend backend;
     private final TableView<Map<String, Object>> tabla;
@@ -29,7 +29,7 @@ public class TablaSemanal {
     private static final NumberFormat MONEDA =
             NumberFormat.getCurrencyInstance(LOCALE_AR);
 
-    public TablaSemanal(VentasBackend backend) {
+    public TablaSemanalCliente(VentasBackend backend) {
         this.backend = backend;
         this.tabla = new TableView<>();
         definirColumnas();

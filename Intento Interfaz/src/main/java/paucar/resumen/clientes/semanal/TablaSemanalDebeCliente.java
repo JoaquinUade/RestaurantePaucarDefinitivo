@@ -18,7 +18,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import paucar.service.VentasBackend;
 
-public class TablaSemanalDebe {
+public class TablaSemanalDebeCliente {
 
     private final VentasBackend backend;/*declara un campo backend que es una instancia de VentasBackend,
                                           se usará para cargar las ventas del día y filtrar las deudas de
@@ -44,7 +44,7 @@ public class TablaSemanalDebe {
     private String clienteActual;
     private LocalDate desdeActual;
 
-    public TablaSemanalDebe(VentasBackend backend) {
+    public TablaSemanalDebeCliente(VentasBackend backend) {
         this.backend = backend;
         this.tabla = new TableView<>();
 
@@ -219,7 +219,7 @@ public void actualizar() {
 
    public void mostrarVentanaPago() {
 
-    VentanaPagoDeudas ventana = new VentanaPagoDeudas(backend);/*crea un objeto de la clase
+    VentanaPagoDeudasCliente ventana = new VentanaPagoDeudasCliente(backend);/*crea un objeto de la clase
                                                                ventanapagodeudas y la guarda en la
                                                                variable ventana */
 
