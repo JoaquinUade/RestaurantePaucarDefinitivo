@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import paucar.admin.platos.Platos;
 import paucar.service.AdminService;
 
 public class Admin extends BorderPane {

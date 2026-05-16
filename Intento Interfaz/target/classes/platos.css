@@ -40,3 +40,26 @@
     -fx-border-color: #dddddd;
     -fx-border-width: 0 0 1 0;
 }
+
+.btn-crear,
+.btn-editar,
+.btn-eliminar {
+    -fx-background-color: #94002c;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 20 40 20 40;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}
+
+.btn-crear:focused,
+.btn-editar:focused,
+.btn-eliminar:focused {
+    -fx-background-color: #94002c;
+    /* MISMO color que normal */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}

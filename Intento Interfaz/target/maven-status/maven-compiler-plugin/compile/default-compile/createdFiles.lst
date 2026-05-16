@@ -20,7 +20,6 @@ paucar\ventas\Tabla.class
 paucar\admin\Admin.class
 paucar\service\VentasBackend$1.class
 paucar\resumen\general\SemanalGeneral$2.class
-paucar\admin\Platos.class
 paucar\resumen\general\MensualGeneral.class
 paucar\service\ProductosService.class
 paucar\resumen\general\MensualGeneral$5.class
