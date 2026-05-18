@@ -2,7 +2,6 @@ paucar\ventas\Ventas$Fila.class
 paucar\resumen\general\MensualGeneral$4.class
 paucar\ventas\Agregar$2.class
 paucar\resumen\general\SemanalGeneral$3.class
-paucar\admin\EmpresasClientes$2.class
 paucar\service\AdminService.class
 paucar\resumen\empresas\MensualEmpresas$7.class
 paucar\resumen\general\SemanalGeneral.class

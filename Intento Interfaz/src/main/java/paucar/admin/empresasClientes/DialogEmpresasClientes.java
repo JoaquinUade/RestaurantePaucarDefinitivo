@@ -1,4 +1,4 @@
-package paucar.admin;
+package paucar.admin.empresasClientes;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 
