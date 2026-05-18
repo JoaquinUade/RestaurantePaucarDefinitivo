@@ -312,4 +312,66 @@ public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
         }
         return java.util.List.of();
     }
+    public void eliminarCliente(String nombre) {
+    try {
+        Long idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.CLIENTE);
+
+        if (idCliente == null) {
+            idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.EMPRESA);
+        }
+
+        if (idCliente == null) {
+            System.err.println("No se encontró el cliente");
+            return;
+        }
+
+        var req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
+                .DELETE()
+                .build();
+
+        var res = http.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 204) {
+            System.err.println("Error al eliminar: " + res.statusCode());
+        }
+
+    } catch (java.io.IOException | InterruptedException e) {
+        System.err.println("Error eliminar: " + e.getMessage());
+    }
+}
+public void editarCliente(String nombreOriginal, String nuevoNombre, TipoCliente tipo) {
+    try {
+        Long idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.CLIENTE);
+
+        if (idCliente == null) {
+            idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.EMPRESA);
+        }
+
+        if (idCliente == null) {
+            System.err.println("No se encontró el cliente");
+            return;
+        }
+
+        var json = TraductorJSON.createObjectNode()
+                .put("nombre", nuevoNombre)
+                .put("tipoCliente", tipo.name());
+
+        var req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
+
+        var res = http.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200) {
+            System.err.println("Error al editar: " + res.statusCode());
+        }
+
+    } catch (java.io.IOException | InterruptedException e) {
+        System.err.println("Error editar: " + e.getMessage());
+    }
+}
+
 }

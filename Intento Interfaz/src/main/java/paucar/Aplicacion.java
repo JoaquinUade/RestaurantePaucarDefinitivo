@@ -157,7 +157,7 @@ public class Aplicacion extends Application {
 
         btnAdmin.setOnAction(e -> {
             marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
-            root.setCenter(new Admin(adminService)); // ← NUEVA instancia cada vez
+            root.setCenter(new Admin(adminService, clientesService)); // ← NUEVA instancia cada vez
         });
         btnVentas.setOnAction(e -> {
             marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);

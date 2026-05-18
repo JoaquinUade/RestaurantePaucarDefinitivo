@@ -1,0 +1,17 @@
+.fondo-empresasclientes {
+    -fx-background-color:#a10030;
+}
+
+.list-view .list-cell:filled:selected .card {
+    -fx-background-color: #4da6ff;
+}
+
+.titulo-empresasclientes {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.card {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}

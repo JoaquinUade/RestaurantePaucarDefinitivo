@@ -10,12 +10,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import paucar.admin.platos.Platos;
 import paucar.service.AdminService;
+import paucar.service.ClientesService;
 
 public class Admin extends BorderPane {
         private final AdminService adminService;
-
-        public Admin(AdminService adminService) {
+        private final ClientesService clientesService;
+        public Admin(AdminService adminService, ClientesService clientesService) {
                 this.adminService = adminService;
+                this.clientesService = clientesService;
                 getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
                                                                                                    para Admin*/
                 botones();/* Crea los botones de la interfaz de administración */
@@ -28,16 +30,22 @@ public class Admin extends BorderPane {
                 grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
                 grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
+                grid.setHgap(20);
 
                 Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
                                                                                                 platos*/
-
+                Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/platos.png");
                 btnPlatos.setOnAction(click -> {/* cuando se presione el boton platos */
-                        marcarActivo(btnPlatos);/* Marca el botón de platos como activo (cambia su estilo) */
+                        marcarActivo(btnPlatos, btnEmpresasClientes);/* Marca el botón de platos como activo (cambia su estilo) */
                         setCenter(new Platos(adminService));/* entra en la vista de platos */
+                });
+                btnEmpresasClientes.setOnAction(click -> {
+                        marcarActivo(btnEmpresasClientes, btnPlatos);
+                        setCenter(new EmpresasClientes(clientesService));
                 });
 
                 grid.add(btnPlatos, 0, 0);
+                grid.add(btnEmpresasClientes, 1, 0);
                 setCenter(grid);
         }
 

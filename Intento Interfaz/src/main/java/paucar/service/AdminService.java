@@ -15,7 +15,8 @@ public class AdminService {
     private final String BASE_URL;
     private final HttpClient http;
     private final ObjectMapper TraductorJSON;
-
+    private ClientesService clientesService;
+    
     public AdminService(String baseUrl) {
         this.BASE_URL = baseUrl;
         this.http = HttpClient.newHttpClient();
@@ -95,4 +96,9 @@ public void eliminarProducto(Long idProducto) {
         System.err.println("Error eliminando producto: " + e.getMessage());
     }
 }
+
+public ClientesService getClientesService() {
+    return clientesService;
+}
+
 }
