@@ -77,6 +77,7 @@ public class MensualEmpresas extends BorderPane {
             javafx.collections.transformation.FilteredList<String> empresasFiltradas) {
 
         ComboBox<String> cb = new ComboBox<>(empresasFiltradas);
+        
         cb.setEditable(true);
 
         java.util.concurrent.atomic.AtomicBoolean updating = new java.util.concurrent.atomic.AtomicBoolean(false);

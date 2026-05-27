@@ -140,6 +140,7 @@ public class SemanalClientes extends BorderPane {
 
     private ComboBox<String> crearCombo(FilteredList<String> datos) {
         ComboBox<String> cb = new ComboBox<>(datos);/*Crea un ComboBox con la lista de clientes*/
+        
         cb.setEditable(true);
 
         AtomicBoolean actualizar = new AtomicBoolean(false);/*Bandera para saber si el cambio

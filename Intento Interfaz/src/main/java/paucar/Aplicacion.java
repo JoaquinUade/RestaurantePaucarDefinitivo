@@ -56,6 +56,10 @@ public class Aplicacion extends Application {
                 getClass().getResource("/platos.css").toExternalForm());
         scene.getStylesheets().add(
                 getClass().getResource("/empresasclientes.css").toExternalForm());
+        scene.getStylesheets().add(
+                getClass().getResource("/agregar.css").toExternalForm());
+        scene.getStylesheets().add(
+                getClass().getResource("/resumen.css").toExternalForm());
         // =====================
         // BARRA LATERAL IZQUIERDA
         // =====================

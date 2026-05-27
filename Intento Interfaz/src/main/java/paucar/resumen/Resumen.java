@@ -48,7 +48,6 @@ public class Resumen extends BorderPane {
     private MensualClientes vistaMensualClientes;
 
     private final ComboBox<String> tipoResumen = new ComboBox<>();
-
     public Resumen(VentasBackend backend) {
         this.backend = backend;
 
@@ -73,6 +72,7 @@ public class Resumen extends BorderPane {
                                                              * agrega las opciones "Mensual" y
                                                              * "Semanal" a ResumenTipo
                                                              */
+        ResumenTipo.getStyleClass().add("combo-agregar");
         ResumenTipo.setValue("Mensual");/* establece el valor por default */
 
         tipoResumen.getItems().addAll(
@@ -80,9 +80,11 @@ public class Resumen extends BorderPane {
                 "Empresas", "Clientes"
         // "Clientes" después
         );
+        tipoResumen.getStyleClass().add("combo-agregar");
         tipoResumen.setValue("General");
 
         pickerFecha.setValue(LocalDate.now());/* establece la fecha actual por default */
+        pickerFecha.getStyleClass().add("date-agregar");
     }
 
     private Node crearBarraFiltros() {

@@ -1,0 +1,41 @@
+.combo-agregar {
+    -fx-background-color: #e4e4e4;
+    -fx-border-color: #000000;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+/* TEXTO visible */
+.combo-agregar .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-prompt-text-fill: black;
+}
+
+/* flecha */
+.combo-agregar .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* 🔥 IMPORTANTE: el popup */
+.combo-agregar .combo-box-popup .list-view {
+    -fx-background-color: #e4e4e4;
+    -fx-border-color: #000000;
+}
+
+/* items */
+.combo-agregar .combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgb(0, 0, 0);
+}
+
+/* hover */
+.combo-agregar .combo-box-popup .list-cell:hover {
+    -fx-background-color: #ffffff;
+}
+
+/* seleccionado */
+.combo-agregar .combo-box-popup .list-cell:selected {
+    -fx-background-color: #6a5acd;
+    -fx-text-fill: rgb(255, 255, 255);
+}

@@ -1,0 +1,68 @@
+/* =========================
+   DATE PICKER (INPUT)
+   ========================= */
+.date-agregar {
+    -fx-background-color: #e4e4e4;
+    -fx-border-color: #000000;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.date-agregar .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
+}
+
+/* botón del calendario */
+.date-agregar .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* =========================
+   POPUP DEL CALENDARIO
+   ========================= */
+.date-picker-popup {
+    -fx-background-color: #e4e4e4;
+    -fx-border-color: #555;
+}
+
+/* cabecera (mes y año) */
+.date-picker-popup .month-year-pane {
+    -fx-background-color: #e4e4e4;
+}
+
+.date-picker-popup .label {
+    -fx-text-fill:#000000;
+}
+
+/* =========================
+   DIAS DEL CALENDARIO
+   ========================= */
+
+/* días normales */
+.date-picker-popup .day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
+}
+
+/* hover */
+.date-picker-popup .day-cell:hover {
+    -fx-background-color: #e4e4e4;
+}
+
+/* día seleccionado */
+.date-picker-popup .day-cell:selected {
+    -fx-background-color: #6a5acd;
+    -fx-text-fill:#000000;
+}
+
+/* días de otros meses (más apagados) */
+.date-picker-popup .day-cell:other-month {
+    -fx-background-color: #e4e4e4;
+}
+
+/* día de hoy */
+.date-picker-popup .day-cell:today {
+    -fx-border-color: #6a5acd;
+    -fx-border-width: 1;
+}

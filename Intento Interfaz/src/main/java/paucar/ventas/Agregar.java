@@ -116,6 +116,7 @@ public class Agregar {
         // --- 2) Combo de clientes (tu autocompletar por texto se mantiene)
         FilteredList<String> clientesFiltrados = new FilteredList<>(clientes, s -> true);
         ComboBox<String> cbCliente = crearComboClientes(clientesFiltrados);
+        cbCliente.getStyleClass().add("combo-agregar");
 
         // --- 3) CARGA INICIAL según el tipo seleccionado (por defecto CLIENTE) ---
         if (tgTipoCliente.getSelectedToggle() != null && clientesService != null) {
@@ -197,6 +198,8 @@ public class Agregar {
 
         // --- 6) Estado y observaciones ---
         ComboBox<TipoDePago> cbEstado = crearComboEstado();
+        cbEstado.getStyleClass().add("combo-agregar");
+
         TextField tfObs = TextFieldObservaciones();
 
         // --- 7) Layout ---
@@ -434,6 +437,8 @@ public class Agregar {
 
         // Combo de productos con autocompletar y filtro "contiene"
         ComboBox<ProductosService.ProductoItem> cbProd = new ComboBox<>(productosFiltrados);
+        cbProd.getStyleClass().add("combo-agregar");
+        
         cbProd.setPrefWidth(280);
         cbProd.setPromptText("Producto");
         cbProd.setEditable(true);

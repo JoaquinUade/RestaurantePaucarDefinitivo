@@ -357,7 +357,7 @@ private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
 
     private void VentanaAgregarPedido() {/*este metodo es el que se ejecuta cuando tocás el botón “+ Agregar”
                                         en la pantalla de Ventas */
-
+productos.setAll(productosService.cargarProductos());
         var dlg = new Agregar(clientes, productos, clientesService, venta);/*crea un objeto nuevo de la clase Agregar y le
                                                           pasa clientes, productos y venta al constructor */
 
