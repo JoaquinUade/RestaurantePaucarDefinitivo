@@ -19,7 +19,6 @@ public class DialogEmpresasClientes {
 
     // ✅ CREAR
     public static Object[] abrirDialogCrear() {
-
         Dialog<Object[]> dialog = new Dialog<>();
         dialog.setTitle("Crear Cliente / Empresa");
 
@@ -28,10 +27,9 @@ public class DialogEmpresasClientes {
 
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField();
-        ComboBox<TipoCliente> cmbTipo = new ComboBox<>();
+        ComboBox<TipoCliente> cmbTipo = new ComboBox<>();/*Combo para tipo de cliente */
 
         txtNombre.setPromptText("Nombre");
-
         cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA);
         cmbTipo.setValue(TipoCliente.CLIENTE);
 
@@ -40,8 +38,8 @@ public class DialogEmpresasClientes {
                 new Label("Nombre"), txtNombre,
                 new Label("Tipo"), cmbTipo
         );
-
         form.setPadding(new Insets(10));
+
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -59,12 +57,12 @@ public class DialogEmpresasClientes {
                     return null;
                 }
 
-                return new Object[]{nombre, cmbTipo.getValue()};
+                return new Object[]{nombre, cmbTipo.getValue()};/*Retorna los datos como array (nombre y tipo) */
             }
-            return null;
+            return null;/*si cancela */
         });
 
-        return dialog.showAndWait().orElse(null);
+        return dialog.showAndWait().orElse(null);/*Muestra el diálogo y devuelve resultado */
     }
 
     // ✅ EDITAR
@@ -77,7 +75,7 @@ public class DialogEmpresasClientes {
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
-        TextField txtNombre = new TextField(nombreOriginal);
+        TextField txtNombre = new TextField(nombreOriginal);/*Campo con dato precargado */
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();
 
         cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA);
@@ -88,8 +86,8 @@ public class DialogEmpresasClientes {
                 new Label("Nombre"), txtNombre,
                 new Label("Tipo"), cmbTipo
         );
-
         form.setPadding(new Insets(10));
+
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -121,30 +119,36 @@ public class DialogEmpresasClientes {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Cliente / Empresa");
 
-        ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(btnEliminar, ButtonType.CANCEL);
+        ButtonType btnEliminar = new ButtonType
+            ("Eliminar", ButtonBar.ButtonData.OK_DONE);/*Crea el botón "Eliminar" como acción de
+                                                       confirmación */
+        dialog.getDialogPane().getButtonTypes()
+            .addAll(btnEliminar, ButtonType.CANCEL);/*Agrega los botones eliminar y cancelar al diálogo */
 
-        PasswordField txtPass = new PasswordField();
+        PasswordField txtPass = new PasswordField();/*Campo para ingresar la contraseña de forma oculta */
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass
-        );
-
+        VBox form = new VBox(10, new Label("Contraseña"), txtPass);/*Crea un contenedor vertical con un
+                                                                   texto y un campo de contraseña */
         form.setPadding(new Insets(10));
-        dialog.getDialogPane().setContent(form);
 
-        final boolean[] confirmado = { false };
+        dialog.getDialogPane().setContent(form);/*Establece el contenido del diálogo (el formulario) */
 
-        dialog.setResultConverter(btn -> {
-            if (btn == btnEliminar && txtPass.getText().equals(PASSWORD)) {
-                confirmado[0] = true;
-            } else if (btn == btnEliminar) {
+        final boolean[] confirmado = {false};/*Variable para guardar si el usuario confirmó la acción */
+
+        dialog.setResultConverter(btn -> {/*Define qué hacer según el botón presionado en el diálogo */
+
+            if (btn == btnEliminar && txtPass.getText().equals(PASSWORD)) {/*Si presiona eliminar y la
+                                                                           contraseña es correcta */
+                confirmado[0] = true;/*Marca que el usuario confirmó
+                                     correctamente la eliminación */
+
+            } else if (btn == btnEliminar) {/*Si presionó eliminar pero la contraseña es incorrecta */
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
             }
             return null;
         });
 
-        dialog.showAndWait();
-        return confirmado[0];
+        dialog.showAndWait();/*Muestra el diálogo y espera a que el usuario interactúe */
+        return confirmado[0];/*Devuelve si el usuario confirmó la eliminación */
     }
 }
