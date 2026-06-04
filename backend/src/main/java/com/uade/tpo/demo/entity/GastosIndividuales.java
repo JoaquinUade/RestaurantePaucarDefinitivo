@@ -26,6 +26,7 @@ public class GastosIndividuales {
     @JoinColumn(name = "id_empleado", nullable = false)
     private Empleado empleado;
 
+
     public GastosIndividuales() {
     }
 
@@ -75,4 +76,5 @@ public class GastosIndividuales {
     public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
     }
+
 }
