@@ -9,6 +9,7 @@ public class GastoVariableRequest {
     private BigDecimal cantidad;
     private String medida;
     private BigDecimal monto;
+    private Boolean cargadoEnStock;
     private Long categoriaId;
 
     public GastoVariableRequest() {
@@ -20,6 +21,14 @@ public class GastoVariableRequest {
         this.cantidad = cantidad;
         this.medida = medida;
         this.monto = monto;
+    }
+
+    public Boolean getCargadoEnStock() {
+        return cargadoEnStock;
+    }
+
+    public void setCargadoEnStock(Boolean cargadoEnStock) {
+        this.cargadoEnStock = cargadoEnStock;
     }
 
     public Long getCategoriaId() {

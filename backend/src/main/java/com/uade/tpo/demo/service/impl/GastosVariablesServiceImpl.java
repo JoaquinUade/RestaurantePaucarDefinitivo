@@ -31,6 +31,11 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
         gasto.setCantidad(request.getCantidad());
         gasto.setMedida(request.getMedida());
         gasto.setMonto(request.getMonto());
+        if (request.getCargadoEnStock() != null) {
+            gasto.setCargadoEnStock(request.getCargadoEnStock());
+        } else {
+            gasto.setCargadoEnStock(false);
+        }
         if (request.getCategoriaId() != null) {
             CategoriaGastoVariable cat = categoriaRepo.findById(request.getCategoriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + request.getCategoriaId()));
@@ -49,6 +54,7 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
             if (gastoActualizado.getCantidad() != null) gasto.setCantidad(gastoActualizado.getCantidad());
             if (gastoActualizado.getMedida() != null) gasto.setMedida(gastoActualizado.getMedida());
             if (gastoActualizado.getMonto() != null) gasto.setMonto(gastoActualizado.getMonto());
+            if (gastoActualizado.getCargadoEnStock() != null) gasto.setCargadoEnStock(gastoActualizado.getCargadoEnStock());
             if (gastoActualizado.getCategoria() != null) gasto.setCategoria(gastoActualizado.getCategoria());
             return gastosVariablesRepository.save(gasto);
         }

@@ -29,6 +29,8 @@ public class GastosVariables {
     @Column(name = "monto", nullable = false, precision = 19, scale = 2)
     private BigDecimal monto;
 
+    @Column(name = "cargado_en_stock")
+    private Boolean cargadoEnStock;
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = true)
     private CategoriaGastoVariable categoria;
@@ -44,6 +46,13 @@ public class GastosVariables {
         this.monto = monto;
     }
 
+    public Boolean getCargadoEnStock() {
+        return cargadoEnStock;
+    }
+
+    public void setCargadoEnStock(Boolean cargadoEnStock) {
+        this.cargadoEnStock = cargadoEnStock;
+    }
     public Long getIdGastoVariable() {
         return idGastoVariable;
     }
