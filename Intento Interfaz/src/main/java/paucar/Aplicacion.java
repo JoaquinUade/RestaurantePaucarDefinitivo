@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import paucar.admin.Admin;
 import paucar.resumen.Resumen;
 import paucar.service.AdminService;
+import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
@@ -145,7 +146,7 @@ public class Aplicacion extends Application {
         vistaResumen = new Resumen(backend);
 
         AdminService adminService = new AdminService(API_BASE);
-
+        CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -163,7 +164,7 @@ public class Aplicacion extends Application {
 
         btnAdmin.setOnAction(e -> {
             marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
-            root.setCenter(new Admin(adminService, clientesService)); // ← NUEVA instancia cada vez
+            root.setCenter(new Admin(adminService, clientesService, categoriaGastos)); // ← NUEVA instancia cada vez
         });
         btnVentas.setOnAction(e -> {
             marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);

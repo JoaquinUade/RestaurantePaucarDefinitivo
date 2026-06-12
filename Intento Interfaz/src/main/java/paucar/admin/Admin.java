@@ -8,45 +8,67 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import paucar.admin.categoriasgastos.CategoriasGastosView;
 import paucar.admin.empresasClientes.EmpresasClientes;
 import paucar.admin.platos.Platos;
 import paucar.service.AdminService;
+import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 
 public class Admin extends BorderPane {
         private final AdminService adminService;
         private final ClientesService clientesService;
-        public Admin(AdminService adminService, ClientesService clientesService) {
+        private final CategoriasGastosService categoriaService;
+
+        public Admin(AdminService adminService, ClientesService clientesService, CategoriasGastosService categoriaService) {
                 this.adminService = adminService;
                 this.clientesService = clientesService;
-                getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
-                                                                                                   para Admin*/
+                this.categoriaService = categoriaService;
+
+                getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*
+                                                                                             * Cargar CSS específico
+                                                                                             * para Admin
+                                                                                             */
                 botones();/* Crea los botones de la interfaz de administración */
         }
 
         private void botones() {
-                GridPane grid = new GridPane();/*Crea un contenedor GridPane para organizar componentes
-                                                en forma de grilla (filas y columnas)*/
+                GridPane grid = new GridPane();/*
+                                                * Crea un contenedor GridPane para organizar componentes
+                                                * en forma de grilla (filas y columnas)
+                                                */
                 grid.getStyleClass().add("boton");
                 grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
                 grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
                 grid.setHgap(20);
 
-                Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
-                                                                                                platos*/
+                Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*
+                                                                              * Crea un botón con una tarjeta para los
+                                                                              * platos
+                                                                              */
                 Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/platos.png");
                 btnPlatos.setOnAction(click -> {/* cuando se presione el boton platos */
-                        marcarActivo(btnPlatos, btnEmpresasClientes);/* Marca el botón de platos como activo (cambia su estilo) */
+                        marcarActivo(btnPlatos, btnEmpresasClientes);/*
+                                                                      * Marca el botón de platos como activo (cambia su
+                                                                      * estilo)
+                                                                      */
                         setCenter(new Platos(adminService));/* entra en la vista de platos */
                 });
                 btnEmpresasClientes.setOnAction(click -> {
                         marcarActivo(btnEmpresasClientes, btnPlatos);
                         setCenter(new EmpresasClientes(clientesService));
                 });
+                Button btnCategoriasGastos = crearTarjeta("GASTOS VARIABLES", "/img/gastos.png");
+
+                btnCategoriasGastos.setOnAction(click -> {
+                        marcarActivo(btnCategoriasGastos, btnPlatos, btnEmpresasClientes);
+                        setCenter(new CategoriasGastosView(categoriaService));
+                });
 
                 grid.add(btnPlatos, 0, 0);
                 grid.add(btnEmpresasClientes, 1, 0);
+                grid.add(btnCategoriasGastos, 2, 0);
                 setCenter(grid);
         }
 
@@ -58,8 +80,10 @@ public class Admin extends BorderPane {
                 icono.setFitWidth(90);/* Establece el ancho fit del icono */
                 icono.setFitHeight(90);/* Establece el alto fit del icono */
 
-                icono.setPreserveRatio(true);/*Mantiene la proporción de la imagen evitando que
-                                                   se deforme*/
+                icono.setPreserveRatio(true);/*
+                                              * Mantiene la proporción de la imagen evitando que
+                                              * se deforme
+                                              */
 
                 Button btn = new Button(titulo);/* Crea un botón con el texto especificado */
 
@@ -67,17 +91,19 @@ public class Admin extends BorderPane {
 
                 btn.setContentDisplay(ContentDisplay.TOP);/* Establece la posición del contenido del botón */
 
-                btn.getStyleClass().add("admin-card");/*Agrega la clase CSS para el estilo de la
-                                                         tarjeta*/
+                btn.getStyleClass().add("admin-card");/*
+                                                       * Agrega la clase CSS para el estilo de la
+                                                       * tarjeta
+                                                       */
                 return btn;
         }
 
         private void marcarActivo(Button activo, Button... otros) {
-                if (!activo.getStyleClass().contains("active")) {/*si no esta activo el color del boton */
-                        activo.getStyleClass().add("active");/*le activa el color */
+                if (!activo.getStyleClass().contains("active")) {/* si no esta activo el color del boton */
+                        activo.getStyleClass().add("active");/* le activa el color */
                 }
                 for (Button b : otros) {
-                        b.getStyleClass().remove("active");/*desactiva los otros botones*/
+                        b.getStyleClass().remove("active");/* desactiva los otros botones */
                 }
         }
 }
