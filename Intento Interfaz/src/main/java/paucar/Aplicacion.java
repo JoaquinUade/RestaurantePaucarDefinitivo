@@ -18,10 +18,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import paucar.admin.Admin;
+import paucar.gastos.GastosView;
 import paucar.resumen.Resumen;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
+import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
 
@@ -29,6 +31,8 @@ public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
     private Resumen vistaResumen;
+    private GastosView vistaGastos;
+
     private static final String API_BASE = "http://localhost:4002/api";
     private VentasBackend backend;
 
@@ -144,9 +148,12 @@ public class Aplicacion extends Application {
         vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
                                    // escrita en ventas
         vistaResumen = new Resumen(backend);
-
         AdminService adminService = new AdminService(API_BASE);
         CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
+        GastosVariablesService gastosService = new GastosVariablesService(API_BASE);
+
+        vistaGastos = new GastosView(gastosService, categoriaGastos);
+        
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -158,7 +165,10 @@ public class Aplicacion extends Application {
             root.setCenter(vistaResumen);
         });
 
-        btnGastos.setOnAction(e -> marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin));
+        btnGastos.setOnAction(e -> {
+            marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin);
+            root.setCenter(vistaGastos);
+        });
         btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin));
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
 
