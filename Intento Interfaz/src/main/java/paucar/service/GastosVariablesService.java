@@ -8,6 +8,8 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.uade.tpo.demo.entity.GastoVariableRequest;
 import com.uade.tpo.demo.entity.GastosVariables;
 
@@ -21,6 +23,8 @@ public class GastosVariablesService {
         this.BASE_URL = baseUrl + "/gastos-variables";
         this.http = HttpClient.newHttpClient();
         this.mapper = new ObjectMapper();
+        this.mapper.registerModule(new JavaTimeModule());
+        this.mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     // ✅ OBTENER TODOS
@@ -37,8 +41,7 @@ public class GastosVariablesService {
                 return mapper.readValue(
                         response.body(),
                         mapper.getTypeFactory()
-                                .constructCollectionType(List.class, GastosVariables.class)
-                );
+                                .constructCollectionType(List.class, GastosVariables.class));
             }
 
         } catch (IOException | InterruptedException e) {
@@ -65,7 +68,23 @@ public class GastosVariablesService {
             System.err.println("Error creando gasto: " + e.getMessage());
         }
     }
+// ✅ EDITAR
+public void editar(Long id, GastoVariableRequest gasto) {
+    try {
+        String json = mapper.writeValueAsString(gasto);
 
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/" + id))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        http.send(request, HttpResponse.BodyHandlers.ofString());
+
+    } catch (IOException | InterruptedException e) {
+        System.err.println("Error editando gasto: " + e.getMessage());
+    }
+}
     // ✅ ELIMINAR (opcional por ahora)
     public void eliminar(Long id) {
         try {

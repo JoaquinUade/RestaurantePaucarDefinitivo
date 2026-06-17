@@ -1,0 +1,50 @@
+.btn-agregar {
+    -fx-background-color: #94002c;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 10px 25px;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}
+.btn-filtrar {
+        -fx-background-color: #94002c;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}
+.btn-editar,
+.btn-eliminar {
+    -fx-background-color: #94002c;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 20px 40px;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}
+.btn-filtrar:focused,
+.btn-agregar:focused,
+.btn-editar:focused,
+.btn-eliminar:focused {
+    -fx-background-color: #94002c;
+    /* MISMO color que normal */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.3, 0, 3);
+}
+
+
+.fondo-rojo {
+    -fx-background-color: #94002c;
+}
