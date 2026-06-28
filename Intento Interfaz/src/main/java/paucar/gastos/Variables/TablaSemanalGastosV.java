@@ -1,4 +1,4 @@
-package paucar.gastos;
+package paucar.gastos.Variables;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -14,9 +14,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
-public class TablaSemanalGastos extends VBox {
+public class TablaSemanalGastosV extends VBox {
 
-        public TablaSemanalGastos(List<GastosVariables> gastos, Consumer<GastosVariables> onSelect) {
+        public TablaSemanalGastosV(List<GastosVariables> gastos, Consumer<GastosVariables> onSelect) {
 
                 TableView<GastosVariables> tabla = new TableView<>();
                 tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);

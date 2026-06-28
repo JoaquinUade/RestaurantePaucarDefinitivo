@@ -18,7 +18,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import paucar.admin.Admin;
-import paucar.gastos.GastosView;
+import paucar.gastos.Gastos;
 import paucar.resumen.Resumen;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
@@ -31,7 +31,6 @@ public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
     private Resumen vistaResumen;
-    private GastosView vistaGastos;
 
     private static final String API_BASE = "http://localhost:4002/api";
     private VentasBackend backend;
@@ -108,13 +107,8 @@ public class Aplicacion extends Application {
             b.setMaxWidth(Double.MAX_VALUE);
         } /* Esto hace que los botones tomen la medida de la navtab izquierda */
 
-        menu.getChildren().addAll(
-                btnVentas,
-                btnResumen,
-                btnGastos,
-                btnStock,
-                btnCalcula,
-                btnAdmin);
+        menu.getChildren().addAll(btnVentas, btnResumen, btnGastos, btnStock,
+                                  btnCalcula, btnAdmin);
 
         // ===== Contenido central =====
         VBox contenido = new VBox(30);
@@ -151,11 +145,9 @@ public class Aplicacion extends Application {
                                    // escrita en ventas
         vistaResumen = new Resumen(backend);
         AdminService adminService = new AdminService(API_BASE);
+        GastosVariablesService gastosVService = new GastosVariablesService(API_BASE);
         CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
-        GastosVariablesService gastosService = new GastosVariablesService(API_BASE);
 
-        vistaGastos = new GastosView(gastosService, categoriaGastos);
-        
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -169,7 +161,7 @@ public class Aplicacion extends Application {
 
         btnGastos.setOnAction(e -> {
             marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(vistaGastos);
+            root.setCenter(new Gastos(gastosVService, categoriaGastos));
         });
         btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin));
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));

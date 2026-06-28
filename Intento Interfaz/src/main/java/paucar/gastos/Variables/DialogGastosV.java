@@ -1,4 +1,4 @@
-package paucar.gastos;
+package paucar.gastos.Variables;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +19,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-public class DialogGastos {
+public class DialogGastosV {
     private static final String PASSWORD = "1234";
 
     public static GastoVariableRequest mostrar(List<CategoriaGastoVariable> categorias) {

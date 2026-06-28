@@ -1,4 +1,4 @@
-package paucar.gastos;
+package paucar.gastos.Variables;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 
-public class GastosView extends VBox {
+public class GastosVariablesView extends VBox {
 
     private final GastosVariablesService service;
     private final CategoriasGastosService categoriasService;
@@ -29,7 +29,7 @@ public class GastosView extends VBox {
 
     private final HBox contenedorCategorias = new HBox(20);
 
-    public GastosView(GastosVariablesService service, CategoriasGastosService catService) {
+    public GastosVariablesView(GastosVariablesService service, CategoriasGastosService catService) {
         this.service = service;
         this.categoriasService = catService;
 
@@ -45,7 +45,7 @@ public class GastosView extends VBox {
             System.out.println("Categorias cargadas:");
             categorias.forEach(c -> System.out.println(c.getNombre()));
 
-            GastoVariableRequest req = DialogGastos.mostrar(categorias);
+            GastoVariableRequest req = DialogGastosV.mostrar(categorias);
 
             if (req != null) {
                 service.crear(req);
@@ -64,12 +64,13 @@ public class GastosView extends VBox {
         contenedorCategorias.setPadding(new Insets(15));
 
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
-
+        scroll.getStyleClass().add("scroll-pane");
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setMinHeight(537);
         // 🔥 claves
         scroll.setFitToWidth(false); // permite scroll horizontal
         scroll.setFitToHeight(false);
 
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // vertical
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // horizontal
         VBox fondo = new VBox();
         fondo.getStyleClass().add("fondo-rojo");
@@ -115,7 +116,7 @@ public class GastosView extends VBox {
             original.setMedida(gastoSeleccionado.getMedida());
             original.setMonto(gastoSeleccionado.getMonto());
 
-            GastoVariableRequest editado = DialogGastos.mostrarEditar(categorias, original);
+            GastoVariableRequest editado = DialogGastosV.mostrarEditar(categorias, original);
 
             if (editado != null) {
                 service.editar(gastoSeleccionado.getIdGastoVariable(), editado);
@@ -130,7 +131,7 @@ public class GastosView extends VBox {
                 return;
             }
 
-            boolean confirmado = DialogGastos.confirmarEliminacion();
+            boolean confirmado = DialogGastosV.confirmarEliminacion();
 
             if (confirmado) {
                 service.eliminar(gastoSeleccionado.getIdGastoVariable());
@@ -160,7 +161,7 @@ public class GastosView extends VBox {
         porCategoria.forEach((categoria, lista) -> {
             contenedorCategorias.getChildren().add(
 
-                    new PanelCategoriaGastos(categoria, lista, gasto -> {
+                    new PanelCategoriaGastosV(categoria, lista, gasto -> {
                         gastoSeleccionado = gasto;
                     }));
         });
