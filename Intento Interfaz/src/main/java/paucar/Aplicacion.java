@@ -23,6 +23,7 @@ import paucar.resumen.Resumen;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
+import paucar.service.EmpleadoService;
 import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
 import paucar.ventas.Ventas;
@@ -98,7 +99,7 @@ public class Aplicacion extends Application {
         Button btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
         Button btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
         Button btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
-
+    
         // Marcar “activo” (estado visual)
         btnVentas.getStyleClass().add("active");
 
@@ -147,6 +148,7 @@ public class Aplicacion extends Application {
         AdminService adminService = new AdminService(API_BASE);
         GastosVariablesService gastosVService = new GastosVariablesService(API_BASE);
         CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
+        EmpleadoService empleadoService = new EmpleadoService(API_BASE);
 
         stage.setTitle("Interfaz");
         stage.setScene(scene);
@@ -168,7 +170,7 @@ public class Aplicacion extends Application {
 
         btnAdmin.setOnAction(e -> {
             marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
-            root.setCenter(new Admin(adminService, clientesService, categoriaGastos)); // ← NUEVA instancia cada vez
+            root.setCenter(new Admin(adminService, clientesService, categoriaGastos, empleadoService)); // ← NUEVA instancia cada vez
         });
         btnVentas.setOnAction(e -> {
             marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);
