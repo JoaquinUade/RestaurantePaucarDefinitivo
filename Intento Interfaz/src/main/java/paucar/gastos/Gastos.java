@@ -8,18 +8,27 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import paucar.gastos.Individuales.GastosIndividualesView;
 import paucar.gastos.Variables.GastosVariablesView;
 import paucar.service.CategoriasGastosService;
+import paucar.service.EmpleadoService;
+import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
 
 public class Gastos extends BorderPane {
 
     private final GastosVariablesService gastosVService;
     private final CategoriasGastosService categoriasService;
+    private final GastosIndividualesService gastosIService;
+    private final EmpleadoService empleadoService;
 
-    public Gastos(GastosVariablesService gastosVService, CategoriasGastosService categoriasService) {
+    public Gastos(GastosVariablesService gastosVService, CategoriasGastosService categoriasService,
+            GastosIndividualesService gastosIService, EmpleadoService empleadoService) {
         this.gastosVService = gastosVService;
         this.categoriasService = categoriasService;
+        this.gastosIService = gastosIService;
+        this.empleadoService = empleadoService;
+
         getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
                                                                                          para Admin*/
         botones();
@@ -36,12 +45,18 @@ public class Gastos extends BorderPane {
         /* Establece el espacio horizontal entre los elementos del GridPane */
 
         Button btnGastosVariables = crearTarjeta("VARIABLES", "/img/platos.png");
+        Button btnGastosIndividuales = crearTarjeta("INDIVIDUALES", "/img/platos.png");
         btnGastosVariables.setOnAction(click -> {
-            marcarActivo(btnGastosVariables);
+            marcarActivo(btnGastosVariables, btnGastosIndividuales);
             setCenter(new GastosVariablesView(gastosVService, categoriasService));
         });
 
+        btnGastosIndividuales.setOnAction(click -> {
+            marcarActivo(btnGastosIndividuales, btnGastosVariables);
+            setCenter(new GastosIndividualesView(gastosIService, empleadoService));
+        });
         grid.add(btnGastosVariables, 0, 0);
+        grid.add(btnGastosIndividuales, 1, 0);
         setCenter(grid);
     }
 

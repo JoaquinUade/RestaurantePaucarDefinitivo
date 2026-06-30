@@ -1,4 +1,4 @@
-package paucar.gastos.Variables;
+package paucar.gastos.Individuales;
 
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
@@ -8,21 +8,21 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.uade.tpo.demo.entity.GastosVariables;
+import com.uade.tpo.demo.entity.GastosIndividuales;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class PanelCategoriaGastosV extends VBox {
+public class PanelGastosIndividuales extends VBox {
 
-    public PanelCategoriaGastosV(String nombreCategoria, List<GastosVariables> gastos,
-                                Consumer<GastosVariables> onSelect) {
+    public PanelGastosIndividuales(String nombre, List<GastosIndividuales> gastos,
+                                   Consumer<GastosIndividuales> onSelect) {
 
-        Label titulo = new Label(nombreCategoria);
+        Label titulo = new Label(nombre);
         titulo.getStyleClass().add("card-header");
         titulo.setMaxWidth(Double.MAX_VALUE);
 
-        Map<Integer, List<GastosVariables>> porSemana = gastos.stream()
+        Map<Integer, List<GastosIndividuales>> porSemana = gastos.stream()
                 .collect(Collectors.groupingBy(g -> {
                     LocalDate f = g.getFecha();
                     WeekFields wf = WeekFields.of(Locale.getDefault());
@@ -32,8 +32,7 @@ public class PanelCategoriaGastosV extends VBox {
         getChildren().add(titulo);
 
         porSemana.values().forEach(lista -> {
-            getChildren().add(new TablaSemanalGastosV(lista, onSelect));
+            getChildren().add(new TablaSemanalIndividual(lista, onSelect));
         });
-
     }
 }
