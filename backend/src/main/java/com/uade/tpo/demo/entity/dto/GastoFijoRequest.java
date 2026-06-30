@@ -9,16 +9,18 @@ public class GastoFijoRequest {
     private Boolean estado;
     private BigDecimal monto;
     private Boolean esPersonal;
+    private String observacion;
 
     public GastoFijoRequest() {
     }
 
-    public GastoFijoRequest(LocalDate fecha, String detalle, Boolean estado, BigDecimal monto, Boolean esPersonal) {
+    public GastoFijoRequest(LocalDate fecha, String detalle, Boolean estado, BigDecimal monto, Boolean esPersonal, String observacion) {
         this.fecha = fecha;
         this.detalle = detalle;
         this.estado = estado;
         this.monto = monto;
         this.esPersonal = esPersonal;
+        this.observacion = observacion;
     }
 
     public LocalDate getFecha() {
@@ -59,5 +61,13 @@ public class GastoFijoRequest {
 
     public void setEsPersonal(Boolean esPersonal) {
         this.esPersonal = esPersonal;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 }

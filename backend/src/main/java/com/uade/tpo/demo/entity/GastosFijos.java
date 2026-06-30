@@ -28,6 +28,9 @@ public class GastosFijos {
     @Column(name = "es_personal", nullable = false)
     private Boolean esPersonal;
 
+    @Column(name = "observacion")
+    private String observacion;
+
     public GastosFijos() {
     }
 
@@ -85,5 +88,13 @@ public class GastosFijos {
 
     public void setEsPersonal(Boolean esPersonal) {
         this.esPersonal = esPersonal;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 }

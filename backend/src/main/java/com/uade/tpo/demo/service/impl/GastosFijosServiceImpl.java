@@ -26,6 +26,7 @@ public class GastosFijosServiceImpl implements GastosFijosService {
         gasto.setEstado(request.getEstado() != null ? request.getEstado() : false);
         gasto.setMonto(request.getMonto());
         gasto.setEsPersonal(request.getEsPersonal() != null ? request.getEsPersonal() : false);
+        gasto.setObservacion(request.getObservacion());
         return gastosFijosRepository.save(gasto);
     }
 
@@ -39,6 +40,7 @@ public class GastosFijosServiceImpl implements GastosFijosService {
             if (gastoActualizado.getEstado() != null) gasto.setEstado(gastoActualizado.getEstado());
             if (gastoActualizado.getMonto() != null) gasto.setMonto(gastoActualizado.getMonto());
             if (gastoActualizado.getEsPersonal() != null) gasto.setEsPersonal(gastoActualizado.getEsPersonal());
+            if (gastoActualizado.getObservacion() != null) gasto.setObservacion(gastoActualizado.getObservacion());
             return gastosFijosRepository.save(gasto);
         }
         throw new IllegalArgumentException("Gasto fijo no encontrado con id: " + id);
