@@ -24,6 +24,7 @@ import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 import paucar.service.EmpleadoService;
+import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
@@ -151,6 +152,7 @@ public class Aplicacion extends Application {
         CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
         EmpleadoService empleadoService = new EmpleadoService(API_BASE);
         GastosIndividualesService gastosIService = new GastosIndividualesService(API_BASE);
+        GastosFijosService gastosFService = new GastosFijosService(API_BASE);
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -164,7 +166,7 @@ public class Aplicacion extends Application {
 
         btnGastos.setOnAction(e -> {
             marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(new Gastos(gastosVService, categoriaGastos, gastosIService, empleadoService));
+            root.setCenter(new Gastos(gastosVService, categoriaGastos, gastosIService, empleadoService, gastosFService));
         });
         btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin));
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));

@@ -8,10 +8,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import paucar.gastos.Fijos.GastosFijosView;
 import paucar.gastos.Individuales.GastosIndividualesView;
 import paucar.gastos.Variables.GastosVariablesView;
 import paucar.service.CategoriasGastosService;
 import paucar.service.EmpleadoService;
+import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
 
@@ -21,13 +23,16 @@ public class Gastos extends BorderPane {
     private final CategoriasGastosService categoriasService;
     private final GastosIndividualesService gastosIService;
     private final EmpleadoService empleadoService;
-
+    private final GastosFijosService gastosFService;
+ 
     public Gastos(GastosVariablesService gastosVService, CategoriasGastosService categoriasService,
-            GastosIndividualesService gastosIService, EmpleadoService empleadoService) {
+                  GastosIndividualesService gastosIService, EmpleadoService empleadoService,
+                  GastosFijosService gastosFService) {
         this.gastosVService = gastosVService;
         this.categoriasService = categoriasService;
         this.gastosIService = gastosIService;
         this.empleadoService = empleadoService;
+        this.gastosFService = gastosFService;
 
         getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
                                                                                          para Admin*/
@@ -46,6 +51,8 @@ public class Gastos extends BorderPane {
 
         Button btnGastosVariables = crearTarjeta("VARIABLES", "/img/platos.png");
         Button btnGastosIndividuales = crearTarjeta("INDIVIDUALES", "/img/platos.png");
+        Button btnGastosFijos = crearTarjeta("FIJOS", "/img/platos.png");
+
         btnGastosVariables.setOnAction(click -> {
             marcarActivo(btnGastosVariables, btnGastosIndividuales);
             setCenter(new GastosVariablesView(gastosVService, categoriasService));
@@ -55,8 +62,14 @@ public class Gastos extends BorderPane {
             marcarActivo(btnGastosIndividuales, btnGastosVariables);
             setCenter(new GastosIndividualesView(gastosIService, empleadoService));
         });
+        btnGastosFijos.setOnAction(click -> {
+            marcarActivo(btnGastosFijos, btnGastosVariables, btnGastosIndividuales);
+            setCenter(new GastosFijosView(gastosFService, empleadoService));
+        });
+
         grid.add(btnGastosVariables, 0, 0);
         grid.add(btnGastosIndividuales, 1, 0);
+        grid.add(btnGastosFijos, 2, 0);
         setCenter(grid);
     }
 
