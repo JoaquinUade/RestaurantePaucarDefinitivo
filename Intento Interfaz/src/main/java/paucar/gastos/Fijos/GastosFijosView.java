@@ -11,6 +11,8 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -64,61 +66,63 @@ public class GastosFijosView extends VBox {
                 recargar(filtroFecha.getValue());
             }
         });
-btnEditar.setOnAction(e -> {
+        btnEditar.setOnAction(e -> {
 
-    if (gastoSeleccionado == null) {
-        new Alert(Alert.AlertType.WARNING, "Seleccione un gasto").showAndWait();
-        return;
-    }
+            if (gastoSeleccionado == null) {
+                new Alert(Alert.AlertType.WARNING, "Seleccione un gasto").showAndWait();
+                return;
+            }
 
-    GastoFijoRequest original = new GastoFijoRequest();
-original.setFecha(gastoSeleccionado.getFecha());
-original.setDetalle(gastoSeleccionado.getDetalle());
-original.setMonto(gastoSeleccionado.getMonto());
-original.setObservacion(gastoSeleccionado.getObservacion());
-original.setEstado(gastoSeleccionado.getEstado());
-original.setEsPersonal(gastoSeleccionado.getEsPersonal());
+            GastoFijoRequest original = new GastoFijoRequest();
+            original.setFecha(gastoSeleccionado.getFecha());
+            original.setDetalle(gastoSeleccionado.getDetalle());
+            original.setMonto(gastoSeleccionado.getMonto());
+            original.setObservacion(gastoSeleccionado.getObservacion());
+            original.setEstado(gastoSeleccionado.getEstado());
+            original.setEsPersonal(gastoSeleccionado.getEsPersonal());
 
-GastoFijoRequest editado =
-        DialogGastosFijos.mostrarEditar(original);
+            GastoFijoRequest editado
+                    = DialogGastosFijos.mostrarEditar(original);
 
-if (editado != null) {
-    service.editar(
-            gastoSeleccionado.getIdGastoFijo(), // ✅ ESTE ES EL CORRECTO
-            editado
-    );
+            if (editado != null) {
+                service.editar(
+                        gastoSeleccionado.getIdGastoFijo(), // ✅ ESTE ES EL CORRECTO
+                        editado
+                );
 
-    recargar(filtroFecha.getValue());
-}
+                recargar(filtroFecha.getValue());
+            }
 
+            if (editado != null) {
+                service.editar(
+                        gastoSeleccionado.getIdGastoFijo(),
+                        editado
+                );
+                recargar(filtroFecha.getValue());
+            }
 
-if (editado != null) {
-    service.editar(
-            gastoSeleccionado.getIdGastoFijo(),
-            editado
-    );
-    recargar(filtroFecha.getValue());
-}
-
-});
+        });
         // ✅ ESPACIADOR
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // ✅ FILA SUPERIOR
         HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar, spacer, btnAgregar);
-HBox barraBotones = crearBarraBotones();
-barraBotones.setPadding(new Insets(0));
+        HBox barraBotones = crearBarraBotones();
+        barraBotones.setPadding(new Insets(0));
 
         // ✅ CONTENEDOR
         contenedor.setPadding(new Insets(15));
+        ScrollPane scroll = new ScrollPane(contenedor);
+        scroll.setFitToWidth(true);
+        scroll.setMinHeight(537);
 
         // ✅ FONDO (igual que tu otra vista)
         VBox fondo = new VBox(15);
         fondo.getStyleClass().add("fondo-rojo");
         fondo.setPadding(new Insets(15));
 
-        fondo.getChildren().addAll(filaSuperior, contenedor, barraBotones);
+        fondo.getChildren().addAll(filaSuperior, scroll, barraBotones);
 
         getChildren().add(fondo);
 
@@ -159,17 +163,18 @@ barraBotones.setPadding(new Insets(0));
                 = new TablaMensualFijos(personales, g -> {
                     gastoSeleccionado = g;
                 }, true);
+Label labelGastosFijos = new Label();
+labelGastosFijos.getStyleClass().add("card-header");
+labelGastosFijos.setText("Gastos fijos");
+labelGastosFijos.setMaxWidth(Double.MAX_VALUE);
 
-        VBox bloquePersonal = new VBox(10,
-                new javafx.scene.control.Label("Pagos al personal"),
-                tablaPersonal
-        );
+Label labelPagosPersonal = new Label();
+labelPagosPersonal.getStyleClass().add("card-header");
+labelPagosPersonal.setText("Pagos al personal");
+labelPagosPersonal.setMaxWidth(Double.MAX_VALUE);
 
-        VBox bloqueGenerales = new VBox(10,
-                new javafx.scene.control.Label("Gastos fijos"),
-                tablaGenerales
-        );
-
+VBox bloqueGenerales = new VBox(0, labelGastosFijos, tablaGenerales);
+VBox bloquePersonal = new VBox(0, labelPagosPersonal, tablaPersonal);
 // ✅ contenedor horizontal
         HBox fila = new HBox(20, bloquePersonal, bloqueGenerales);
 
@@ -183,60 +188,61 @@ barraBotones.setPadding(new Insets(0));
 
         contenedor.getChildren().add(fila);
     }
+
     private HBox crearBarraBotones() {
 
-    Button btnEditar = new Button("Editar");
-    btnEditar.getStyleClass().add("btn-editar");
+        Button btnEditar = new Button("Editar");
+        btnEditar.getStyleClass().add("btn-editar");
 
-    Button btnEliminar = new Button("Eliminar");
-    btnEliminar.getStyleClass().add("btn-eliminar");
+        Button btnEliminar = new Button("Eliminar");
+        btnEliminar.getStyleClass().add("btn-eliminar");
 
-    // ✅ EDITAR
-    btnEditar.setOnAction(e -> {
+        // ✅ EDITAR
+        btnEditar.setOnAction(e -> {
 
-        if (gastoSeleccionado == null) {
-            new Alert(Alert.AlertType.WARNING, "Seleccione un gasto").showAndWait();
-            return;
-        }
+            if (gastoSeleccionado == null) {
+                new Alert(Alert.AlertType.WARNING, "Seleccione un gasto").showAndWait();
+                return;
+            }
 
-        GastoFijoRequest original = new GastoFijoRequest();
-        original.setFecha(gastoSeleccionado.getFecha());
-        original.setDetalle(gastoSeleccionado.getDetalle());
-        original.setMonto(gastoSeleccionado.getMonto());
-        original.setObservacion(gastoSeleccionado.getObservacion());
-        original.setEstado(gastoSeleccionado.getEstado());
-        original.setEsPersonal(gastoSeleccionado.getEsPersonal());
+            GastoFijoRequest original = new GastoFijoRequest();
+            original.setFecha(gastoSeleccionado.getFecha());
+            original.setDetalle(gastoSeleccionado.getDetalle());
+            original.setMonto(gastoSeleccionado.getMonto());
+            original.setObservacion(gastoSeleccionado.getObservacion());
+            original.setEstado(gastoSeleccionado.getEstado());
+            original.setEsPersonal(gastoSeleccionado.getEsPersonal());
 
-        GastoFijoRequest editado =
-                DialogGastosFijos.mostrarEditar(original);
+            GastoFijoRequest editado
+                    = DialogGastosFijos.mostrarEditar(original);
 
-        if (editado != null) {
-            service.editar(
-                    gastoSeleccionado.getIdGastoFijo(),
-                    editado
-            );
-            recargar(filtroFecha.getValue());
-        }
-    });
+            if (editado != null) {
+                service.editar(
+                        gastoSeleccionado.getIdGastoFijo(),
+                        editado
+                );
+                recargar(filtroFecha.getValue());
+            }
+        });
 
-    // ✅ ELIMINAR
-    btnEliminar.setOnAction(e -> {
+        // ✅ ELIMINAR
+        btnEliminar.setOnAction(e -> {
 
-        if (gastoSeleccionado == null) {
-            return;
-        }
+            if (gastoSeleccionado == null) {
+                return;
+            }
 
-        boolean confirmado =
-                DialogGastosFijos.confirmarEliminacion();
+            boolean confirmado
+                    = DialogGastosFijos.confirmarEliminacion();
 
-        if (confirmado) {
-            service.eliminar(
-                    gastoSeleccionado.getIdGastoFijo()
-            );
-            recargar(filtroFecha.getValue());
-        }
-    });
+            if (confirmado) {
+                service.eliminar(
+                        gastoSeleccionado.getIdGastoFijo()
+                );
+                recargar(filtroFecha.getValue());
+            }
+        });
 
-    return new HBox(10, btnEditar, btnEliminar);
-}
+        return new HBox(10, btnEditar, btnEliminar);
+    }
 }

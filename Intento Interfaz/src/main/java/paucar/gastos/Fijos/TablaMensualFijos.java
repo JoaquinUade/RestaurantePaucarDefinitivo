@@ -1,23 +1,25 @@
 package paucar.gastos.Fijos;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 import com.uade.tpo.demo.entity.GastosFijos;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 
 public class TablaMensualFijos extends VBox {
 
     public TablaMensualFijos(List<GastosFijos> gastos,
-                         Consumer<GastosFijos> onSelect,
-                         boolean esPersonal){
+            Consumer<GastosFijos> onSelect,
+            boolean esPersonal) {
 
         TableView<GastosFijos> tabla = new TableView<>();
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
@@ -25,69 +27,162 @@ public class TablaMensualFijos extends VBox {
         // ✅ DETALLE (antes nombre)
         TableColumn<GastosFijos, String> colDetalle;
 
-if (esPersonal) {
-    colDetalle = new TableColumn<>("Empleado");
-} else {
-    colDetalle = new TableColumn<>("Detalle");
-}
+        if (esPersonal) {
+            colDetalle = new TableColumn<>("Empleado");
+        } else {
+            colDetalle = new TableColumn<>("Detalle");
+        }
 
-colDetalle.setCellValueFactory(c ->
-        new SimpleStringProperty(c.getValue().getDetalle()));
+        colDetalle.setCellValueFactory(c
+                -> new SimpleStringProperty(c.getValue().getDetalle()));
+        colDetalle.setCellFactory(tc -> new TableCell<>() {
 
-        // ✅ MONTO
-        TableColumn<GastosFijos, String> colMonto = new TableColumn<>("Monto");
-        colMonto.setCellValueFactory(c ->
-                new SimpleStringProperty("$" + c.getValue().getMonto()));
+            private final javafx.scene.text.Text text
+                    = new javafx.scene.text.Text();
 
-        // ✅ ESTADO (Boolean → texto)
-        TableColumn<GastosFijos, String> colEstado = new TableColumn<>("Estado");
+            {
+                text.wrappingWidthProperty()
+                        .bind(tc.widthProperty().subtract(16));
 
-        colEstado.setCellValueFactory(c -> {
-            Boolean estado = c.getValue().getEstado();
-            String texto = (estado != null && estado) ? "Pagado" : "Pendiente";
-            return new SimpleStringProperty(texto);
+                setGraphic(text);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty || item == null || item.isBlank()) {
+                    text.setText(null);
+                    setGraphic(null);
+                } else {
+                    text.setText(item);
+                    setGraphic(text);
+                }
+            }
         });
+        Locale locale = Locale.of("es", "AR");
 
-        // ✅ ESTADO EDITABLE
-        colEstado.setCellFactory(
-                ComboBoxTableCell.forTableColumn("Pendiente", "Pagado")
+        NumberFormat formato
+                = NumberFormat.getCurrencyInstance(locale);
+
+        TableColumn<GastosFijos, String> colMonto
+                = new TableColumn<>("Monto");
+
+        colMonto.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        formato.format(c.getValue().getMonto())
+                )
+        );
+        // ✅ ESTADO (Boolean → texto)
+        TableColumn<GastosFijos, Boolean> colEstado
+                = new TableColumn<>("Estado");
+
+        colEstado.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(
+                        c.getValue().getEstado()
+                )
         );
 
-        colEstado.setOnEditCommit(e -> {
-            GastosFijos g = e.getRowValue();
-            g.setEstado(e.getNewValue().equals("Pagado"));
+        colEstado.setCellFactory(tc -> new TableCell<>() {
+
+            private final ComboBox<String> combo = new ComboBox<>();
+
+            {
+                combo.getItems().addAll("Pendiente", "Pagado");
+
+                combo.valueProperty().addListener((obs, anterior, nuevo) -> {
+
+                    if (getIndex() >= 0
+                            && getIndex() < getTableView().getItems().size()) {
+
+                        GastosFijos gasto
+                                = getTableView().getItems().get(getIndex());
+
+                        gasto.setEstado("Pagado".equals(nuevo));
+
+                        // Acá luego podrás llamar a tu service
+                        // service.actualizarEstado(...)
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                    return;
+                }
+
+                combo.setValue(
+                        Boolean.TRUE.equals(item)
+                        ? "Pagado"
+                        : "Pendiente"
+                );
+
+                setGraphic(combo);
+            }
         });
 
-       TableColumn<GastosFijos, String> colObs = null;
+        TableColumn<GastosFijos, String> colObs = null;
 
-if (!esPersonal) {
-    colObs = new TableColumn<>("Observación");
+        if (!esPersonal) {
+            colObs = new TableColumn<>("Observación");
 
-    colObs.setCellValueFactory(c ->
-            new SimpleStringProperty(
-                    c.getValue().getObservacion() == null ? "" : c.getValue().getObservacion()
-            )
-    );
+            colObs.setCellValueFactory(c
+                    -> new SimpleStringProperty(
+                            c.getValue().getObservacion() == null
+                            ? ""
+                            : c.getValue().getObservacion()
+                    )
+            );
 
-    colObs.setCellFactory(TextFieldTableCell.forTableColumn());
+            colObs.setCellFactory(tc -> new TableCell<>() {
 
-    colObs.setOnEditCommit(e -> {
-        GastosFijos g = e.getRowValue();
-        g.setObservacion(e.getNewValue());
-    });
-}
+                private final javafx.scene.text.Text text
+                        = new javafx.scene.text.Text();
 
+                {
+                    text.wrappingWidthProperty()
+                            .bind(tc.widthProperty().subtract(16));
+
+                    setGraphic(text);
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null || item.isBlank()) {
+                        text.setText(null);
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        setGraphic(text);
+                    }
+                }
+            });
+
+            colObs.setOnEditCommit(e -> {
+                GastosFijos g = e.getRowValue();
+                g.setObservacion(e.getNewValue());
+            });
+        }
+        tabla.setPrefHeight(460);
         // ✅ TABLA EDITABLE
         tabla.setEditable(true);
-
         // ✅ AGREGAR COLUMNAS
         tabla.getColumns().add(colDetalle);
         tabla.getColumns().add(colMonto);
         tabla.getColumns().add(colEstado);
-        
-if (colObs != null) {
-    tabla.getColumns().add(colObs);
-}
+
+        if (colObs != null) {
+            tabla.getColumns().add(colObs);
+        }
 
         // ✅ CARGAR DATOS
         tabla.setItems(FXCollections.observableArrayList(gastos));

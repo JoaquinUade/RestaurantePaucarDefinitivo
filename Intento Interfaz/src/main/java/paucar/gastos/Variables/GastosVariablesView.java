@@ -33,7 +33,7 @@ public class GastosVariablesView extends VBox {
         this.service = service;
         this.categoriasService = catService;
 
-        DatePicker filtroFecha = new DatePicker(LocalDate.now());
+        filtroFecha = new DatePicker(LocalDate.now());
         filtroFecha.getStyleClass().add("date-agregar");
         filtroFecha.setPromptText("Filtrar por mes");
 
