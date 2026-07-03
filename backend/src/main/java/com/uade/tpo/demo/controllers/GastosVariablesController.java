@@ -54,4 +54,9 @@ public class GastosVariablesController {
     public ResponseEntity<List<GastosVariables>> obtenerPorAnioYMes(@PathVariable int anio, @PathVariable int mes) {
         return ResponseEntity.ok(gastosVariablesService.obtenerGastosVariablesPorAnioYMes(anio, mes));
     }
+
+    @GetMapping("/anio/{anio}/mes/{mes}/no-cargados")
+    public ResponseEntity<List<GastosVariables>> obtenerNoCargadosPorAnioYMes(@PathVariable int anio, @PathVariable int mes) {
+        return ResponseEntity.ok(gastosVariablesService.obtenerGastosVariablesNoCargadosPorAnioYMes(anio, mes));
+    }
 }

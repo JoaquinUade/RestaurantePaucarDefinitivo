@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS productos (
   categoria VARCHAR(50) NOT NULL,
   PRIMARY KEY (id_producto)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS stock (
+  id_stock BIGINT NOT NULL AUTO_INCREMENT,
+  nombre_producto VARCHAR(255) NOT NULL,
+  cantidad DECIMAL(19,4) NOT NULL,
+  stock_minimo DECIMAL(19,4) NOT NULL,
+  PRIMARY KEY (id_stock),
+  UNIQUE KEY uk_stock_nombre_producto (nombre_producto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -10,6 +10,7 @@ public interface GastosVariablesService {
     GastosVariables modificarGastoVariable(Long id, GastosVariables gasto);
     void borrarGastoVariable(Long id);
     List<GastosVariables> obtenerGastosVariablesPorAnioYMes(int anio, int mes);
+    List<GastosVariables> obtenerGastosVariablesNoCargadosPorAnioYMes(int anio, int mes);
     List<GastosVariables> obtenerGastosVariablesPorAnio(int anio);
     List<GastosVariables> obtenerTodosLosGastosVariables();
     GastosVariables obtenerGastoVariablePorId(Long id);

@@ -79,6 +79,11 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
     }
 
     @Override
+    public List<GastosVariables> obtenerGastosVariablesNoCargadosPorAnioYMes(int anio, int mes) {
+        return gastosVariablesRepository.findNoCargadosEnStockPorAnioYMes(anio, mes);
+    }
+
+    @Override
     public List<GastosVariables> obtenerGastosVariablesPorAnio(int anio) {
         return gastosVariablesRepository.findAll()
                 .stream()
