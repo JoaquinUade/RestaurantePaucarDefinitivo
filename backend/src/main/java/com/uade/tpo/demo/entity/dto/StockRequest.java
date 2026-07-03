@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class StockRequest {
 
+    private Long categoriaId;
     private String nombreProducto;
     private BigDecimal cantidad;
     private BigDecimal stockMinimo;
@@ -11,10 +12,19 @@ public class StockRequest {
     public StockRequest() {
     }
 
-    public StockRequest(String nombreProducto, BigDecimal cantidad, BigDecimal stockMinimo) {
+    public StockRequest(Long categoriaId, String nombreProducto, BigDecimal cantidad, BigDecimal stockMinimo) {
+        this.categoriaId = categoriaId;
         this.nombreProducto = nombreProducto;
         this.cantidad = cantidad;
         this.stockMinimo = stockMinimo;
+    }
+
+    public Long getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(Long categoriaId) {
+        this.categoriaId = categoriaId;
     }
 
     public String getNombreProducto() {

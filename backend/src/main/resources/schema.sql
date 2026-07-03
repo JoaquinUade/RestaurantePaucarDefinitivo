@@ -31,9 +31,11 @@ CREATE TABLE IF NOT EXISTS productos (
 
 CREATE TABLE IF NOT EXISTS stock (
   id_stock BIGINT NOT NULL AUTO_INCREMENT,
+  id_categoria BIGINT NOT NULL,
   nombre_producto VARCHAR(255) NOT NULL,
   cantidad DECIMAL(19,4) NOT NULL,
   stock_minimo DECIMAL(19,4) NOT NULL,
   PRIMARY KEY (id_stock),
-  UNIQUE KEY uk_stock_nombre_producto (nombre_producto)
+  UNIQUE KEY uk_stock_categoria (id_categoria),
+  CONSTRAINT fk_stock_categoria FOREIGN KEY (id_categoria) REFERENCES categoria_gasto_variable(id_categoria)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

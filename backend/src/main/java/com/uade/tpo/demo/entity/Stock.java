@@ -12,7 +12,11 @@ public class Stock {
     @Column(name = "id_stock")
     private Long idStock;
 
-    @Column(name = "nombre_producto", nullable = false, unique = true)
+    @OneToOne(optional = false)
+    @JoinColumn(name = "id_categoria", nullable = false, unique = true)
+    private CategoriaGastoVariable categoriaGastoVariable;
+
+    @Column(name = "nombre_producto", nullable = false)
     private String nombreProducto;
 
     @Column(name = "cantidad", nullable = false, precision = 19, scale = 4)
@@ -24,7 +28,8 @@ public class Stock {
     public Stock() {
     }
 
-    public Stock(String nombreProducto, BigDecimal cantidad, BigDecimal stockMinimo) {
+    public Stock(CategoriaGastoVariable categoriaGastoVariable, String nombreProducto, BigDecimal cantidad, BigDecimal stockMinimo) {
+        this.categoriaGastoVariable = categoriaGastoVariable;
         this.nombreProducto = nombreProducto;
         this.cantidad = cantidad;
         this.stockMinimo = stockMinimo;
@@ -36,6 +41,14 @@ public class Stock {
 
     public void setIdStock(Long idStock) {
         this.idStock = idStock;
+    }
+
+    public CategoriaGastoVariable getCategoriaGastoVariable() {
+        return categoriaGastoVariable;
+    }
+
+    public void setCategoriaGastoVariable(CategoriaGastoVariable categoriaGastoVariable) {
+        this.categoriaGastoVariable = categoriaGastoVariable;
     }
 
     public String getNombreProducto() {

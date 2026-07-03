@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
-    Optional<Stock> findByNombreProductoIgnoreCase(String nombreProducto);
+    Optional<Stock> findByCategoriaGastoVariable_IdCategoria(Long idCategoria);
 
     @Query("SELECT s FROM Stock s WHERE s.cantidad <= s.stockMinimo")
     List<Stock> findStockBajoMinimo();

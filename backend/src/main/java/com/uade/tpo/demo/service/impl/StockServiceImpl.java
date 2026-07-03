@@ -1,7 +1,9 @@
 package com.uade.tpo.demo.service.impl;
 
+import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
+import com.uade.tpo.demo.repository.CategoriaGastoVariableRepository;
 import com.uade.tpo.demo.repository.StockRepository;
 import com.uade.tpo.demo.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,26 +19,64 @@ public class StockServiceImpl implements StockService {
     @Autowired
     private StockRepository stockRepository;
 
+    @Autowired
+    private CategoriaGastoVariableRepository categoriaRepository;
+
     @Override
     public Stock agregarProductoAStock(StockRequest request) {
+        if (request.getCategoriaId() == null) {
+            throw new IllegalArgumentException("La categoria es obligatoria");
+        }
         if (request.getNombreProducto() == null || request.getNombreProducto().isBlank()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio");
         }
 
+        CategoriaGastoVariable categoria = categoriaRepository.findById(request.getCategoriaId())
+                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + request.getCategoriaId()));
+
         BigDecimal cantidad = request.getCantidad() != null ? request.getCantidad() : BigDecimal.ZERO;
         BigDecimal stockMinimo = request.getStockMinimo() != null ? request.getStockMinimo() : BigDecimal.ZERO;
+        if (cantidad.signum() == 0) {
+            throw new IllegalArgumentException("La cantidad debe ser distinta de cero");
+        }
 
-        String nombreProducto = request.getNombreProducto().trim();
-        Optional<Stock> stockExistente = stockRepository.findByNombreProductoIgnoreCase(nombreProducto);
+        Optional<Stock> stockExistente = stockRepository.findByCategoriaGastoVariable_IdCategoria(categoria.getIdCategoria());
         if (stockExistente.isPresent()) {
             Stock stock = stockExistente.get();
-            stock.setCantidad(stock.getCantidad().add(cantidad));
+            stock.setNombreProducto(request.getNombreProducto().trim());
+            aplicarCambioCantidad(stock, cantidad);
             stock.setStockMinimo(stockMinimo);
             return stockRepository.save(stock);
         }
 
-        Stock stock = new Stock(nombreProducto, cantidad, stockMinimo);
+        if (cantidad.signum() < 0) {
+            throw new IllegalArgumentException("No se puede crear stock con una cantidad negativa");
+        }
+
+        Stock stock = new Stock(categoria, request.getNombreProducto().trim(), cantidad, stockMinimo);
         return stockRepository.save(stock);
+    }
+
+    @Override
+    public Stock ajustarCantidadStock(Long id, BigDecimal cantidad) {
+        Stock stock = stockRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Stock no encontrado con id: " + id));
+
+        aplicarCambioCantidad(stock, cantidad);
+        return stockRepository.save(stock);
+    }
+
+    private void aplicarCambioCantidad(Stock stock, BigDecimal cantidad) {
+        if (cantidad == null || cantidad.signum() == 0) {
+            throw new IllegalArgumentException("La cantidad debe ser distinta de cero");
+        }
+
+        BigDecimal nuevaCantidad = stock.getCantidad().add(cantidad);
+        if (nuevaCantidad.signum() < 0) {
+            throw new IllegalArgumentException("No hay stock suficiente para descontar esa cantidad");
+        }
+
+        stock.setCantidad(nuevaCantidad);
     }
 
     @Override
@@ -52,6 +92,11 @@ public class StockServiceImpl implements StockService {
         }
         if (stockActualizado.getNombreProducto() != null && !stockActualizado.getNombreProducto().isBlank()) {
             stock.setNombreProducto(stockActualizado.getNombreProducto().trim());
+        }
+        if (stockActualizado.getCategoriaGastoVariable() != null && stockActualizado.getCategoriaGastoVariable().getIdCategoria() != null) {
+            CategoriaGastoVariable categoria = categoriaRepository.findById(stockActualizado.getCategoriaGastoVariable().getIdCategoria())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + stockActualizado.getCategoriaGastoVariable().getIdCategoria()));
+            stock.setCategoriaGastoVariable(categoria);
         }
 
         return stockRepository.save(stock);

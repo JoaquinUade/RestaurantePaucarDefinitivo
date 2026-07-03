@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/stock")
@@ -21,6 +22,11 @@ public class StockController {
     public ResponseEntity<Stock> agregarProductoAStock(@RequestBody StockRequest request) {
         Stock stock = stockService.agregarProductoAStock(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(stock);
+    }
+
+    @PatchMapping("/{id}/cantidad")
+    public ResponseEntity<Stock> ajustarCantidadStock(@PathVariable Long id, @RequestParam BigDecimal cantidad) {
+        return ResponseEntity.ok(stockService.ajustarCantidadStock(id, cantidad));
     }
 
     @PutMapping("/{id}")
