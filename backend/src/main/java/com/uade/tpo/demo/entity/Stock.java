@@ -25,6 +25,9 @@ public class Stock {
     @Column(name = "stock_minimo", nullable = false, precision = 19, scale = 4)
     private BigDecimal stockMinimo;
 
+    @Column(name = "unidad_medida")
+    private String unidadMedida;
+
     public Stock() {
     }
 
@@ -73,5 +76,13 @@ public class Stock {
 
     public void setStockMinimo(BigDecimal stockMinimo) {
         this.stockMinimo = stockMinimo;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
+    }
+
+    public String getUnidadMedida() {
+        return unidadMedida;
     }
 }

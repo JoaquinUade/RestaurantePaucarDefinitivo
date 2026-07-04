@@ -1,5 +1,6 @@
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empleados\TablaEmpleados.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\TablaSemanalGastosV.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\TablaStock.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\Ventas.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\Resumen.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Individuales\PanelGastosIndividuales.java
@@ -9,7 +10,9 @@ C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDef
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Individuales\DialogGastosIndividuales.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empresasClientes\TablaEmpresasClientes.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\clientes\MensualClientes.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\DialogStock.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\EmpleadoService.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\StockService.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Individuales\GastosIndividualesView.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Fijos\DialogGastosFijos.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\AdminService.java
@@ -35,6 +38,8 @@ C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDef
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\ResumenBackend.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\Tabla.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\empresas\semanal\TablaSemanalDebe.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\TablaCategoriaStock.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\PanelCategoriaStock.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empleados\DialogEmpleados.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\general\SemanalGeneral.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empresasClientes\DialogEmpresasClientes.java
@@ -49,4 +54,5 @@ C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDef
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\categoriasgastos\DialogCategoriasGastos.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\GastosVariablesView.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Fijos\GastosFijosView.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\StockView.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\PanelCategoriaGastosV.java

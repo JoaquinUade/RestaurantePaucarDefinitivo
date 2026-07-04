@@ -8,6 +8,7 @@ public class StockRequest {
     private String nombreProducto;
     private BigDecimal cantidad;
     private BigDecimal stockMinimo;
+    private String unidadMedida;
 
     public StockRequest() {
     }
@@ -50,4 +51,13 @@ public class StockRequest {
     public void setStockMinimo(BigDecimal stockMinimo) {
         this.stockMinimo = stockMinimo;
     }
+    
+   public String getUnidadMedida() {
+        return unidadMedida;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
+    }
+
 }

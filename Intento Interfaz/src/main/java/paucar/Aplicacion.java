@@ -27,7 +27,9 @@ import paucar.service.EmpleadoService;
 import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
+import paucar.service.StockService;
 import paucar.service.VentasBackend;
+import paucar.stock.StockView;
 import paucar.ventas.Ventas;
 
 public class Aplicacion extends Application {
@@ -101,17 +103,18 @@ public class Aplicacion extends Application {
         Button btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
         Button btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
         Button btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
-    
+
         // Marcar “activo” (estado visual)
         btnVentas.getStyleClass().add("active");
 
-        Button[] botones = new Button[] { btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin };
+        Button[] botones = new Button[]{btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin};
         for (Button b : botones) {
             b.setMaxWidth(Double.MAX_VALUE);
-        } /* Esto hace que los botones tomen la medida de la navtab izquierda */
+        }
+        /* Esto hace que los botones tomen la medida de la navtab izquierda */
 
         menu.getChildren().addAll(btnVentas, btnResumen, btnGastos, btnStock,
-                                  btnCalcula, btnAdmin);
+                btnCalcula, btnAdmin);
 
         // ===== Contenido central =====
         VBox contenido = new VBox(30);
@@ -145,7 +148,7 @@ public class Aplicacion extends Application {
         root.setLeft(menuScroll);
         root.setCenter(contenido);
         vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
-                                   // escrita en ventas
+        // escrita en ventas
         vistaResumen = new Resumen(backend);
         AdminService adminService = new AdminService(API_BASE);
         GastosVariablesService gastosVService = new GastosVariablesService(API_BASE);
@@ -153,6 +156,8 @@ public class Aplicacion extends Application {
         EmpleadoService empleadoService = new EmpleadoService(API_BASE);
         GastosIndividualesService gastosIService = new GastosIndividualesService(API_BASE);
         GastosFijosService gastosFService = new GastosFijosService(API_BASE);
+        StockService stockService = new StockService(API_BASE);
+
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -168,7 +173,11 @@ public class Aplicacion extends Application {
             marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin);
             root.setCenter(new Gastos(gastosVService, categoriaGastos, gastosIService, empleadoService, gastosFService));
         });
-        btnStock.setOnAction(e -> marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin));
+        btnStock.setOnAction(e -> {
+
+            marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin);
+            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService));
+        });
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
 
         btnAdmin.setOnAction(e -> {

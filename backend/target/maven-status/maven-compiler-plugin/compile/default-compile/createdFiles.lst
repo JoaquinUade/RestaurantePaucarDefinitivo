@@ -14,6 +14,7 @@ com\uade\tpo\demo\service\ClienteServiceImpl.class
 com\uade\tpo\demo\controllers\ProductoController.class
 com\uade\tpo\demo\repository\GastosRepository.class
 com\uade\tpo\demo\repository\ClienteRepository.class
+com\uade\tpo\demo\entity\Stock.class
 com\uade\tpo\demo\entity\dto\VentaResumenDiarioDTO.class
 com\uade\tpo\demo\controllers\EmpleadoController.class
 com\uade\tpo\demo\entity\GastosIndividuales.class
@@ -22,12 +23,14 @@ com\uade\tpo\demo\entity\GastosVariables.class
 com\uade\tpo\demo\controllers\GastosIndividualesController.class
 com\uade\tpo\demo\entity\Empleado.class
 com\uade\tpo\demo\service\VentaServiceImpl$1.class
+com\uade\tpo\demo\controllers\StockController.class
 com\uade\tpo\demo\repository\EmpleadoRepository.class
 com\uade\tpo\demo\service\GastosService.class
 com\uade\tpo\demo\exceptions\CategoryDuplicateException.class
 com\uade\tpo\demo\DemoApplication.class
 com\uade\tpo\demo\controllers\GastosController.class
 com\uade\tpo\demo\service\GastosIndividualesService.class
+com\uade\tpo\demo\service\StockService.class
 com\uade\tpo\demo\entity\Cliente.class
 com\uade\tpo\demo\entity\dto\EmpleadoRequest.class
 com\uade\tpo\demo\entity\dto\VentaRequest.class
@@ -36,12 +39,14 @@ com\uade\tpo\demo\entity\Venta.class
 com\uade\tpo\demo\entity\CategoriaGastoVariable.class
 com\uade\tpo\demo\entity\TipoCliente.class
 com\uade\tpo\demo\service\GastosFijosService.class
+com\uade\tpo\demo\entity\dto\StockRequest.class
 com\uade\tpo\demo\controllers\CategoriaGastoVariableController.class
 com\uade\tpo\demo\service\ProductoServiceImpl.class
 com\uade\tpo\demo\service\impl\CategoriaGastoVariableServiceImpl.class
 com\uade\tpo\demo\entity\Categoria.class
 com\uade\tpo\demo\service\VentaServiceImpl.class
 com\uade\tpo\demo\repository\GastosFijosRepository.class
+com\uade\tpo\demo\repository\StockRepository.class
 com\uade\tpo\demo\repository\VentaRepository.class
 com\uade\tpo\demo\entity\TipoDePago.class
 com\uade\tpo\demo\service\impl\GastosVariablesServiceImpl.class
@@ -56,4 +61,5 @@ com\uade\tpo\demo\entity\dto\GastoRequest.class
 com\uade\tpo\demo\repository\GastosVariablesRepository.class
 com\uade\tpo\demo\service\impl\GastosServiceImpl.class
 com\uade\tpo\demo\controllers\GastosVariablesController.class
+com\uade\tpo\demo\service\impl\StockServiceImpl.class
 com\uade\tpo\demo\entity\dto\GastoFijoRequest.class
