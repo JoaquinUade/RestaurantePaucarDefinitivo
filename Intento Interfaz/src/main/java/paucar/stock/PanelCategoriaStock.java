@@ -16,7 +16,6 @@ public class PanelCategoriaStock extends VBox {
             Consumer<Stock> onSelect) {
 
         Label titulo = new Label(nombreCategoria);
-
         titulo.getStyleClass().add("card-header");
         titulo.setMaxWidth(Double.MAX_VALUE);
 

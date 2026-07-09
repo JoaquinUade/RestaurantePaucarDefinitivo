@@ -44,11 +44,11 @@ public class TablaCategoriaStock extends VBox {
             Stock stock = c.getValue();
 
             String texto =
-                    stock.getCantidad()
-                            .stripTrailingZeros()
-                            .toPlainString()
-                            + " "
-                            + stock.getUnidadMedida();
+        stock.getCantidad()
+                .stripTrailingZeros()
+                .toPlainString()
+                + " "
+                + stock.getUnidadCantidad();
 
             return new SimpleStringProperty(texto);
         });
@@ -63,11 +63,12 @@ public class TablaCategoriaStock extends VBox {
             Stock stock = c.getValue();
 
             String texto =
-                    stock.getStockMinimo()
-                            .stripTrailingZeros()
-                            .toPlainString()
-                            + " "
-                            + stock.getUnidadMedida();
+        stock.getStockMinimo()
+                .stripTrailingZeros()
+                .toPlainString()
+                + " "
+                + stock.getUnidadStockMinimo();
+
 
             return new SimpleStringProperty(texto);
         });

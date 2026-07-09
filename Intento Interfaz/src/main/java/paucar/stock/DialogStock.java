@@ -18,6 +18,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -26,15 +27,63 @@ import javafx.scene.layout.VBox;
 public class DialogStock {
 
     public static StockRequest mostrar(List<CategoriaGastoVariable> categorias,
-                                       List<GastosVariables> gastos) {
+            List<GastosVariables> gastos) {
         TableView<GastosVariables> tabla
                 = new TableView<>();
+
+        tabla.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+        TableColumn<GastosVariables, String> colFecha
+                = new TableColumn<>("Fecha");
+
+        colFecha.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue()
+                                .getFecha()
+                                .toString()
+                ));
         TableColumn<GastosVariables, String> colProducto
                 = new TableColumn<>("Producto");
-
+        colProducto.setPrefWidth(200);
         colProducto.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getProducto()));
+
+        colProducto.setCellFactory(tc -> new TableCell<>() {
+
+            private final javafx.scene.text.Text text
+                    = new javafx.scene.text.Text();
+
+            {
+                text.wrappingWidthProperty()
+                        .bind(tc.widthProperty().subtract(10));
+
+                setPrefHeight(
+                        javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+
+                setGraphic(text);
+            }
+
+            @Override
+            protected void updateItem(
+                    String item,
+                    boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+
+                    text.setText(null);
+                    setGraphic(null);
+
+                } else {
+
+                    text.setText(item);
+                    setGraphic(text);
+                }
+            }
+        });
         TableColumn<GastosVariables, String> colCantidad
                 = new TableColumn<>("Cantidad");
 
@@ -47,8 +96,21 @@ public class DialogStock {
                         + " "
                         + c.getValue().getMedida()
                 ));
+        TableColumn<GastosVariables, String> colPrecio
+                = new TableColumn<>("Precio");
+
+        colPrecio.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        "$ "
+                        + c.getValue()
+                                .getMonto()
+                                .stripTrailingZeros()
+                                .toPlainString()
+                ));
+        tabla.getColumns().add(colFecha);
         tabla.getColumns().add(colProducto);
         tabla.getColumns().add(colCantidad);
+        tabla.getColumns().add(colPrecio);
 
         tabla.setPrefHeight(250);
         Dialog<StockRequest> dialog = new Dialog<>();
@@ -98,31 +160,31 @@ public class DialogStock {
                                 : item.getNombre());
             }
         });
-comboCategoria.setOnAction(e -> {
+        comboCategoria.setOnAction(e -> {
 
-    CategoriaGastoVariable categoria =
-            comboCategoria.getValue();
+            CategoriaGastoVariable categoria
+                    = comboCategoria.getValue();
 
-    if (categoria == null) {
-        return;
-    }
+            if (categoria == null) {
+                return;
+            }
 
-    List<GastosVariables> filtrados =
-            gastos.stream()
-                    .filter(g ->
-                            g.getCategoria()
+            List<GastosVariables> filtrados
+                    = gastos.stream()
+                            .filter(g
+                                    -> g.getCategoria()
                                     .getIdCategoria()
                                     .equals(
                                             categoria.getIdCategoria()))
-                    .toList();
+                            .toList();
 
-    tabla.getItems().setAll(filtrados);
+            tabla.getItems().setAll(filtrados);
 
-    System.out.println(
-            "Productos encontrados: "
+            System.out.println(
+                    "Productos encontrados: "
                     + filtrados.size());
-});
-        TextField txtCantidad = new TextField();
+        });
+
         TextField txtStockMinimo = new TextField();
 
         VBox form = new VBox(
@@ -131,8 +193,6 @@ comboCategoria.setOnAction(e -> {
                 comboCategoria,
                 new Label("Producto"),
                 tabla,
-                new Label("Cantidad"),
-                txtCantidad,
                 new Label("Stock mínimo"),
                 txtStockMinimo
         );
@@ -160,6 +220,12 @@ comboCategoria.setOnAction(e -> {
                                 .getSelectedItem();
 
                 if (seleccionado == null) {
+
+                    new Alert(
+                            Alert.AlertType.WARNING,
+                            "Seleccione un producto"
+                    ).showAndWait();
+
                     return null;
                 }
 
@@ -176,10 +242,18 @@ comboCategoria.setOnAction(e -> {
                         seleccionado.getProducto()
                 );
 
+                request.setCantidad(
+                        seleccionado.getCantidad()
+                );
+
+                request.setUnidadCantidad(
+                        seleccionado.getMedida()
+                );
+
                 try {
 
                     String texto
-                            = txtCantidad.getText().trim();
+                            = txtStockMinimo.getText().trim();
 
                     java.util.regex.Pattern pattern
                             = java.util.regex.Pattern.compile(
@@ -191,30 +265,16 @@ comboCategoria.setOnAction(e -> {
 
                     if (matcher.matches()) {
 
-                        request.setCantidad(
+                        request.setStockMinimo(
                                 new BigDecimal(
                                         matcher.group(1)
                                 )
                         );
 
-                        request.setUnidadMedida(
+                        request.setUnidadStockMinimo(
                                 matcher.group(2).trim()
                         );
-
                     }
-
-                } catch (Exception e) {
-
-                    request.setCantidad(BigDecimal.ZERO);
-                }
-
-                try {
-
-                    request.setStockMinimo(
-                            new BigDecimal(
-                                    txtStockMinimo.getText()
-                            )
-                    );
 
                 } catch (Exception e) {
 
@@ -222,7 +282,9 @@ comboCategoria.setOnAction(e -> {
                             BigDecimal.ZERO
                     );
                 }
-
+                System.out.println("SE CREO EL REQUEST");
+                System.out.println(request.getNombreProducto());
+                System.out.println(request.getCantidad());
                 return request;
             }
 
@@ -295,14 +357,6 @@ comboCategoria.setOnAction(e -> {
                 = new TextField(
                         original.getNombreProducto());
 
-        TextField txtCantidad
-                = new TextField(
-                        original.getCantidad()
-                                .stripTrailingZeros()
-                                .toPlainString()
-                        + " "
-                        + original.getUnidadMedida());
-
         TextField txtStockMinimo
                 = new TextField(
                         original.getStockMinimo()
@@ -315,8 +369,6 @@ comboCategoria.setOnAction(e -> {
                 comboCategoria,
                 new Label("Producto"),
                 txtProducto,
-                new Label("Cantidad"),
-                txtCantidad,
                 new Label("Stock mínimo"),
                 txtStockMinimo
         );
@@ -339,32 +391,15 @@ comboCategoria.setOnAction(e -> {
                 req.setNombreProducto(
                         txtProducto.getText());
 
-                try {
+                req.setCantidad(original.getCantidad());
 
-                    String texto
-                            = txtCantidad.getText().trim();
+                req.setUnidadCantidad(
+                        original.getUnidadCantidad()
+                );
 
-                    java.util.regex.Pattern pattern
-                            = java.util.regex.Pattern.compile(
-                                    "(\\d+(?:\\.\\d+)?)(.*)");
-
-                    java.util.regex.Matcher matcher
-                            = pattern.matcher(texto);
-
-                    if (matcher.matches()) {
-
-                        req.setCantidad(
-                                new BigDecimal(
-                                        matcher.group(1)));
-
-                        req.setUnidadMedida(
-                                matcher.group(2).trim());
-                    }
-
-                } catch (Exception e) {
-
-                    req.setCantidad(BigDecimal.ZERO);
-                }
+                req.setUnidadStockMinimo(
+                        original.getUnidadStockMinimo()
+                );
 
                 try {
 

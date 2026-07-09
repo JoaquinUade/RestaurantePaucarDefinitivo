@@ -42,18 +42,31 @@ public class StockServiceImpl implements StockService {
 
         Optional<Stock> stockExistente = stockRepository.findByCategoriaGastoVariable_IdCategoria(categoria.getIdCategoria());
         if (stockExistente.isPresent()) {
-            Stock stock = stockExistente.get();
-            stock.setNombreProducto(request.getNombreProducto().trim());
-            aplicarCambioCantidad(stock, cantidad);
-            stock.setStockMinimo(stockMinimo);
-            return stockRepository.save(stock);
-        }
+    Stock stock = stockExistente.get();
+
+    stock.setNombreProducto(
+            request.getNombreProducto().trim());
+
+    stock.setStockMinimo(stockMinimo);
+
+    stock.setUnidadStockMinimo(
+            request.getUnidadStockMinimo());
+
+    return stockRepository.save(stock);
+}
 
         if (cantidad.signum() < 0) {
             throw new IllegalArgumentException("No se puede crear stock con una cantidad negativa");
         }
 
-        Stock stock = new Stock(categoria, request.getNombreProducto().trim(), cantidad, stockMinimo);
+        Stock stock = new Stock(
+                categoria,
+                request.getNombreProducto().trim(),
+                cantidad,
+                stockMinimo,
+                request.getUnidadCantidad(),
+                request.getUnidadStockMinimo()
+        );
         return stockRepository.save(stock);
     }
 
@@ -98,7 +111,13 @@ public class StockServiceImpl implements StockService {
                     .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + stockActualizado.getCategoriaGastoVariable().getIdCategoria()));
             stock.setCategoriaGastoVariable(categoria);
         }
+        if (stockActualizado.getUnidadCantidad() != null) {
+            stock.setUnidadCantidad(stockActualizado.getUnidadCantidad());
+        }
 
+        if (stockActualizado.getUnidadStockMinimo() != null) {
+            stock.setUnidadStockMinimo(stockActualizado.getUnidadStockMinimo());
+        }
         return stockRepository.save(stock);
     }
 

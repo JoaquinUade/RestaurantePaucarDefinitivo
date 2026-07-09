@@ -25,17 +25,25 @@ public class Stock {
     @Column(name = "stock_minimo", nullable = false, precision = 19, scale = 4)
     private BigDecimal stockMinimo;
 
-    @Column(name = "unidad_medida")
-    private String unidadMedida;
+    @Column(name = "unidad_cantidad")
+    private String unidadCantidad;
+
+@Column(name = "unidad_stock_minimo")
+private String unidadStockMinimo;
 
     public Stock() {
     }
 
-    public Stock(CategoriaGastoVariable categoriaGastoVariable, String nombreProducto, BigDecimal cantidad, BigDecimal stockMinimo) {
+    public Stock(CategoriaGastoVariable categoriaGastoVariable, String nombreProducto,
+                 BigDecimal cantidad, BigDecimal stockMinimo, String unidadCantidad,
+                 String unidadStockMinimo) {
+
         this.categoriaGastoVariable = categoriaGastoVariable;
         this.nombreProducto = nombreProducto;
         this.cantidad = cantidad;
         this.stockMinimo = stockMinimo;
+        this.unidadCantidad = unidadCantidad;
+        this.unidadStockMinimo = unidadStockMinimo;
     }
 
     public Long getIdStock() {
@@ -78,11 +86,19 @@ public class Stock {
         this.stockMinimo = stockMinimo;
     }
 
-    public void setUnidadMedida(String unidadMedida) {
-        this.unidadMedida = unidadMedida;
-    }
+    public String getUnidadCantidad() {
+    return unidadCantidad;
+}
 
-    public String getUnidadMedida() {
-        return unidadMedida;
-    }
+public void setUnidadCantidad(String unidadCantidad) {
+    this.unidadCantidad = unidadCantidad;
+}
+
+public String getUnidadStockMinimo() {
+    return unidadStockMinimo;
+}
+
+public void setUnidadStockMinimo(String unidadStockMinimo) {
+    this.unidadStockMinimo = unidadStockMinimo;
+}
 }

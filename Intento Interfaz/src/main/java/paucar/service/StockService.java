@@ -46,9 +46,6 @@ public class StockService {
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
-System.out.println("URL: " + BASE_URL);
-System.out.println("Status: " + response.statusCode());
-System.out.println("Body: " + response.body());
             if (response.statusCode() >= 200 &&
                 response.statusCode() < 300) {
 
@@ -110,39 +107,49 @@ System.out.println("Body: " + response.body());
     }
 
     // CREAR
+public void crear(StockRequest stock) {
 
-    public void crear(StockRequest stock) {
+    try {
+    System.out.println("CREANDO STOCK");
+        String json =
+                mapper.writeValueAsString(stock);
 
-        try {
+        System.out.println("JSON ENVIADO:");
+        System.out.println(json);
 
-            String json =
-                    mapper.writeValueAsString(stock);
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL))
+                .header(
+                        "Content-Type",
+                        "application/json"
+                )
+                .POST(
+                        HttpRequest.BodyPublishers
+                                .ofString(json)
+                )
+                .build();
 
-            var request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL))
-                    .header(
-                            "Content-Type",
-                            "application/json"
-                    )
-                    .POST(
-                            HttpRequest.BodyPublishers
-                                    .ofString(json)
-                    )
-                    .build();
+        var response =
+                http.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
 
-            http.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofString()
-            );
+        System.out.println(
+                "STATUS POST: " +
+                response.statusCode()
+        );
 
-        } catch (IOException | InterruptedException e) {
+        System.out.println(
+                "BODY POST: " +
+                response.body()
+        );
 
-            System.err.println(
-                    "Error creando stock: "
-                    + e.getMessage()
-            );
-        }
+    } catch (IOException | InterruptedException e) {
+
+        e.printStackTrace();
     }
+}
 
     // EDITAR
 
@@ -151,7 +158,7 @@ System.out.println("Body: " + response.body());
             Stock stock) {
 
         try {
-
+  System.out.println("EDITANDO STOCK " + id);
             String json =
                     mapper.writeValueAsString(stock);
 

@@ -74,10 +74,13 @@ public void editar(Long id, GastoVariableRequest gasto) {
         String json = mapper.writeValueAsString(gasto);
 
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+        .uri(URI.create(BASE_URL + "/" + id))
+        .header("Content-Type", "application/json")
+        .method(
+                "PATCH",
+                HttpRequest.BodyPublishers.ofString(json)
+        )
+        .build();
 
         http.send(request, HttpResponse.BodyHandlers.ofString());
 

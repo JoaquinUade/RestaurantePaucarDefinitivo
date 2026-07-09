@@ -14,7 +14,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;        
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
@@ -31,8 +33,8 @@ public class StockView extends BorderPane {
     private final HBox contenedorCategorias
             = new HBox(20);
 
-    public StockView(StockService service,CategoriasGastosService categoriasService,
-                     GastosVariablesService gastosVariablesService) {
+    public StockView(StockService service, CategoriasGastosService categoriasService,
+            GastosVariablesService gastosVariablesService) {
 
         this.service = service;
         this.categoriasService = categoriasService;
@@ -40,24 +42,33 @@ public class StockView extends BorderPane {
 
         tablaStock = new TablaStock();
         Button btnAgregar = new Button("Agregar Producto");
+        btnAgregar.getStyleClass().add("btn-agregar");
         Button btnEditar = new Button("Editar");
+        btnEditar.getStyleClass().add("btn-editar");
         Button btnEliminar = new Button("Eliminar");
+        btnEliminar.getStyleClass().add("btn-eliminar");
 
         btnAgregar.setOnAction(e -> {
 
-    List<CategoriaGastoVariable> categorias =
-            categoriasService.obtenerCategorias();
+            List<CategoriaGastoVariable> categorias
+                    = categoriasService.obtenerCategorias();
 
-    List<GastosVariables> gastos =
-            gastosVariablesService.obtenerTodos();
+            List<GastosVariables> gastos
+                    = gastosVariablesService.obtenerTodos();
 
-    DialogStock.mostrar(
-            categorias,
-            gastos
-    );
+            StockRequest request
+                    = DialogStock.mostrar(
+                            categorias,
+                            gastos
+                    );
 
-    recargar();
-});
+            if (request != null) {
+
+                service.crear(request);
+
+                recargar();
+            }
+        });
         btnEditar.setOnAction(e -> {
 
             if (stockSeleccionado == null) {
@@ -79,6 +90,15 @@ public class StockView extends BorderPane {
 
             if (editado != null) {
 
+                stockSeleccionado.setNombreProducto(
+                        editado.getNombreProducto());
+
+                stockSeleccionado.setStockMinimo(
+                        editado.getStockMinimo());
+
+                stockSeleccionado.setUnidadStockMinimo(
+                        editado.getUnidadStockMinimo());
+
                 service.editar(
                         stockSeleccionado.getIdStock(),
                         stockSeleccionado
@@ -88,9 +108,6 @@ public class StockView extends BorderPane {
             }
         });
         btnEliminar.setOnAction(e -> {
-
-            Stock stockSeleccionado
-                    = tablaStock.getSeleccionado();
 
             if (stockSeleccionado == null) {
                 return;
@@ -109,26 +126,31 @@ public class StockView extends BorderPane {
             }
         });
         HBox barraBotones = new HBox(10, btnEditar, btnEliminar);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        contenedorCategorias.setPadding(new Insets(15));
+        ScrollPane scroll = new ScrollPane(contenedorCategorias);
+        scroll.getStyleClass().add("scroll-pane");
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setMinHeight(537);
+        // 🔥 claves
+        scroll.setFitToWidth(false); // permite scroll horizontal
+        scroll.setFitToHeight(false);
 
-        VBox topBar = new VBox(10);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // horizontal
+
+        VBox fondo = new VBox();
+        fondo.getStyleClass().add("fondo-rojo");
+        fondo.setPadding(new Insets(15));
+        fondo.setSpacing(15);
+
+        VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
+ HBox topBar = new HBox(10, spacer, btnAgregar);
 
         topBar.setPadding(new Insets(10));
-        ScrollPane scroll
-                = new ScrollPane(contenedorCategorias);
+        fondo.getChildren().addAll(topBar, scroll, barraBotones);
 
-        scroll.setFitToHeight(false);
-        scroll.setFitToWidth(false);
-
-        VBox contenido = new VBox(
-                15,
-                scroll,
-                barraBotones
-        );
-
-        topBar.getChildren().add(btnAgregar);
-
-        setTop(topBar);
-        setCenter(contenido);
+        setCenter(fondo);
 
         recargar();
     }
@@ -138,8 +160,6 @@ public class StockView extends BorderPane {
         contenedorCategorias.getChildren().clear();
 
         List<Stock> stocks = service.obtenerTodos();
-
-        System.out.println("Stocks encontrados: " + stocks.size());
 
         for (Stock s : stocks) {
             System.out.println(
