@@ -1,6 +1,7 @@
 package paucar.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -147,7 +148,10 @@ public void crear(StockRequest stock) {
 
     } catch (IOException | InterruptedException e) {
 
-        e.printStackTrace();
+        System.err.println(
+                "Error creando stock: "
+                + e.getMessage()
+        );
     }
 }
 
@@ -264,4 +268,44 @@ public void crear(StockRequest stock) {
 
         return List.of();
     }
+    public void ajustarCantidadStock(
+        Long id,
+        BigDecimal cantidad) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/"
+                                + id
+                                + "/cantidad?cantidad="
+                                + cantidad
+                        )
+                )
+                .method(
+                        "PATCH",
+                        HttpRequest.BodyPublishers.noBody()
+                )
+                .build();
+
+        var response =
+                http.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+        System.out.println(
+                "PATCH STATUS: "
+                + response.statusCode());
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error ajustando cantidad: "
+                + e.getMessage()
+        );
+    }
+}
 }

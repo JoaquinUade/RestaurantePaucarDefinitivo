@@ -1,6 +1,9 @@
 package paucar.stock;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -11,27 +14,29 @@ import com.uade.tpo.demo.entity.dto.StockRequest;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;        
+import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
 
 public class StockView extends BorderPane {
 
-    private final TablaStock tablaStock;
-
     private final StockService service;
     private final CategoriasGastosService categoriasService;
     private Stock stockSeleccionado;
     private final GastosVariablesService gastosVariablesService;
-
+    private boolean modoDiario = false;
     private final HBox contenedorCategorias
             = new HBox(20);
+    private DatePicker filtroFecha;
+    private Label lblFecha = new Label();
 
     public StockView(StockService service, CategoriasGastosService categoriasService,
             GastosVariablesService gastosVariablesService) {
@@ -40,13 +45,20 @@ public class StockView extends BorderPane {
         this.categoriasService = categoriasService;
         this.gastosVariablesService = gastosVariablesService;
 
-        tablaStock = new TablaStock();
         Button btnAgregar = new Button("Agregar Producto");
         btnAgregar.getStyleClass().add("btn-agregar");
         Button btnEditar = new Button("Editar");
         btnEditar.getStyleClass().add("btn-editar");
         Button btnEliminar = new Button("Eliminar");
         btnEliminar.getStyleClass().add("btn-eliminar");
+        Button btnCambiarVista = new Button("Modo Diario");
+        btnCambiarVista.getStyleClass().add("btn-editar");
+        filtroFecha = new DatePicker(LocalDate.now());
+        filtroFecha.getStyleClass().add("date-agregar");
+        filtroFecha.setOnAction(e -> {
+            actualizarFecha();
+            recargar();
+        });
 
         btnAgregar.setOnAction(e -> {
 
@@ -55,12 +67,8 @@ public class StockView extends BorderPane {
 
             List<GastosVariables> gastos
                     = gastosVariablesService.obtenerTodos();
-
-            StockRequest request
-                    = DialogStock.mostrar(
-                            categorias,
-                            gastos
-                    );
+            List<Stock> stocks = service.obtenerTodos();
+            StockRequest request = DialogStock.mostrar(categorias, gastos, stocks);
 
             if (request != null) {
 
@@ -70,10 +78,6 @@ public class StockView extends BorderPane {
             }
         });
         btnEditar.setOnAction(e -> {
-
-            if (stockSeleccionado == null) {
-                return;
-            }
 
             if (stockSeleccionado == null) {
                 return;
@@ -125,14 +129,16 @@ public class StockView extends BorderPane {
                 recargar();
             }
         });
-        HBox barraBotones = new HBox(10, btnEditar, btnEliminar);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region spacerTop = new Region();
+        HBox.setHgrow(spacerTop, Priority.ALWAYS);
+
+        Region spacerBottom = new Region();
+        HBox.setHgrow(spacerBottom, Priority.ALWAYS);
         contenedorCategorias.setPadding(new Insets(15));
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
         scroll.getStyleClass().add("scroll-pane");
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMinHeight(537);
+        scroll.setMinHeight(507);
         // 🔥 claves
         scroll.setFitToWidth(false); // permite scroll horizontal
         scroll.setFitToHeight(false);
@@ -145,13 +151,31 @@ public class StockView extends BorderPane {
         fondo.setSpacing(15);
 
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
- HBox topBar = new HBox(10, spacer, btnAgregar);
+        HBox topBar = new HBox(10, filtroFecha, lblFecha, spacerTop, btnAgregar);
+        HBox barraBotones = new HBox(10, btnEditar, btnEliminar, spacerBottom, btnCambiarVista);
 
         topBar.setPadding(new Insets(10));
         fondo.getChildren().addAll(topBar, scroll, barraBotones);
+btnCambiarVista.setOnAction(e -> {
 
+    modoDiario = !modoDiario;
+
+    if (modoDiario) {
+        btnCambiarVista.setText("Modo Stock");
+        topBar.getChildren().remove(btnAgregar);
+    } else {
+        btnCambiarVista.setText("Modo Diario");
+
+        if (!topBar.getChildren().contains(btnAgregar)) {
+            topBar.getChildren().add(btnAgregar);
+        }
+    }
+
+    recargar();
+});
         setCenter(fondo);
 
+        actualizarFecha();
         recargar();
     }
 
@@ -160,6 +184,22 @@ public class StockView extends BorderPane {
         contenedorCategorias.getChildren().clear();
 
         List<Stock> stocks = service.obtenerTodos();
+        LocalDate fechaSeleccionada = filtroFecha.getValue();
+
+if (modoDiario) {
+
+    stocks = stocks.stream()
+            .filter(s -> s.getFecha() != null
+                    && !s.getFecha().isAfter(fechaSeleccionada))
+            .toList();
+
+} else {
+
+    stocks = stocks.stream()
+            .filter(s -> s.getFecha() != null
+                    && s.getFecha().equals(fechaSeleccionada))
+            .toList();
+}
 
         for (Stock s : stocks) {
             System.out.println(
@@ -183,7 +223,23 @@ public class StockView extends BorderPane {
                     new PanelCategoriaStock(
                             categoria,
                             lista,
-                            stock -> stockSeleccionado = stock));
+                            stock -> stockSeleccionado = stock, modoDiario, service));
         });
+    }
+
+    private void actualizarFecha() {
+
+        DateTimeFormatter formatter
+                = DateTimeFormatter.ofPattern(
+                        "EEEE dd/MM/yyyy",
+                        new Locale("es", "ES"));
+
+        String texto = filtroFecha.getValue().format(formatter);
+
+        texto = texto.substring(0, 1).toUpperCase()
+                + texto.substring(1);
+
+        lblFecha.setText(texto);
+        lblFecha.getStyleClass().add("titulo-xl-blanco");
     }
 }

@@ -8,11 +8,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
-    Optional<Stock> findByCategoriaGastoVariable_IdCategoria(Long idCategoria);
+    Optional<Stock> findByCategoriaGastoVariable_IdCategoria(
+            Long idCategoria);
 
-    @Query("SELECT s FROM Stock s WHERE s.cantidad <= s.stockMinimo")
+    List<Stock> findByActivoTrue();
+
+    @Query(
+        "SELECT s FROM Stock s " +
+        "WHERE s.cantidad <= s.stockMinimo"
+    )
     List<Stock> findStockBajoMinimo();
 }

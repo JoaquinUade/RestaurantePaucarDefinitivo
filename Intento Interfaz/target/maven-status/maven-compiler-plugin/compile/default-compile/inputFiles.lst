@@ -1,6 +1,5 @@
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empleados\TablaEmpleados.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\TablaSemanalGastosV.java
-C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\TablaStock.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\Ventas.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\Resumen.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Individuales\PanelGastosIndividuales.java
@@ -31,6 +30,7 @@ C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDef
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\CategoriasGastosService.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empresasClientes\EmpresasClientes.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\DialogGastosV.java
+C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\TablaItemsComprados.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\ClientesService.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\clientes\semanal\SemanalClientes.java
 C:\Users\Usuario\Desktop\RestauranteCuentasPaucarDefinitive\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\clientes\semanal\TablaSemanalDebeCliente.java

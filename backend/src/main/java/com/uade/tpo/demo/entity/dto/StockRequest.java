@@ -13,12 +13,13 @@ public class StockRequest {
     private BigDecimal stockMinimo;
     private String unidadStockMinimo;
 
+    private Long gastoVariableId;
 
     public StockRequest() {
     }
 
     public StockRequest(Long categoriaId, String nombreProducto, BigDecimal cantidad,
-                       String unidadCantidad, BigDecimal stockMinimo, String unidadStockMinimo) {
+            String unidadCantidad, BigDecimal stockMinimo, String unidadStockMinimo) {
         this.categoriaId = categoriaId;
         this.nombreProducto = nombreProducto;
         this.cantidad = cantidad;
@@ -75,4 +76,11 @@ public class StockRequest {
         this.unidadStockMinimo = unidadStockMinimo;
     }
 
+    public Long getGastoVariableId() {
+        return gastoVariableId;
+    }
+
+    public void setGastoVariableId(Long gastoVariableId) {
+        this.gastoVariableId = gastoVariableId;
+    }
 }

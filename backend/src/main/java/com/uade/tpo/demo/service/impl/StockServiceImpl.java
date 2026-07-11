@@ -1,9 +1,11 @@
 package com.uade.tpo.demo.service.impl;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
+import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 import com.uade.tpo.demo.repository.CategoriaGastoVariableRepository;
+import com.uade.tpo.demo.repository.GastosVariablesRepository;
 import com.uade.tpo.demo.repository.StockRepository;
 import com.uade.tpo.demo.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class StockServiceImpl implements StockService {
     @Autowired
     private CategoriaGastoVariableRepository categoriaRepository;
 
+    @Autowired
+    private GastosVariablesRepository gastosVariablesRepository;
+
     @Override
     public Stock agregarProductoAStock(StockRequest request) {
         if (request.getCategoriaId() == null) {
@@ -39,26 +44,15 @@ public class StockServiceImpl implements StockService {
         if (cantidad.signum() == 0) {
             throw new IllegalArgumentException("La cantidad debe ser distinta de cero");
         }
-
-        Optional<Stock> stockExistente = stockRepository.findByCategoriaGastoVariable_IdCategoria(categoria.getIdCategoria());
-        if (stockExistente.isPresent()) {
-    Stock stock = stockExistente.get();
-
-    stock.setNombreProducto(
-            request.getNombreProducto().trim());
-
-    stock.setStockMinimo(stockMinimo);
-
-    stock.setUnidadStockMinimo(
-            request.getUnidadStockMinimo());
-
-    return stockRepository.save(stock);
-}
-
         if (cantidad.signum() < 0) {
             throw new IllegalArgumentException("No se puede crear stock con una cantidad negativa");
         }
-
+        GastosVariables gasto = gastosVariablesRepository
+                .findById(request.getGastoVariableId())
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Gasto no encontrado con id: "
+                        + request.getGastoVariableId()));
         Stock stock = new Stock(
                 categoria,
                 request.getNombreProducto().trim(),
@@ -67,6 +61,8 @@ public class StockServiceImpl implements StockService {
                 request.getUnidadCantidad(),
                 request.getUnidadStockMinimo()
         );
+        stock.setGastoVariable(gasto);
+        stock.setFecha(gasto.getFecha());
         return stockRepository.save(stock);
     }
 
@@ -79,17 +75,28 @@ public class StockServiceImpl implements StockService {
         return stockRepository.save(stock);
     }
 
-    private void aplicarCambioCantidad(Stock stock, BigDecimal cantidad) {
-        if (cantidad == null || cantidad.signum() == 0) {
-            throw new IllegalArgumentException("La cantidad debe ser distinta de cero");
+    private void aplicarCambioCantidad(
+            Stock stock,
+            BigDecimal cantidad) {
+
+        if (cantidad == null) {
+
+            throw new IllegalArgumentException(
+                    "La cantidad no puede ser nula");
         }
 
-        BigDecimal nuevaCantidad = stock.getCantidad().add(cantidad);
-        if (nuevaCantidad.signum() < 0) {
-            throw new IllegalArgumentException("No hay stock suficiente para descontar esa cantidad");
+        if (cantidad.signum() < 0) {
+
+            throw new IllegalArgumentException(
+                    "La cantidad no puede ser negativa");
         }
 
-        stock.setCantidad(nuevaCantidad);
+        stock.setCantidad(cantidad);
+
+        if (cantidad.compareTo(BigDecimal.ZERO) == 0) {
+
+            stock.setActivo(false);
+        }
     }
 
     @Override
@@ -136,7 +143,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<Stock> obtenerTodosLosStocks() {
-        return stockRepository.findAll();
+        return stockRepository.findByActivoTrue();
     }
 
     @Override

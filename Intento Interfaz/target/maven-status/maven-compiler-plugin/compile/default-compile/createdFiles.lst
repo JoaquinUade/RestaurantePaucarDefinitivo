@@ -38,6 +38,7 @@ paucar\gastos\Individuales\DialogGastosIndividuales.class
 paucar\admin\Admin.class
 paucar\service\VentasBackend$1.class
 paucar\gastos\Individuales\TablaSemanalIndividual.class
+paucar\stock\PanelCategoriaStock.class
 paucar\admin\platos\Platos.class
 paucar\admin\categoriasgastos\TablaCategoriasGastos.class
 paucar\resumen\general\MensualGeneral.class
@@ -46,6 +47,8 @@ paucar\resumen\empresas\MensualEmpresas$2.class
 paucar\gastos\Individuales\GastosIndividualesView.class
 paucar\resumen\clientes\MensualClientes$2.class
 paucar\service\GastosFijosService.class
+paucar\stock\TablaItemsComprados.class
+paucar\stock\DialogStock$4.class
 paucar\gastos\Fijos\TablaMensualFijos.class
 paucar\ventas\Agregar$5.class
 paucar\resumen\general\SemanalGeneral$4.class
@@ -79,6 +82,7 @@ paucar\admin\empresasClientes\EmpresasClientes.class
 paucar\resumen\empresas\semanal\SemanalEmpresas$2.class
 paucar\service\AdminService.class
 paucar\gastos\Individuales\DialogGastosIndividuales$4.class
+paucar\stock\DialogStock$3.class
 paucar\resumen\empresas\semanal\TablaSemanal.class
 paucar\gastos\Fijos\TablaMensualFijos$1.class
 paucar\resumen\general\SemanalGeneral.class
@@ -92,13 +96,13 @@ paucar\resumen\empresas\semanal\VentanaPagoDeudas$1.class
 paucar\admin\empleados\TablaEmpleados.class
 paucar\resumen\empresas\MensualEmpresas$3.class
 paucar\stock\StockView.class
+paucar\stock\TablaItemsComprados$1.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas.class
 paucar\gastos\Fijos\DialogGastosFijos.class
 paucar\resumen\empresas\semanal\SemanalEmpresas.class
 paucar\resumen\empresas\MensualEmpresas$6.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas$2.class
 paucar\service\StockService.class
-paucar\stock\TablaStock$1.class
 paucar\ventas\Tabla$1.class
 paucar\ventas\Tabla.class
 paucar\gastos\Fijos\DialogGastosFijos$1.class
@@ -107,7 +111,6 @@ paucar\service\GastosVariablesService.class
 paucar\stock\DialogStock$1.class
 paucar\resumen\clientes\semanal\SemanalClientes$1.class
 paucar\service\ProductosService.class
-paucar\stock\TablaStock.class
 paucar\resumen\clientes\MensualClientes$4.class
 paucar\resumen\general\MensualGeneral$5.class
 paucar\resumen\empresas\semanal\TablaSemanalDebe$1.class
@@ -122,5 +125,6 @@ paucar\ventas\Agregar$1.class
 paucar\admin\empleados\EmpleadosView.class
 paucar\resumen\clientes\MensualClientes$5.class
 paucar\resumen\general\SemanalGeneral$1.class
+paucar\stock\TablaCategoriaStock.class
 paucar\service\ResumenBackend$1.class
 paucar\gastos\Individuales\TablaSemanalIndividual$1.class

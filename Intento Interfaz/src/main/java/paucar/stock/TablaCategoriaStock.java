@@ -1,5 +1,6 @@
 package paucar.stock;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -10,83 +11,106 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
+import paucar.service.StockService;
 
 public class TablaCategoriaStock extends VBox {
 
+    private final StockService stockService;
+
     public TablaCategoriaStock(
             List<Stock> stocks,
-            Consumer<Stock> onSelect) {
-
-        TableView<Stock> tabla =
-                new TableView<>();
-
+            Consumer<Stock> onSelect,
+            boolean modoDiario, StockService stockService) {
+        this.stockService = stockService;
+        TableView<Stock> tabla
+                = new TableView<>();
+        tabla.setEditable(true);
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // PRODUCTO
+        TableColumn<Stock, String> colProducto
+                = new TableColumn<>("Producto");
 
-        TableColumn<Stock, String> colProducto =
-                new TableColumn<>("Producto");
-
-        colProducto.setCellValueFactory(c ->
-                new SimpleStringProperty(
+        colProducto.setCellValueFactory(c
+                -> new SimpleStringProperty(
                         c.getValue()
                                 .getNombreProducto()));
 
         // CANTIDAD
+        TableColumn<Stock, String> colCantComprada
+                = new TableColumn<>("Cantidad comprada");
 
-        TableColumn<Stock, String> colCantidad =
-                new TableColumn<>("Cantidad");
-
-        colCantidad.setCellValueFactory(c -> {
+        colCantComprada.setCellValueFactory(c -> {
 
             Stock stock = c.getValue();
 
-            String texto =
-        stock.getCantidad()
-                .stripTrailingZeros()
-                .toPlainString()
-                + " "
-                + stock.getUnidadCantidad();
+            String texto
+                    = stock.getCantidad()
+                            .stripTrailingZeros()
+                            .toPlainString()
+                    + " "
+                    + stock.getUnidadCantidad();
 
             return new SimpleStringProperty(texto);
         });
 
         // STOCK MINIMO
-
-        TableColumn<Stock, String> colMinimo =
-                new TableColumn<>("Stock mínimo");
+        TableColumn<Stock, String> colMinimo
+                = new TableColumn<>("Stock mínimo");
 
         colMinimo.setCellValueFactory(c -> {
 
             Stock stock = c.getValue();
 
-            String texto =
-        stock.getStockMinimo()
-                .stripTrailingZeros()
-                .toPlainString()
-                + " "
-                + stock.getUnidadStockMinimo();
-
-
-            return new SimpleStringProperty(texto);
+            return new SimpleStringProperty(
+                    stock.getStockMinimo()
+                            .stripTrailingZeros()
+                            .toPlainString());
         });
 
-        // ESTADO
+        colMinimo.setCellFactory(
+                TextFieldTableCell.forTableColumn());
+        colMinimo.setOnEditCommit(event -> {
 
-        TableColumn<Stock, String> colEstado =
-                new TableColumn<>("Estado");
+            Stock stock = event.getRowValue();
+
+            try {
+
+                BigDecimal nuevoMinimo
+                        = new BigDecimal(
+                                event.getNewValue());
+
+                stock.setStockMinimo(nuevoMinimo);
+
+                stockService.editar(
+                        stock.getIdStock(),
+                        stock);
+
+                tabla.refresh();
+
+            } catch (Exception e) {
+
+                System.err.println(
+                        "Error al editar stock mínimo: "
+                        + e.getMessage());
+            }
+        });
+        // ESTADO
+        TableColumn<Stock, String> colEstado
+                = new TableColumn<>("Estado");
 
         colEstado.setCellValueFactory(c -> {
 
             Stock stock = c.getValue();
 
-            boolean bajoStock =
-                    stock.getCantidad()
+            boolean bajoStock
+                    = stock.getCantidad()
                             .compareTo(
                                     stock.getStockMinimo())
-                            <= 0;
+                    <= 0;
 
             return new SimpleStringProperty(
                     bajoStock
@@ -95,8 +119,17 @@ public class TablaCategoriaStock extends VBox {
         });
 
         tabla.getColumns().add(colProducto);
-        tabla.getColumns().add(colCantidad);
-        tabla.getColumns().add(colMinimo);
+
+        if (modoDiario) {
+
+            tabla.getColumns().add(colMinimo);
+
+        } else {
+
+            tabla.getColumns().add(colCantComprada);
+            tabla.getColumns().add(colMinimo);
+        }
+
         tabla.getColumns().add(colEstado);
 
         tabla.setItems(
@@ -115,23 +148,23 @@ public class TablaCategoriaStock extends VBox {
 
                         System.out.println(
                                 "Seleccionado: "
-                                        + newSel.getNombreProducto());
+                                + newSel.getNombreProducto());
                     }
                 });
 
-        long faltantes =
-                stocks.stream()
-                        .filter(s ->
-                                s.getCantidad()
-                                        .compareTo(
-                                                s.getStockMinimo())
-                                        <= 0)
+        long faltantes
+                = stocks.stream()
+                        .filter(s
+                                -> s.getCantidad()
+                                .compareTo(
+                                        s.getStockMinimo())
+                        <= 0)
                         .count();
 
-        Label lblInfo =
-                new Label(
+        Label lblInfo
+                = new Label(
                         "Productos con bajo stock: "
-                                + faltantes);
+                        + faltantes);
 
         getChildren().addAll(
                 tabla,

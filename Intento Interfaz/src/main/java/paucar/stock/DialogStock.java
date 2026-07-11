@@ -8,7 +8,6 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -18,8 +17,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -27,92 +24,9 @@ import javafx.scene.layout.VBox;
 public class DialogStock {
 
     public static StockRequest mostrar(List<CategoriaGastoVariable> categorias,
-            List<GastosVariables> gastos) {
+            List<GastosVariables> gastos, List<Stock> stocks) {
         TableView<GastosVariables> tabla
-                = new TableView<>();
-
-        tabla.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-        TableColumn<GastosVariables, String> colFecha
-                = new TableColumn<>("Fecha");
-
-        colFecha.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue()
-                                .getFecha()
-                                .toString()
-                ));
-        TableColumn<GastosVariables, String> colProducto
-                = new TableColumn<>("Producto");
-        colProducto.setPrefWidth(200);
-        colProducto.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue().getProducto()));
-
-        colProducto.setCellFactory(tc -> new TableCell<>() {
-
-            private final javafx.scene.text.Text text
-                    = new javafx.scene.text.Text();
-
-            {
-                text.wrappingWidthProperty()
-                        .bind(tc.widthProperty().subtract(10));
-
-                setPrefHeight(
-                        javafx.scene.layout.Region.USE_COMPUTED_SIZE);
-
-                setGraphic(text);
-            }
-
-            @Override
-            protected void updateItem(
-                    String item,
-                    boolean empty) {
-
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-
-                    text.setText(null);
-                    setGraphic(null);
-
-                } else {
-
-                    text.setText(item);
-                    setGraphic(text);
-                }
-            }
-        });
-        TableColumn<GastosVariables, String> colCantidad
-                = new TableColumn<>("Cantidad");
-
-        colCantidad.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue()
-                                .getCantidad()
-                                .stripTrailingZeros()
-                                .toPlainString()
-                        + " "
-                        + c.getValue().getMedida()
-                ));
-        TableColumn<GastosVariables, String> colPrecio
-                = new TableColumn<>("Precio");
-
-        colPrecio.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        "$ "
-                        + c.getValue()
-                                .getMonto()
-                                .stripTrailingZeros()
-                                .toPlainString()
-                ));
-        tabla.getColumns().add(colFecha);
-        tabla.getColumns().add(colProducto);
-        tabla.getColumns().add(colCantidad);
-        tabla.getColumns().add(colPrecio);
-
-        tabla.setPrefHeight(250);
+                = TablaItemsComprados.crear();
         Dialog<StockRequest> dialog = new Dialog<>();
 
         dialog.setTitle("Agregar Stock");
@@ -176,6 +90,27 @@ public class DialogStock {
                                     .getIdCategoria()
                                     .equals(
                                             categoria.getIdCategoria()))
+                            .filter(g
+                                    -> stocks.stream()
+                                    .noneMatch(s
+                                            -> s.getNombreProducto()
+                                            .equalsIgnoreCase(
+                                                    g.getProducto())))
+                            .filter(g -> {
+
+                                boolean existe = stocks.stream()
+                                        .anyMatch(s
+                                                -> s.getNombreProducto()
+                                                .equalsIgnoreCase(
+                                                        g.getProducto()));
+
+                                System.out.println(
+                                        g.getProducto()
+                                        + " -> existe en stock: "
+                                        + existe);
+
+                                return !existe;
+                            })
                             .toList();
 
             tabla.getItems().setAll(filtrados);
@@ -241,7 +176,9 @@ public class DialogStock {
                 request.setNombreProducto(
                         seleccionado.getProducto()
                 );
-
+                request.setGastoVariableId(
+                        seleccionado.getIdGastoVariable()
+                );
                 request.setCantidad(
                         seleccionado.getCantidad()
                 );

@@ -1,5 +1,6 @@
 package com.uade.tpo.demo.entity;
 
+import java.time.LocalDate;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -13,8 +14,12 @@ public class Stock {
     private Long idStock;
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "id_categoria", nullable = false, unique = true)
+    @JoinColumn(name = "id_categoria", nullable = false)
     private CategoriaGastoVariable categoriaGastoVariable;
+
+    @OneToOne
+    @JoinColumn(name = "id_gasto_variable", nullable = false, unique = true)
+    private GastosVariables gastoVariable;
 
     @Column(name = "nombre_producto", nullable = false)
     private String nombreProducto;
@@ -28,15 +33,21 @@ public class Stock {
     @Column(name = "unidad_cantidad")
     private String unidadCantidad;
 
-@Column(name = "unidad_stock_minimo")
-private String unidadStockMinimo;
+    @Column(name = "unidad_stock_minimo")
+    private String unidadStockMinimo;
+
+    @Column(name = "fecha")
+    private LocalDate fecha;
+
+    @Column(nullable = false)
+    private Boolean activo = true;
 
     public Stock() {
     }
 
     public Stock(CategoriaGastoVariable categoriaGastoVariable, String nombreProducto,
-                 BigDecimal cantidad, BigDecimal stockMinimo, String unidadCantidad,
-                 String unidadStockMinimo) {
+            BigDecimal cantidad, BigDecimal stockMinimo, String unidadCantidad,
+            String unidadStockMinimo) {
 
         this.categoriaGastoVariable = categoriaGastoVariable;
         this.nombreProducto = nombreProducto;
@@ -87,18 +98,42 @@ private String unidadStockMinimo;
     }
 
     public String getUnidadCantidad() {
-    return unidadCantidad;
-}
+        return unidadCantidad;
+    }
 
-public void setUnidadCantidad(String unidadCantidad) {
-    this.unidadCantidad = unidadCantidad;
-}
+    public void setUnidadCantidad(String unidadCantidad) {
+        this.unidadCantidad = unidadCantidad;
+    }
 
-public String getUnidadStockMinimo() {
-    return unidadStockMinimo;
-}
+    public String getUnidadStockMinimo() {
+        return unidadStockMinimo;
+    }
 
-public void setUnidadStockMinimo(String unidadStockMinimo) {
-    this.unidadStockMinimo = unidadStockMinimo;
-}
+    public void setUnidadStockMinimo(String unidadStockMinimo) {
+        this.unidadStockMinimo = unidadStockMinimo;
+    }
+
+    public GastosVariables getGastoVariable() {
+        return gastoVariable;
+    }
+
+    public void setGastoVariable(GastosVariables gastoVariable) {
+        this.gastoVariable = gastoVariable;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

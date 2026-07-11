@@ -7,13 +7,14 @@ import com.uade.tpo.demo.entity.Stock;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import paucar.service.StockService;
 
 public class PanelCategoriaStock extends VBox {
 
     public PanelCategoriaStock(
             String nombreCategoria,
             List<Stock> stocks,
-            Consumer<Stock> onSelect) {
+            Consumer<Stock> onSelect, boolean modoDiario, StockService stockService) {
 
         Label titulo = new Label(nombreCategoria);
         titulo.getStyleClass().add("card-header");
@@ -24,6 +25,7 @@ public class PanelCategoriaStock extends VBox {
         getChildren().add(
                 new TablaCategoriaStock(
                         stocks,
-                        onSelect));
+                        onSelect,
+                        modoDiario, stockService));
     }
 }
