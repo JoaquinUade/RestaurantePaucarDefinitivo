@@ -82,56 +82,40 @@ public class StockServiceImpl implements StockService {
         return stockGuardado;
     }
 
-    @Override
-    public Stock ajustarCantidadStock(
-            Long id,
-            BigDecimal cantidad) {
+ @Override
+public Stock ajustarStockDisponible( Long id, BigDecimal stockDisponible, LocalDate fecha) {
+System.out.println(
+        "AJUSTANDO STOCK: "
+        + id
+        + " -> "
+        + stockDisponible);
+    Stock stock = stockRepository.findById(id)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
+                            "Stock no encontrado con id: "
+                                    + id));
 
-        Stock stock = stockRepository.findById(id)
-                .orElseThrow(()
-                        -> new IllegalArgumentException(
-                        "Stock no encontrado con id: "
-                        + id));
-
-        aplicarCambioCantidad(stock, cantidad);
-
-        HistorialStock historial = new HistorialStock();
-
-        historial.setStock(stock);
-
-        historial.setCantidad(stock.getStockMinimo());
-
-        historial.setFecha(
-                LocalDate.now());
-
-        historialStockRepository.save(historial);
-
-        return stockRepository.save(stock);
+    if (stockDisponible == null) {
+        throw new IllegalArgumentException(
+                "La cantidad no puede ser nula");
     }
 
-    private void aplicarCambioCantidad(
-            Stock stock,
-            BigDecimal cantidad) {
-
-        if (cantidad == null) {
-
-            throw new IllegalArgumentException(
-                    "La cantidad no puede ser nula");
-        }
-
-        if (cantidad.signum() < 0) {
-
-            throw new IllegalArgumentException(
-                    "La cantidad no puede ser negativa");
-        }
-
-        stock.setCantidad(cantidad);
-
-        if (cantidad.compareTo(BigDecimal.ZERO) == 0) {
-
-            stock.setActivo(false);
-        }
+    if (stockDisponible.signum() < 0) {
+        throw new IllegalArgumentException(
+                "La cantidad no puede ser negativa");
     }
+
+    stock.setStockMinimo(stockDisponible);
+
+    HistorialStock historial = new HistorialStock();
+    historial.setStock(stock);
+    historial.setCantidad(stockDisponible);
+    historial.setFecha(fecha);
+
+    historialStockRepository.save(historial);
+
+    return stockRepository.save(stock);
+}
 
     @Override
     public Stock modificarStock(Long id, Stock stockActualizado) {
@@ -164,17 +148,6 @@ public class StockServiceImpl implements StockService {
             stock.setUnidadStockMinimo(stockActualizado.getUnidadStockMinimo());
         }
 
-        if (stock.getStockMinimo().compareTo(BigDecimal.ZERO) <= 0) {
-            stock.setActivo(false);
-        }
-
-        HistorialStock historial = new HistorialStock();
-        historial.setStock(stock);
-        historial.setCantidad(stock.getStockMinimo());
-        historial.setFecha(stock.getFecha());
-
-        historialStockRepository.save(historial);
-
         return stockRepository.save(stock);
     }
 
@@ -193,7 +166,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<Stock> obtenerTodosLosStocks() {
-        return stockRepository.findByActivoTrue();
+        return stockRepository.findAll();
     }
 
     @Override

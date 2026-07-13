@@ -1,7 +1,6 @@
 package com.uade.tpo.demo.entity.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class StockRequest {
 
@@ -15,7 +14,6 @@ public class StockRequest {
     private String unidadStockMinimo;
 
     private Long gastoVariableId;
-    private LocalDate fecha;
 
     public StockRequest() {
     }
@@ -84,11 +82,5 @@ public class StockRequest {
 
     public void setGastoVariableId(Long gastoVariableId) {
         this.gastoVariableId = gastoVariableId;
-    }
-    public LocalDate getFecha() {
-        return fecha;
-    }
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
     }
 }

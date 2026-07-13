@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,6 @@ public class StockService {
     }
 
     // OBTENER TODOS
-
     public List<Stock> obtenerTodos() {
 
         try {
@@ -43,13 +43,13 @@ public class StockService {
                     .GET()
                     .build();
 
-            var response =
-                    http.send(
+            var response
+                    = http.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
-            if (response.statusCode() >= 200 &&
-                response.statusCode() < 300) {
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
 
                 return mapper.readValue(
                         response.body(),
@@ -72,7 +72,6 @@ public class StockService {
     }
 
     // OBTENER POR ID
-
     public Stock obtenerPorId(Long id) {
 
         try {
@@ -82,14 +81,14 @@ public class StockService {
                     .GET()
                     .build();
 
-            var response =
-                    http.send(
+            var response
+                    = http.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
 
-            if (response.statusCode() >= 200 &&
-                response.statusCode() < 300) {
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
 
                 return mapper.readValue(
                         response.body(),
@@ -109,63 +108,62 @@ public class StockService {
     }
 
     // CREAR
-public void crear(StockRequest stock) {
+    public void crear(StockRequest stock) {
 
-    try {
-    System.out.println("CREANDO STOCK");
-        String json =
-                mapper.writeValueAsString(stock);
+        try {
+            System.out.println("CREANDO STOCK");
+            String json
+                    = mapper.writeValueAsString(stock);
 
-        System.out.println("JSON ENVIADO:");
-        System.out.println(json);
+            System.out.println("JSON ENVIADO:");
+            System.out.println(json);
 
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .header(
-                        "Content-Type",
-                        "application/json"
-                )
-                .POST(
-                        HttpRequest.BodyPublishers
-                                .ofString(json)
-                )
-                .build();
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL))
+                    .header(
+                            "Content-Type",
+                            "application/json"
+                    )
+                    .POST(
+                            HttpRequest.BodyPublishers
+                                    .ofString(json)
+                    )
+                    .build();
 
-        var response =
-                http.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
+            var response
+                    = http.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
 
-        System.out.println(
-                "STATUS POST: " +
-                response.statusCode()
-        );
+            System.out.println(
+                    "STATUS POST: "
+                    + response.statusCode()
+            );
 
-        System.out.println(
-                "BODY POST: " +
-                response.body()
-        );
+            System.out.println(
+                    "BODY POST: "
+                    + response.body()
+            );
 
-    } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
 
-        System.err.println(
-                "Error creando stock: "
-                + e.getMessage()
-        );
+            System.err.println(
+                    "Error creando stock: "
+                    + e.getMessage()
+            );
+        }
     }
-}
 
     // EDITAR
-
     public void editar(
             Long id,
             Stock stock) {
 
         try {
-  System.out.println("EDITANDO STOCK " + id);
-            String json =
-                    mapper.writeValueAsString(stock);
+            System.out.println("EDITANDO STOCK " + id);
+            String json
+                    = mapper.writeValueAsString(stock);
 
             var request = HttpRequest.newBuilder()
                     .uri(
@@ -198,7 +196,6 @@ public void crear(StockRequest stock) {
     }
 
     // ELIMINAR
-
     public void eliminar(Long id) {
 
         try {
@@ -227,7 +224,6 @@ public void crear(StockRequest stock) {
     }
 
     // PRODUCTOS CON FALTA DE STOCK
-
     public List<Stock> obtenerFaltantes() {
 
         try {
@@ -241,14 +237,14 @@ public void crear(StockRequest stock) {
                     .GET()
                     .build();
 
-            var response =
-                    http.send(
+            var response
+                    = http.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
 
-            if (response.statusCode() >= 200 &&
-                response.statusCode() < 300) {
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
 
                 return mapper.readValue(
                         response.body(),
@@ -269,90 +265,95 @@ public void crear(StockRequest stock) {
 
         return List.of();
     }
-    public void ajustarCantidadStock(
-        Long id,
-        BigDecimal cantidad) {
 
-    try {
+    public void ajustarStockDisponible(
+            Long id,
+            BigDecimal stockDisponible,
+            LocalDate fecha) {
 
-        var request = HttpRequest.newBuilder()
-                .uri(
-                        URI.create(
-                                BASE_URL
-                                + "/"
-                                + id
-                                + "/cantidad?cantidad="
-                                + cantidad
-                        )
-                )
-                .method(
-                        "PATCH",
-                        HttpRequest.BodyPublishers.noBody()
-                )
-                .build();
+        try {
 
-        var response =
-                http.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
-
-        System.out.println(
-                "PATCH STATUS: "
-                + response.statusCode());
-
-    } catch (IOException | InterruptedException e) {
-
-        System.err.println(
-                "Error ajustando cantidad: "
-                + e.getMessage()
-        );
-    }
-}
-public List<HistorialStock> obtenerHistorialPorStock(
-        Long idStock) {
-
-    try {
-
-        var request = HttpRequest.newBuilder()
-                .uri(
-                        URI.create(
-                                BASE_URL
-                                + "/"
-                                + idStock
-                                + "/historial"
-                        )
-                )
-                .GET()
-                .build();
-
-        var response =
-                http.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
-
-        if (response.statusCode() >= 200
-                && response.statusCode() < 300) {
-
-            return mapper.readValue(
-                    response.body(),
-                    mapper.getTypeFactory()
-                            .constructCollectionType(
-                                    List.class,
-                                    HistorialStock.class
+            var request = HttpRequest.newBuilder()
+                    .uri(
+                            URI.create(
+                                    BASE_URL
+                                    + "/"
+                                    + id
+                                    + "/cantStock?stockDisponible="
+                                    + stockDisponible
+                                    + "&fecha="
+                                    + fecha
                             )
+                    )
+                    .method(
+                            "PATCH",
+                            HttpRequest.BodyPublishers.noBody()
+                    )
+                    .build();
+
+            var response
+                    = http.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+            System.out.println(
+                    "PATCH STATUS: "
+                    + response.statusCode());
+
+        } catch (IOException | InterruptedException e) {
+
+            System.err.println(
+                    "Error ajustando stock: "
+                    + e.getMessage()
+            );
+        }
+    }
+
+    public List<HistorialStock> obtenerHistorialPorStock(
+            Long idStock) {
+
+        try {
+
+            var request = HttpRequest.newBuilder()
+                    .uri(
+                            URI.create(
+                                    BASE_URL
+                                    + "/"
+                                    + idStock
+                                    + "/historial"
+                            )
+                    )
+                    .GET()
+                    .build();
+
+            var response
+                    = http.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
+
+                return mapper.readValue(
+                        response.body(),
+                        mapper.getTypeFactory()
+                                .constructCollectionType(
+                                        List.class,
+                                        HistorialStock.class
+                                )
+                );
+            }
+
+        } catch (IOException | InterruptedException e) {
+
+            System.err.println(
+                    "Error obteniendo historial: "
+                    + e.getMessage()
             );
         }
 
-    } catch (IOException | InterruptedException e) {
-
-        System.err.println(
-                "Error obteniendo historial: "
-                + e.getMessage()
-        );
+        return List.of();
     }
-
-    return List.of();
-}
 }

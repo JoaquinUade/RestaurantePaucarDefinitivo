@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS stock (
   unidad_cantidad VARCHAR(50),
   unidad_stock_minimo VARCHAR(50),
 
+  fecha DATE NOT NULL,
+
   PRIMARY KEY (id_stock),
 
   UNIQUE KEY uk_stock_gasto_variable (id_gasto_variable),
@@ -56,6 +58,7 @@ CREATE TABLE IF NOT EXISTS stock (
     REFERENCES gastos_variables(id_gasto_variable)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS historial_stock (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 

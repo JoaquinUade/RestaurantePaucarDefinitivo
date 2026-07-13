@@ -13,7 +13,7 @@ public class Stock {
     @Column(name = "id_stock")
     private Long idStock;
 
-    @OneToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = false)
     private CategoriaGastoVariable categoriaGastoVariable;
 
@@ -38,9 +38,6 @@ public class Stock {
 
     @Column(name = "fecha")
     private LocalDate fecha;
-
-    @Column(nullable = false)
-    private Boolean activo = true;
 
     public Stock() {
     }
@@ -127,13 +124,5 @@ public class Stock {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
-    }
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
     }
 }

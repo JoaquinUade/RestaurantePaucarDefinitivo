@@ -1,5 +1,6 @@
 package paucar.stock;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -38,7 +39,7 @@ public class StockView extends BorderPane {
             = new HBox(20);
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
-    
+
     public StockView(StockService service, CategoriasGastosService categoriasService,
             GastosVariablesService gastosVariablesService) {
 
@@ -69,7 +70,7 @@ public class StockView extends BorderPane {
             List<GastosVariables> gastos
                     = gastosVariablesService.obtenerTodos();
             List<Stock> stocks = service.obtenerTodos();
-            
+
             StockRequest request = DialogStock.mostrar(categorias, gastos, stocks);
 
             if (request != null) {
@@ -158,23 +159,23 @@ public class StockView extends BorderPane {
 
         topBar.setPadding(new Insets(10));
         fondo.getChildren().addAll(topBar, scroll, barraBotones);
-btnCambiarVista.setOnAction(e -> {
+        btnCambiarVista.setOnAction(e -> {
 
-    modoDiario = !modoDiario;
+            modoDiario = !modoDiario;
 
-    if (modoDiario) {
-        btnCambiarVista.setText("Modo Stock");
-        topBar.getChildren().remove(btnAgregar);
-    } else {
-        btnCambiarVista.setText("Modo Diario");
+            if (modoDiario) {
+                btnCambiarVista.setText("Modo Stock");
+                topBar.getChildren().remove(btnAgregar);
+            } else {
+                btnCambiarVista.setText("Modo Diario");
 
-        if (!topBar.getChildren().contains(btnAgregar)) {
-            topBar.getChildren().add(btnAgregar);
-        }
-    }
+                if (!topBar.getChildren().contains(btnAgregar)) {
+                    topBar.getChildren().add(btnAgregar);
+                }
+            }
 
-    recargar();
-});
+            recargar();
+        });
         setCenter(fondo);
 
         actualizarFecha();
@@ -188,53 +189,103 @@ btnCambiarVista.setOnAction(e -> {
         List<Stock> stocks = service.obtenerTodos();
         System.out.println("========== STOCKS ==========");
 
-for (Stock s : stocks) {
-    System.out.println(
-            "ID=" + s.getIdStock()
-            + " | Producto=" + s.getNombreProducto()
-            + " | Cantidad=" + s.getStockMinimo()
-            + " | Fecha=" + s.getFecha()
-            + " | Activo=" + s.getActivo()
-    );
-}
+        for (Stock s : stocks) {
+            System.out.println(
+                    "ID=" + s.getIdStock()
+                    + " | Producto=" + s.getNombreProducto()
+                    + " | Cantidad=" + s.getStockMinimo()
+                    + " | Fecha=" + s.getFecha()
+            );
+        }
 
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
-if (modoDiario) {
+        if (modoDiario) {
 
-    stocks = stocks.stream()
-            .filter(stock -> {
+            stocks = stocks.stream()
+                    .filter(stock -> {
 
-                List<HistorialStock> historial =
-                        service.obtenerHistorialPorStock(
-                                stock.getIdStock());
+                        List<HistorialStock> historial
+                                = service.obtenerHistorialPorStock(
+                                        stock.getIdStock());
 
-                HistorialStock ultimoRegistro =
-                        historial.stream()
-                                .filter(h -> !h.getFecha()
-                                        .isAfter(fechaSeleccionada))
+                        if (historial.isEmpty()) {
+                            return false;
+                        }
+
+                        // Fecha de nacimiento
+                        LocalDate fechaNacimiento = historial.stream()
+                                .map(HistorialStock::getFecha)
+                                .min(LocalDate::compareTo)
+                                .orElse(null);
+
+                        if (fechaSeleccionada.isBefore(fechaNacimiento)) {
+                            return false;
+                        }
+
+                        // Fecha de muerte (cantidad = 0)
+                        HistorialStock muerte = historial.stream()
+                                .filter(h
+                                        -> h.getCantidad()
+                                        .compareTo(BigDecimal.ZERO) == 0)
                                 .max(java.util.Comparator.comparing(
                                         HistorialStock::getFecha))
                                 .orElse(null);
 
-                if (ultimoRegistro != null) {
+// DEBUG
+System.out.println("\n==== " + stock.getNombreProducto() + " ====");
 
-                    stock.setStockMinimo(
-                            ultimoRegistro.getCantidad());
+System.out.println("Fecha seleccionada: "
+        + fechaSeleccionada);
 
-                    return true;
-                }
+System.out.println("Fecha nacimiento: "
+        + fechaNacimiento);
 
-                return false;
-            })
-            .toList();
+if (muerte != null) {
+    System.out.println("Fecha muerte: "
+            + muerte.getFecha());
 } else {
-
-    stocks = stocks.stream()
-            .filter(s -> s.getFecha() != null
-                    && s.getFecha().equals(fechaSeleccionada))
-            .toList();
+    System.out.println("Fecha muerte: NINGUNA");
 }
+
+if (fechaSeleccionada.isBefore(fechaNacimiento)) {
+    return false;
+}
+
+                        if (muerte != null
+                                && fechaSeleccionada.isAfter(
+                                        muerte.getFecha())) {
+
+                            return false;
+                        }
+
+                        // Último valor válido para la fecha seleccionada
+                        HistorialStock ultimoRegistro
+                                = historial.stream()
+                                        .filter(h
+                                                -> !h.getFecha()
+                                                .isAfter(fechaSeleccionada))
+                                        .max(java.util.Comparator.comparing(
+                                                HistorialStock::getFecha))
+                                        .orElse(null);
+
+                        if (ultimoRegistro == null) {
+                            return false;
+                        }
+
+                        stock.setStockMinimo(
+                                ultimoRegistro.getCantidad());
+
+                        return true;
+                    })
+                    .toList();
+        } else {
+
+            stocks = stocks.stream()
+                    .filter(s -> s.getFecha() != null
+                    && s.getFecha().equals(fechaSeleccionada))
+                    .toList();
+        }
         for (Stock s : stocks) {
             System.out.println(
                     s.getNombreProducto() + " - "

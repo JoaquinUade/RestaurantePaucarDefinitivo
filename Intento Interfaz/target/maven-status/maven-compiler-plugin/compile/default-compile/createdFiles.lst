@@ -100,6 +100,7 @@ paucar\stock\TablaItemsComprados$1.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas.class
 paucar\gastos\Fijos\DialogGastosFijos.class
 paucar\resumen\empresas\semanal\SemanalEmpresas.class
+paucar\shared\MonedaUtils.class
 paucar\resumen\empresas\MensualEmpresas$6.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas$2.class
 paucar\service\StockService.class

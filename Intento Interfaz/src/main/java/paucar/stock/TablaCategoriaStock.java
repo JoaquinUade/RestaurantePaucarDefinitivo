@@ -27,7 +27,7 @@ public class TablaCategoriaStock extends VBox {
         this.stockService = stockService;
         TableView<Stock> tabla
                 = new TableView<>();
-        tabla.setEditable(true);
+         tabla.setEditable(modoDiario);
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
@@ -64,55 +64,26 @@ public class TablaCategoriaStock extends VBox {
 
         colMinimo.setCellValueFactory(c -> {
 
-    Stock stock = c.getValue();
+            Stock stock = c.getValue();
 
-    String texto = stock.getStockMinimo()
-            .stripTrailingZeros()
-            .toPlainString();
+            String texto = stock.getStockMinimo()
+                    .stripTrailingZeros()
+                    .toPlainString();
 
-    if (!modoDiario) {
-        texto += " " + stock.getUnidadStockMinimo();
-    }
-
-    return new SimpleStringProperty(texto);
-});
-
-        colMinimo.setCellFactory(
-                TextFieldTableCell.forTableColumn());
-        colMinimo.setOnEditCommit(event -> {
-
-            Stock stock = event.getRowValue();
-
-            try {
-
-                BigDecimal nuevoMinimo
-                        = new BigDecimal(
-                                event.getNewValue());
-
-                stock.setStockMinimo(nuevoMinimo);
-
-                stock.setFecha(fechaSeleccionada);
-
-                stockService.editar(
-                        stock.getIdStock(),
-                        stock);
-
-                tabla.refresh();
-
-            } catch (Exception e) {
-
-                System.err.println(
-                        "Error al editar stock mínimo: "
-                        + e.getMessage());
+            if (!modoDiario) {
+                texto += " " + stock.getUnidadStockMinimo();
             }
+
+            return new SimpleStringProperty(texto);
         });
+
         // UNIDAD
         TableColumn<Stock, String> colUnidad
                 = new TableColumn<>("Unidad");
 
         colUnidad.setCellValueFactory(c
-        -> new SimpleStringProperty(
-                c.getValue().getUnidadStockMinimo()));
+                -> new SimpleStringProperty(
+                        c.getValue().getUnidadStockMinimo()));
         // ESTADO
         TableColumn<Stock, String> colEstado
                 = new TableColumn<>("Estado");
@@ -136,6 +107,36 @@ public class TablaCategoriaStock extends VBox {
         tabla.getColumns().add(colProducto);
 
         if (modoDiario) {
+                 colMinimo.setCellFactory(
+                TextFieldTableCell.forTableColumn());
+                colMinimo.setOnEditCommit(event -> {
+
+            Stock stock = event.getRowValue();
+
+            try {
+
+                BigDecimal nuevoMinimo
+                        = new BigDecimal(
+                                event.getNewValue());
+
+                stock.setStockMinimo(nuevoMinimo);
+
+                stock.setFecha(fechaSeleccionada);
+
+                stockService.ajustarStockDisponible(
+                        stock.getIdStock(),
+                        nuevoMinimo,
+                        fechaSeleccionada);
+
+                tabla.refresh();
+
+            } catch (Exception e) {
+
+                System.err.println(
+                        "Error al editar stock mínimo: "
+                        + e.getMessage());
+            }
+        });
             tabla.getColumns().add(colMinimo);
             tabla.getColumns().add(colUnidad);
         } else {

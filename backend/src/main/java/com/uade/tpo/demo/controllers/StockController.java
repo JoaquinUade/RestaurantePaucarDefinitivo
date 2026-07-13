@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/stock")
@@ -25,9 +26,12 @@ public class StockController {
         return ResponseEntity.status(HttpStatus.CREATED).body(stock);
     }
 
-    @PatchMapping("/{id}/cantidad")
-    public ResponseEntity<Stock> ajustarCantidadStock(@PathVariable Long id, @RequestParam BigDecimal cantidad) {
-        return ResponseEntity.ok(stockService.ajustarCantidadStock(id, cantidad));
+    @PatchMapping("/{id}/cantStock")
+    public ResponseEntity<Stock> ajustarStockDisponible(
+            @PathVariable Long id,
+            @RequestParam BigDecimal stockDisponible,
+            @RequestParam LocalDate fecha) {
+        return ResponseEntity.ok(stockService.ajustarStockDisponible(id, stockDisponible, fecha));
     }
 
     @PutMapping("/{id}")
@@ -57,12 +61,13 @@ public class StockController {
     public ResponseEntity<List<Stock>> obtenerProductosEnFaltaDeStock() {
         return ResponseEntity.ok(stockService.obtenerProductosEnFaltaDeStock());
     }
-    @GetMapping("/{id}/historial")
-public ResponseEntity<List<HistorialStock>> obtenerHistorial(
-        @PathVariable Long id) {
 
-    return ResponseEntity.ok(
-            stockService.obtenerHistorialPorStock(id)
-    );
-}
+    @GetMapping("/{id}/historial")
+    public ResponseEntity<List<HistorialStock>> obtenerHistorial(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                stockService.obtenerHistorialPorStock(id)
+        );
+    }
 }
