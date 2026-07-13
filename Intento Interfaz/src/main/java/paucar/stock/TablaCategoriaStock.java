@@ -1,6 +1,7 @@
 package paucar.stock;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,7 +23,7 @@ public class TablaCategoriaStock extends VBox {
     public TablaCategoriaStock(
             List<Stock> stocks,
             Consumer<Stock> onSelect,
-            boolean modoDiario, StockService stockService) {
+            boolean modoDiario, StockService stockService, LocalDate fechaSeleccionada) {
         this.stockService = stockService;
         TableView<Stock> tabla
                 = new TableView<>();
@@ -63,13 +64,18 @@ public class TablaCategoriaStock extends VBox {
 
         colMinimo.setCellValueFactory(c -> {
 
-            Stock stock = c.getValue();
+    Stock stock = c.getValue();
 
-            return new SimpleStringProperty(
-                    stock.getStockMinimo()
-                            .stripTrailingZeros()
-                            .toPlainString());
-        });
+    String texto = stock.getStockMinimo()
+            .stripTrailingZeros()
+            .toPlainString();
+
+    if (!modoDiario) {
+        texto += " " + stock.getUnidadStockMinimo();
+    }
+
+    return new SimpleStringProperty(texto);
+});
 
         colMinimo.setCellFactory(
                 TextFieldTableCell.forTableColumn());
@@ -85,6 +91,8 @@ public class TablaCategoriaStock extends VBox {
 
                 stock.setStockMinimo(nuevoMinimo);
 
+                stock.setFecha(fechaSeleccionada);
+
                 stockService.editar(
                         stock.getIdStock(),
                         stock);
@@ -98,6 +106,13 @@ public class TablaCategoriaStock extends VBox {
                         + e.getMessage());
             }
         });
+        // UNIDAD
+        TableColumn<Stock, String> colUnidad
+                = new TableColumn<>("Unidad");
+
+        colUnidad.setCellValueFactory(c
+        -> new SimpleStringProperty(
+                c.getValue().getUnidadStockMinimo()));
         // ESTADO
         TableColumn<Stock, String> colEstado
                 = new TableColumn<>("Estado");
@@ -121,9 +136,8 @@ public class TablaCategoriaStock extends VBox {
         tabla.getColumns().add(colProducto);
 
         if (modoDiario) {
-
             tabla.getColumns().add(colMinimo);
-
+            tabla.getColumns().add(colUnidad);
         } else {
 
             tabla.getColumns().add(colCantComprada);

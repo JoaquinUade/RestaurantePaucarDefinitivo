@@ -2,16 +2,19 @@ package com.uade.tpo.demo.service.impl;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.entity.GastosVariables;
+import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 import com.uade.tpo.demo.repository.CategoriaGastoVariableRepository;
 import com.uade.tpo.demo.repository.GastosVariablesRepository;
+import com.uade.tpo.demo.repository.HistorialStockRepository;
 import com.uade.tpo.demo.repository.StockRepository;
 import com.uade.tpo.demo.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,8 @@ public class StockServiceImpl implements StockService {
 
     @Autowired
     private GastosVariablesRepository gastosVariablesRepository;
+    @Autowired
+    private HistorialStockRepository historialStockRepository;
 
     @Override
     public Stock agregarProductoAStock(StockRequest request) {
@@ -63,15 +68,44 @@ public class StockServiceImpl implements StockService {
         );
         stock.setGastoVariable(gasto);
         stock.setFecha(gasto.getFecha());
-        return stockRepository.save(stock);
+
+        Stock stockGuardado = stockRepository.save(stock);
+
+        HistorialStock historial = new HistorialStock();
+        historial.setStock(stockGuardado);
+        historial.setCantidad(stock.getStockMinimo());
+
+        historial.setFecha(stockGuardado.getFecha());
+
+        historialStockRepository.save(historial);
+
+        return stockGuardado;
     }
 
     @Override
-    public Stock ajustarCantidadStock(Long id, BigDecimal cantidad) {
+    public Stock ajustarCantidadStock(
+            Long id,
+            BigDecimal cantidad) {
+
         Stock stock = stockRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Stock no encontrado con id: " + id));
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado con id: "
+                        + id));
 
         aplicarCambioCantidad(stock, cantidad);
+
+        HistorialStock historial = new HistorialStock();
+
+        historial.setStock(stock);
+
+        historial.setCantidad(stock.getStockMinimo());
+
+        historial.setFecha(
+                LocalDate.now());
+
+        historialStockRepository.save(historial);
+
         return stockRepository.save(stock);
     }
 
@@ -110,6 +144,10 @@ public class StockServiceImpl implements StockService {
         if (stockActualizado.getStockMinimo() != null) {
             stock.setStockMinimo(stockActualizado.getStockMinimo());
         }
+
+        if (stockActualizado.getFecha() != null) {
+            stock.setFecha(stockActualizado.getFecha());
+        }
         if (stockActualizado.getNombreProducto() != null && !stockActualizado.getNombreProducto().isBlank()) {
             stock.setNombreProducto(stockActualizado.getNombreProducto().trim());
         }
@@ -125,6 +163,18 @@ public class StockServiceImpl implements StockService {
         if (stockActualizado.getUnidadStockMinimo() != null) {
             stock.setUnidadStockMinimo(stockActualizado.getUnidadStockMinimo());
         }
+
+        if (stock.getStockMinimo().compareTo(BigDecimal.ZERO) <= 0) {
+            stock.setActivo(false);
+        }
+
+        HistorialStock historial = new HistorialStock();
+        historial.setStock(stock);
+        historial.setCantidad(stock.getStockMinimo());
+        historial.setFecha(stock.getFecha());
+
+        historialStockRepository.save(historial);
+
         return stockRepository.save(stock);
     }
 
@@ -149,5 +199,13 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<Stock> obtenerProductosEnFaltaDeStock() {
         return stockRepository.findStockBajoMinimo();
+    }
+
+    @Override
+    public List<HistorialStock> obtenerHistorialPorStock(
+            Long idStock) {
+
+        return historialStockRepository
+                .findByStock_IdStockOrderByFechaAsc(idStock);
     }
 }

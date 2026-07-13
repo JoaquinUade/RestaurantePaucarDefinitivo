@@ -56,3 +56,16 @@ CREATE TABLE IF NOT EXISTS stock (
     REFERENCES gastos_variables(id_gasto_variable)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS historial_stock (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    id_stock BIGINT NOT NULL,
+
+    cantidad DECIMAL(19,4) NOT NULL,
+
+    fecha DATE NOT NULL,
+
+    CONSTRAINT fk_historial_stock
+        FOREIGN KEY (id_stock)
+        REFERENCES stock(id_stock)
+);

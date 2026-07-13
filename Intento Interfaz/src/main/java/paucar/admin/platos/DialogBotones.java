@@ -5,20 +5,28 @@ import java.math.BigDecimal;
 import com.uade.tpo.demo.entity.Categoria;
 import com.uade.tpo.demo.entity.Producto;
 
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import paucar.shared.MonedaUtils;
 
 public class DialogBotones {
-private static final String PASSWORD = "1234";
 
-public static Producto abrirDialogCrear() {
+    private static final String PASSWORD = "1234";
+
+    public static Producto abrirDialogCrear() {
 
         Dialog<Producto> dialog = new Dialog<>();/*crea un dialog, osea una ventana emergente */
         dialog.setTitle("Crear producto");/*le pone el titulo crear producto */
 
-        ButtonType btnGuardar = new ButtonType
-                ("Guardar", ButtonBar.ButtonData.OK_DONE);/*añade el boton guardar y se le asigna el
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);/*añade el boton guardar y se le asigna el
                                                                   valor de "ok"*/
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);/*añade el boton cancelar */
         PasswordField txtPass = new PasswordField();
@@ -48,40 +56,39 @@ public static Producto abrirDialogCrear() {
                 "CARNE", "POSTRES");/*agrega las opciones de categoría al combo box */
 
         VBox form = new VBox(10, new Label("Contraseña"), txtPass, new Label("Nombre"), txtNombre, new Label("Precio"),
-                   txtPrecio, new Label("Categoría"), cmbCategoria);/*crea un contenedor vertical (VBox) que organiza los elementos del formulario
+                txtPrecio, new Label("Categoría"), cmbCategoria);/*crea un contenedor vertical (VBox) que organiza los elementos del formulario
                             uno debajo del otro, con un espacio de 10 píxeles entre ellos */
 
         form.setPadding(new Insets(10));/*pone relleno alrededor del dialog */
 
         dialog.getDialogPane().setContent(form);/* Establece el contenido del panel de diálogo */
 
-        dialog.setResultConverter(btn -> { /*Según el botón presionado, devuelve el objeto creado o null*/
+        dialog.setResultConverter(btn -> {
+            /*Según el botón presionado, devuelve el objeto creado o null*/
             if (btn == btnGuardar) {/*si el boton es guardar */
-                 if (!txtPass.getText().equals(PASSWORD)) {
-        new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
-        return null;
-}
+                if (!txtPass.getText().equals(PASSWORD)) {
+                    new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
+                    return null;
+                }
                 Producto p = new Producto();/*crea un nuevo producto y le asigna los valores ingresados
                                             en el formulario */
 
                 p.setNombre(txtNombre.getText());/*asigna el nombre ingresado al producto */
 
-                String textoPrecio = txtPrecio.getText()
-                        .replace(".", "")
-                        .replace(",", ".");/*quita los puntos para eliminar separadores de miles
-                                                               y las comas por puntos para convertir el texto a un
-                                                               formato numérico válido */
+                BigDecimal precio
+                        = MonedaUtils.parseMoneda(
+                                txtPrecio.getText());
+                                
+if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-                BigDecimal precio;/*declara una variable para almacenar el precio convertido a número*/
-                try {
-                    precio = new BigDecimal(textoPrecio);/*intenta convertir el texto del precio a un
-                                                             número decimal */
+    new Alert(
+            Alert.AlertType.ERROR,
+            "Precio inválido")
+            .showAndWait();
 
-                } catch (NumberFormatException ex) {/*si no se puede convertir el precio */
+    return null;
+}
 
-                    new Alert(Alert.AlertType.ERROR, "Precio inválido").showAndWait();/*muestra un mensaje de error*/
-                    return null;/*retorna null para indicar que no se guardó el producto */
-                }
                 p.setPrecio(precio);/*asigna el precio convertido al producto */
 
                 p.setCategoria(Categoria.valueOf(cmbCategoria.getValue()));/*asigna la categoría al producto */
@@ -91,7 +98,7 @@ public static Producto abrirDialogCrear() {
         });
         return dialog.showAndWait().orElse(null);
     }
-    
+
     public static Producto abrirDialogEditar(Producto producto) {
 
         Dialog<Producto> dialog = new Dialog<>();/*abre una ventana que va a retornar un objeto del tipo
@@ -100,7 +107,7 @@ public static Producto abrirDialogCrear() {
 
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);/*crea un botón de guardar, el segundo parámetro
                                                                                               es para indicar que es un botón de tipo "OK" */
-                                                                                              
+
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);/*agrega al dialog el boton guardar y el
                                                                                       boton cancelar */
         PasswordField txtPass = new PasswordField();
@@ -125,8 +132,8 @@ public static Producto abrirDialogCrear() {
                                                               producto para que aparezca seleccionada
                                                               automáticamente cuando se muestra*/
 
-        VBox form = new VBox(10, new Label("Contraseña"), txtPass,new Label("Nombre"), txtNombre, new Label("Precio"),
-                    txtPrecio, new Label("Categoría"), cmbCategoria);/*Crea un contenedor vertical
+        VBox form = new VBox(10, new Label("Contraseña"), txtPass, new Label("Nombre"), txtNombre, new Label("Precio"),
+                txtPrecio, new Label("Categoría"), cmbCategoria);/*Crea un contenedor vertical
                                                                           (VBox) que organiza elementos
                                                                           uno debajo del otro */
         form.setPadding(new Insets(10));/*Establece relleno a los lados del
@@ -135,28 +142,29 @@ public static Producto abrirDialogCrear() {
         dialog.getDialogPane().setContent(form);/*Establece el contenido de la ventana */
 
         dialog.setResultConverter(btn -> {/*Según el botón presionado, devuelve un objeto editado o null*/
-            
+
             if (btn == btnGuardar) {/*Si el botón presionado es guardar, se actualizan los datos del
                                     producto con los valores ingresados en el formulario */
-            if (!txtPass.getText().equals(PASSWORD)) {
-                new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
-                return null;
-            }
+                if (!txtPass.getText().equals(PASSWORD)) {
+                    new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
+                    return null;
+                }
                 producto.setNombre(txtNombre.getText());/*Asigna el nombre del producto */
 
-                String textoPrecio = txtPrecio.getText()
-                        .replace(".", "")/*elimina separadores de miles */
-                        .replace(",", ".");/*intercambia coma por punto para tener un
-                                                                numero valido*/
-                BigDecimal precio;/*declara una variable para almacenar el precio convertido a número*/
-                try {
-                    precio = new BigDecimal(textoPrecio);/*intenta convertir el texto a número */
+                BigDecimal precio
+                        = MonedaUtils.parseMoneda(
+                                txtPrecio.getText());
+                                
+if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-                } catch (NumberFormatException ex) {/*si no se puede convertir */
+    new Alert(
+            Alert.AlertType.ERROR,
+            "Precio inválido")
+            .showAndWait();
 
-                    new Alert(Alert.AlertType.ERROR, "Precio inválido").showAndWait();/*muestra un mensaje de error */
-                    return null;/* retorna null para indicar que no se guardó el producto editado */
-                }
+    return null;
+}
+
                 producto.setPrecio(precio);/*Asigna el precio del producto */
 
                 producto.setCategoria(com.uade.tpo.demo.entity.Categoria.valueOf(cmbCategoria.getValue()));/*Asigna la categoría del producto */
@@ -166,8 +174,8 @@ public static Producto abrirDialogCrear() {
         });
         return dialog.showAndWait().orElse(null);
     }
-    
-public static boolean confirmarEliminacion() {
+
+    public static boolean confirmarEliminacion() {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar producto");
 
@@ -177,13 +185,13 @@ public static boolean confirmarEliminacion() {
         PasswordField txtPass = new PasswordField();
 
         VBox form = new VBox(10,
-            new Label("Contraseña"), txtPass
+                new Label("Contraseña"), txtPass
         );
         form.setPadding(new Insets(10));
 
         dialog.getDialogPane().setContent(form);
 
-        final boolean[] confirmado = { false };
+        final boolean[] confirmado = {false};
 
         dialog.setResultConverter(btn -> {
             if (btn == btnConfirmar && txtPass.getText().equals(PASSWORD)) {

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.entity.GastosVariables;
+import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
@@ -37,7 +38,7 @@ public class StockView extends BorderPane {
             = new HBox(20);
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
-
+    
     public StockView(StockService service, CategoriasGastosService categoriasService,
             GastosVariablesService gastosVariablesService) {
 
@@ -68,6 +69,7 @@ public class StockView extends BorderPane {
             List<GastosVariables> gastos
                     = gastosVariablesService.obtenerTodos();
             List<Stock> stocks = service.obtenerTodos();
+            
             StockRequest request = DialogStock.mostrar(categorias, gastos, stocks);
 
             if (request != null) {
@@ -184,15 +186,48 @@ btnCambiarVista.setOnAction(e -> {
         contenedorCategorias.getChildren().clear();
 
         List<Stock> stocks = service.obtenerTodos();
+        System.out.println("========== STOCKS ==========");
+
+for (Stock s : stocks) {
+    System.out.println(
+            "ID=" + s.getIdStock()
+            + " | Producto=" + s.getNombreProducto()
+            + " | Cantidad=" + s.getStockMinimo()
+            + " | Fecha=" + s.getFecha()
+            + " | Activo=" + s.getActivo()
+    );
+}
+
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
 if (modoDiario) {
 
     stocks = stocks.stream()
-            .filter(s -> s.getFecha() != null
-                    && !s.getFecha().isAfter(fechaSeleccionada))
-            .toList();
+            .filter(stock -> {
 
+                List<HistorialStock> historial =
+                        service.obtenerHistorialPorStock(
+                                stock.getIdStock());
+
+                HistorialStock ultimoRegistro =
+                        historial.stream()
+                                .filter(h -> !h.getFecha()
+                                        .isAfter(fechaSeleccionada))
+                                .max(java.util.Comparator.comparing(
+                                        HistorialStock::getFecha))
+                                .orElse(null);
+
+                if (ultimoRegistro != null) {
+
+                    stock.setStockMinimo(
+                            ultimoRegistro.getCantidad());
+
+                    return true;
+                }
+
+                return false;
+            })
+            .toList();
 } else {
 
     stocks = stocks.stream()
@@ -200,7 +235,6 @@ if (modoDiario) {
                     && s.getFecha().equals(fechaSeleccionada))
             .toList();
 }
-
         for (Stock s : stocks) {
             System.out.println(
                     s.getNombreProducto() + " - "
@@ -223,7 +257,9 @@ if (modoDiario) {
                     new PanelCategoriaStock(
                             categoria,
                             lista,
-                            stock -> stockSeleccionado = stock, modoDiario, service));
+                            stock -> stockSeleccionado = stock,
+                            modoDiario, service,
+                            fechaSeleccionada));
         });
     }
 

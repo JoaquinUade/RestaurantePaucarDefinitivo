@@ -1,5 +1,6 @@
 package com.uade.tpo.demo.controllers;
 
+import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 import com.uade.tpo.demo.service.StockService;
@@ -56,4 +57,12 @@ public class StockController {
     public ResponseEntity<List<Stock>> obtenerProductosEnFaltaDeStock() {
         return ResponseEntity.ok(stockService.obtenerProductosEnFaltaDeStock());
     }
+    @GetMapping("/{id}/historial")
+public ResponseEntity<List<HistorialStock>> obtenerHistorial(
+        @PathVariable Long id) {
+
+    return ResponseEntity.ok(
+            stockService.obtenerHistorialPorStock(id)
+    );
+}
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
@@ -307,5 +308,51 @@ public void crear(StockRequest stock) {
                 + e.getMessage()
         );
     }
+}
+public List<HistorialStock> obtenerHistorialPorStock(
+        Long idStock) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/"
+                                + idStock
+                                + "/historial"
+                        )
+                )
+                .GET()
+                .build();
+
+        var response =
+                http.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+        if (response.statusCode() >= 200
+                && response.statusCode() < 300) {
+
+            return mapper.readValue(
+                    response.body(),
+                    mapper.getTypeFactory()
+                            .constructCollectionType(
+                                    List.class,
+                                    HistorialStock.class
+                            )
+            );
+        }
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error obteniendo historial: "
+                + e.getMessage()
+        );
+    }
+
+    return List.of();
 }
 }

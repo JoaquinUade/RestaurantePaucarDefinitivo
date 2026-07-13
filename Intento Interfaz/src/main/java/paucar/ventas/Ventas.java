@@ -2,7 +2,6 @@ package paucar.ventas;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -34,13 +33,13 @@ import paucar.resumen.empresas.semanal.TablaSemanalDebe;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
 import paucar.service.VentasBackend;
+import paucar.shared.MonedaUtils;
 
 public final class Ventas extends BorderPane {
 
     // ====== Constantes y formateadores ======
     private static final Locale LOCALE_AR = Locale.of("es", "AR");
     private static final String API_BASE = "http://localhost:4002/api";
-    private final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);
 
     private final VentaRequest venta = new VentaRequest();
     // ====== Servicios / backend ======
@@ -251,7 +250,7 @@ public final class Ventas extends BorderPane {
         TextoVisualTotal.getStyleClass().add("total-monto");/*crea total-monto para en algun momento
                                                                estilarlo con css */
         TextoVisualTotal.textProperty()
-                .bind(Bindings.createStringBinding(() -> FormatearMonto(total.get()), total));/*Cada vez que total
+                .bind(Bindings.createStringBinding(() -> MonedaUtils.formatearMoneda(total.get()), total));/*Cada vez que total
                                                                                  cambie, actualiza
                                                                               automáticamente el texto del
                                                                              Label con el total formateado */
@@ -391,32 +390,6 @@ productos.setAll(productosService.cargarProductos());
         total.set(t.setScale(2, RoundingMode.HALF_UP));/*ajusto el total a 2 decimales con
                                                                  redondeo clásico y actualizo la propiedad
                                                                  'total' para refrescar la UI */
-    }
-
-    private String FormatearMonto(BigDecimal v) {
-        if (v == null) {/*si el valor del monto es null */
-            return "$ 0,00";/*retorna cero con 2 decimales */
-        }
-        return MONEDA.format(v);/*sino retorna el monto formateado como moneda */
-    }
-
-    // Si no lo usás, podés eliminarlo o anotar @SuppressWarnings("unused")
-    @SuppressWarnings("unused")
-    private BigDecimal parseMoneda(String s) {
-        try {
-            String limpio = s.replace("$", "")/*quita el simbolo de moneda */
-                    .replace(" ", "")/*quita los espacios vacios */
-                    .replace(".", "")/*quita los puntos */
-                    .replace(",", ".");/*reemplaza las comas por puntos para
-                                                                    utilizar los decimales en modo gringo */
-
-            return new BigDecimal(limpio).setScale(2, RoundingMode.HALF_UP);/*retorna el valor
-                                                                                      limpio y solo con 2
-                                                                                      decimales */
-        } catch (Exception e) {
-            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);/*retorna cero con 2
-                                                                               decimales */
-        }
     }
 
     private void confirmarPedidoAsync(String nombreCliente, TipoCliente tipo) {

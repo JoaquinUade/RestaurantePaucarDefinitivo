@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import paucar.shared.MonedaUtils;
 
 public class TablaItemsComprados {
 
@@ -88,13 +89,10 @@ public class TablaItemsComprados {
                 = new TableColumn<>("Precio");
 
         colPrecio.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        "$ "
-                        + c.getValue()
-                                .getMonto()
-                                .stripTrailingZeros()
-                                .toPlainString()
-                ));
+        -> new SimpleStringProperty(
+                MonedaUtils.formatearMoneda(
+                        c.getValue().getMonto())
+        ));
 
         tabla.getColumns().add(colFecha);
         tabla.getColumns().add(colProducto);
