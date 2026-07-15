@@ -1,7 +1,5 @@
 package paucar.resumen.empresas.semanal;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Map;
 
 import com.uade.tpo.demo.entity.TipoDePago;
@@ -24,12 +22,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import paucar.service.VentasBackend;
+import paucar.shared.MonedaUtils;
 
 public class VentanaPagoDeudas {
 
     private final VentasBackend backend;
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");
-    private static final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);
 
     public VentanaPagoDeudas(VentasBackend backend) {
         this.backend = backend;
@@ -106,7 +103,7 @@ public class VentanaPagoDeudas {
         TableColumn<Map<String, Object>, String> colMonto = new TableColumn<>("Monto");
         colMonto.setCellValueFactory(fila -> {
             Number m = (Number) fila.getValue().get("monto");
-            return new SimpleObjectProperty<>(MONEDA.format(m == null ? 0 : m.doubleValue()));
+            return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));
         });
 
         TableColumn<Map<String, Object>, String> colDesc = crearColumnaTexto

@@ -15,6 +15,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import paucar.service.VentasBackend;
+import paucar.shared.FechaUtils;
+import paucar.shared.MonedaUtils;
 
 public class MensualClientes extends BorderPane {
 
@@ -55,8 +57,8 @@ public class MensualClientes extends BorderPane {
 
         var clientes = backend.obtenerClientesPorTipo(TipoCliente.CLIENTE);
 
-        javafx.collections.transformation.FilteredList<String> filtradas =
-                new javafx.collections.transformation.FilteredList<>(
+        javafx.collections.transformation.FilteredList<String> filtradas
+                = new javafx.collections.transformation.FilteredList<>(
                         javafx.collections.FXCollections.observableArrayList(clientes),
                         s -> true);
 
@@ -85,12 +87,14 @@ public class MensualClientes extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, old, txt) -> {
 
-            if (updating.get()) return;
+            if (updating.get()) {
+                return;
+            }
 
             String filtro = (txt == null ? "" : txt.trim().toLowerCase());
 
-            filtradas.setPredicate(item ->
-                    item != null && (filtro.isEmpty() || item.toLowerCase().contains(filtro)));
+            filtradas.setPredicate(item
+                    -> item != null && (filtro.isEmpty() || item.toLowerCase().contains(filtro)));
 
             if (!cb.isShowing() && !filtro.isEmpty()) {
                 cb.show();
@@ -161,8 +165,8 @@ public class MensualClientes extends BorderPane {
 
         TableColumn<VentaResumenDiarioDTO, LocalDate> col = new TableColumn<>("Fecha");
 
-        col.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getFecha()));
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getFecha()));
 
         col.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
             @Override
@@ -176,12 +180,7 @@ public class MensualClientes extends BorderPane {
                 } else if (fecha == null) {
                     setText("TOTAL MES");
                 } else {
-                    setText(String.format(
-                            "%02d-%s",
-                            fecha.getDayOfMonth(),
-                            fecha.getMonth().getDisplayName(
-                                    java.time.format.TextStyle.FULL,
-                                    java.util.Locale.of("es", "AR"))));
+                    setText(FechaUtils.fechaMes(fecha));
                 }
             }
         });
@@ -196,8 +195,8 @@ public class MensualClientes extends BorderPane {
 
         TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
 
-        col.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleObjectProperty<>(getter.apply(c.getValue())));
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(getter.apply(c.getValue())));
 
         col.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
             @Override
@@ -207,9 +206,7 @@ public class MensualClientes extends BorderPane {
                 if (empty || v == null) {
                     setText("");
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
                 }
             }
         });
@@ -222,8 +219,8 @@ public class MensualClientes extends BorderPane {
 
         TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>("Debe");
 
-        col.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getDebe()));
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getDebe()));
 
         col.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
             @Override
@@ -234,9 +231,7 @@ public class MensualClientes extends BorderPane {
                     setText("");
                     setTextFill(null);
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
 
                     setTextFill(v.compareTo(BigDecimal.ZERO) > 0
                             ? javafx.scene.paint.Color.RED
@@ -255,8 +250,8 @@ public class MensualClientes extends BorderPane {
 
         TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
 
-        col.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleObjectProperty<>(getter.apply(c.getValue())));
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(getter.apply(c.getValue())));
 
         col.setCellFactory(tc -> new javafx.scene.control.TableCell<>() {
             @Override
@@ -267,9 +262,7 @@ public class MensualClientes extends BorderPane {
                     setText("");
                     setTextFill(null);
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
 
                     setTextFill(v.compareTo(BigDecimal.ZERO) > 0
                             ? javafx.scene.paint.Color.GREEN
@@ -281,62 +274,60 @@ public class MensualClientes extends BorderPane {
         col.setSortable(false);
         return col;
     }
-private String formato(BigDecimal v) {
-    return java.text.NumberFormat
-            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-            .format(v);
-}
 
-private void RenderTotalMensual(VentaResumenDiarioDTO t) {
+    private void RenderTotalMensual(VentaResumenDiarioDTO t) {
 
-    javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
 
-    grid.setHgap(5);
-    grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        grid.setHgap(5);
+        grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-    for (TableColumn<?, ?> columna : tabla.getColumns()) {
+        for (TableColumn<?, ?> columna : tabla.getColumns()) {
 
-        javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
-        cc.prefWidthProperty().bind(columna.widthProperty());
-        grid.getColumnConstraints().add(cc);
+            javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
+            cc.prefWidthProperty().bind(columna.widthProperty());
+            grid.getColumnConstraints().add(cc);
+        }
+
+        grid.add(new javafx.scene.control.Label("TOTAL MES"), 0, 0);
+        String texto = MonedaUtils.formatearMoneda(t.getVentaTotal());
+        grid.add(new javafx.scene.control.Label(texto), 1, 0);
+
+        javafx.scene.control.Label totalDebe = new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDebe()));
+        totalDebe.setTextFill(t.getDebe().compareTo(BigDecimal.ZERO) > 0
+                ? javafx.scene.paint.Color.RED
+                : javafx.scene.paint.Color.BLACK);
+        grid.add(totalDebe, 2, 0);
+
+        javafx.scene.control.Label totalPagado = new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDeudaPagada()));
+        totalPagado.setTextFill(t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0
+                ? javafx.scene.paint.Color.GREEN
+                : javafx.scene.paint.Color.BLACK);
+        grid.add(totalPagado, 3, 0);
+
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getCredito())), 5, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getTransferencia())), 6, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getMercadoPago())), 7, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getEfectivo())), 8, 0);
+
+        footerTotal.setCenter(grid);
     }
 
-    grid.add(new javafx.scene.control.Label("TOTAL MES"), 0, 0);
-    grid.add(new javafx.scene.control.Label(formato(t.getVentaTotal())), 1, 0);
-
-    javafx.scene.control.Label totalDebe = new javafx.scene.control.Label(formato(t.getDebe()));
-    totalDebe.setTextFill(t.getDebe().compareTo(BigDecimal.ZERO) > 0
-            ? javafx.scene.paint.Color.RED
-            : javafx.scene.paint.Color.BLACK);
-    grid.add(totalDebe, 2, 0);
-
-    javafx.scene.control.Label totalPagado = new javafx.scene.control.Label(formato(t.getDeudaPagada()));
-    totalPagado.setTextFill(t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0
-            ? javafx.scene.paint.Color.GREEN
-            : javafx.scene.paint.Color.BLACK);
-    grid.add(totalPagado, 3, 0);
-
-    grid.add(new javafx.scene.control.Label(formato(t.getDebito())), 4, 0);
-    grid.add(new javafx.scene.control.Label(formato(t.getCredito())), 5, 0);
-    grid.add(new javafx.scene.control.Label(formato(t.getTransferencia())), 6, 0);
-    grid.add(new javafx.scene.control.Label(formato(t.getMercadoPago())), 7, 0);
-    grid.add(new javafx.scene.control.Label(formato(t.getEfectivo())), 8, 0);
-
-    footerTotal.setCenter(grid);
-}
     private void cargarMes() {
 
         datos.clear();
 
-        if (clienteSeleccionado == null)
+        if (clienteSeleccionado == null) {
             return;
+        }
 
         LocalDate fecha = LocalDate.of(anio, mes, 1);
 
         while (fecha.getMonthValue() == mes) {
 
-            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY &&
-                    fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY
+                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
 
                 VentaResumenDiarioDTO resumen = new VentaResumenDiarioDTO(fecha);
 
@@ -344,20 +335,27 @@ private void RenderTotalMensual(VentaResumenDiarioDTO t) {
 
                 for (var v : ventas) {
 
-                    if (v.get("tipoCliente") == TipoCliente.CLIENTE &&
-                            clienteSeleccionado.equals(v.get("nombre"))) {
+                    if (v.get("tipoCliente") == TipoCliente.CLIENTE
+                            && clienteSeleccionado.equals(v.get("nombre"))) {
 
                         BigDecimal monto = (BigDecimal) v.get("monto");
                         TipoDePago tipo = (TipoDePago) v.get("estado");
 
                         switch (tipo) {
-                            case EFECTIVO -> resumen.setEfectivo(resumen.getEfectivo().add(monto));
-                            case DEBITO -> resumen.setDebito(resumen.getDebito().add(monto));
-                            case CREDITO -> resumen.setCredito(resumen.getCredito().add(monto));
-                            case TRANSFERENCIA -> resumen.setTransferencia(resumen.getTransferencia().add(monto));
-                            case MERCADO_PAGO -> resumen.setMercadoPago(resumen.getMercadoPago().add(monto));
-                            case DEBE -> resumen.setDebe(resumen.getDebe().add(monto));
-                            case DEUDA_PAGADA -> resumen.setDeudaPagada(resumen.getDeudaPagada().add(monto));
+                            case EFECTIVO ->
+                                resumen.setEfectivo(resumen.getEfectivo().add(monto));
+                            case DEBITO ->
+                                resumen.setDebito(resumen.getDebito().add(monto));
+                            case CREDITO ->
+                                resumen.setCredito(resumen.getCredito().add(monto));
+                            case TRANSFERENCIA ->
+                                resumen.setTransferencia(resumen.getTransferencia().add(monto));
+                            case MERCADO_PAGO ->
+                                resumen.setMercadoPago(resumen.getMercadoPago().add(monto));
+                            case DEBE ->
+                                resumen.setDebe(resumen.getDebe().add(monto));
+                            case DEUDA_PAGADA ->
+                                resumen.setDeudaPagada(resumen.getDeudaPagada().add(monto));
                         }
 
                         if (tipo != TipoDePago.DEBE) {
@@ -373,18 +371,18 @@ private void RenderTotalMensual(VentaResumenDiarioDTO t) {
         }
         VentaResumenDiarioDTO total = new VentaResumenDiarioDTO(null);
 
-for (VentaResumenDiarioDTO d : datos) {
+        for (VentaResumenDiarioDTO d : datos) {
 
-    total.setVentaTotal(total.getVentaTotal().add(d.getVentaTotal()));
-    total.setDebe(total.getDebe().add(d.getDebe()));
-    total.setDeudaPagada(total.getDeudaPagada().add(d.getDeudaPagada()));
-    total.setDebito(total.getDebito().add(d.getDebito()));
-    total.setCredito(total.getCredito().add(d.getCredito()));
-    total.setTransferencia(total.getTransferencia().add(d.getTransferencia()));
-    total.setMercadoPago(total.getMercadoPago().add(d.getMercadoPago()));
-    total.setEfectivo(total.getEfectivo().add(d.getEfectivo()));
-}
+            total.setVentaTotal(total.getVentaTotal().add(d.getVentaTotal()));
+            total.setDebe(total.getDebe().add(d.getDebe()));
+            total.setDeudaPagada(total.getDeudaPagada().add(d.getDeudaPagada()));
+            total.setDebito(total.getDebito().add(d.getDebito()));
+            total.setCredito(total.getCredito().add(d.getCredito()));
+            total.setTransferencia(total.getTransferencia().add(d.getTransferencia()));
+            total.setMercadoPago(total.getMercadoPago().add(d.getMercadoPago()));
+            total.setEfectivo(total.getEfectivo().add(d.getEfectivo()));
+        }
 
-RenderTotalMensual(total);
+        RenderTotalMensual(total);
     }
 }

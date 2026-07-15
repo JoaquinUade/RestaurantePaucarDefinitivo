@@ -1,11 +1,7 @@
 package paucar.resumen.empresas.semanal;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import paucar.service.VentasBackend;
+import paucar.shared.MonedaUtils;
 
 public class SemanalEmpresas extends BorderPane {
 
@@ -177,7 +174,7 @@ public class SemanalEmpresas extends BorderPane {
                                                                                            guarda en total*/
         tablaDebe.cargarDeudasEmpresa(empresa,
                 inicioSemana.minusMonths(12));
-        lblTotal.setText("Total: " + formatoDineroAR(total));
+        lblTotal.setText("Total: " + MonedaUtils.formatearMoneda(total));
     }
 
     private ComboBox<String> crearComboEmpresas(FilteredList<String> empresasFiltradas) {
@@ -297,27 +294,6 @@ public class SemanalEmpresas extends BorderPane {
             }
         });
         return cbEmpresa;/* devuelve el ComboBox con la celda personalizada */
-    }
-
-    private String formatoDineroAR(double monto) {
-
-        Locale localeAR = Locale.of("es", "AR");/*Define el formato regional de Argentina
-                                                                   para que números y moneda se muestren
-                                                                   según las reglas locales*/
-
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(localeAR);/*Aplica las reglas del locale
-                                                                           argentino (separadores decimal y
-                                                                           de miles) al formato de números*/
-
-        DecimalFormat df = new DecimalFormat("$ #,##0.00", symbols);/*Define un formato de número
-                                                                             que incluye el símbolo de peso,
-                                                                             separadores de miles y dos
-                                                                             decimales, utilizando los
-                                                                             símbolos definidos para
-                                                                             Argentina*/
-        df.setRoundingMode(RoundingMode.UP);/* Establece el modo de redondeo a redondeo hacia arriba */
-
-        return df.format(monto);/* Devuelve el monto formateado según el locale argentino */
     }
 
     public void actualizarFecha(LocalDate fecha) {

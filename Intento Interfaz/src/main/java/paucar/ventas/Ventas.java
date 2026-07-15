@@ -2,9 +2,6 @@ package paucar.ventas;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import com.uade.tpo.demo.entity.TipoCliente;
@@ -33,12 +30,13 @@ import paucar.resumen.empresas.semanal.TablaSemanalDebe;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
 import paucar.service.VentasBackend;
+import paucar.shared.FechaUtils;
+import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 
 public final class Ventas extends BorderPane {
 
     // ====== Constantes y formateadores ======
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");
     private static final String API_BASE = "http://localhost:4002/api";
 
     private final VentaRequest venta = new VentaRequest();
@@ -205,7 +203,7 @@ public final class Ventas extends BorderPane {
     private Node crearTabla() {
         var pane = new Tabla(
                 RenglonDeLaTabla,
-                LOCALE_AR,
+                LocaleUtils.ES_AR,
                 fila -> eliminarVentaDesdeBackend(fila),
                 (fila, nuevoEstado) -> actualizarEstadoEnBackend(fila, nuevoEstado)
         );
@@ -213,14 +211,9 @@ public final class Ventas extends BorderPane {
     }
 
     private Node crearHeader() {
-        var hoy = LocalDate.now();/*guardamos en la variable hoy la fecha actual */
-        var dow = hoy.getDayOfWeek().getDisplayName(TextStyle.FULL, LOCALE_AR).toUpperCase();/*guardamos en
-                                                                                             la variable dow
-                                                                                            el dia de la
-                                                                                           semana que estamos 
-                                                                                           en argentina*/
-
-        var lblTitulo = new Label(dow + " " + hoy.getDayOfMonth() + "/" + hoy.getMonthValue() + "/" + hoy.getYear());/*parte visual de la fecha grande en la pantalla */
+        var lblTitulo = new Label(
+                FechaUtils.hoyTitulo()
+        );
         lblTitulo.getStyleClass().add("titulo-xl");/*Aplicále al Label todos los estilos definidos para
                                                     la clase .titulo-xl de mi css */
 
@@ -291,30 +284,32 @@ public final class Ventas extends BorderPane {
             }
         }));
     }
-private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
 
-    CompletableFuture
-        .supplyAsync(() ->
-            backend.actualizarEstadoVenta(
-                fila.getIdVenta(),
-                nuevoEstado
-            )
-        )
-        .thenAccept(ok -> Platform.runLater(() -> {
+    private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
+
+        CompletableFuture
+                .supplyAsync(()
+                        -> backend.actualizarEstadoVenta(
+                        fila.getIdVenta(),
+                        nuevoEstado
+                )
+                )
+                .thenAccept(ok -> Platform.runLater(() -> {
             if (!ok) {
                 new Alert(
-                    Alert.AlertType.ERROR,
-                    "No se pudo guardar el estado"
+                        Alert.AlertType.ERROR,
+                        "No se pudo guardar el estado"
                 ).showAndWait();
-            } else{
+            } else {
                 tablaSemanalDebe.actualizar();
             }
         }));
-}
+    }
+
     public void recargarDelBackend() {
         CompletableFuture /*CompletableFuture es una herramienta de Java que te permite ejecutar código en
                           segundo plano sin trabar la interfaz gráfica (UI)*/
-                .supplyAsync(() -> backend.cargarVentasDelDia(LocalDate.now()))/*Ejecuta en segundo plano el cargarVentasDelDia
+                .supplyAsync(() -> backend.cargarVentasDelDia(FechaUtils.hoy()))/*Ejecuta en segundo plano el cargarVentasDelDia
                                                                                 del backend, pasándole la fecha de hoy
                                                                                 (LocalDate.now()), para obtener la lista de
                                                                                 ventas del día sin trabar la UI*/
@@ -356,7 +351,7 @@ private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
 
     private void VentanaAgregarPedido() {/*este metodo es el que se ejecuta cuando tocás el botón “+ Agregar”
                                         en la pantalla de Ventas */
-productos.setAll(productosService.cargarProductos());
+        productos.setAll(productosService.cargarProductos());
         var dlg = new Agregar(clientes, productos, clientesService, venta);/*crea un objeto nuevo de la clase Agregar y le
                                                           pasa clientes, productos y venta al constructor */
 

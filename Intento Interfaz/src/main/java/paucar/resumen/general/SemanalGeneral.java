@@ -2,12 +2,10 @@ package paucar.resumen.general;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -29,19 +27,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import paucar.service.VentasBackend;
+import paucar.shared.LocaleUtils;
+import paucar.shared.MonedaUtils;
 import paucar.ventas.Tabla;
 import paucar.ventas.Ventas;
 
 public class SemanalGeneral extends BorderPane {
 
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");
-
     private final TableView<VentaResumenDiarioDTO> tablaTotalSemanal = new TableView<>();
 
     private final ObservableList<VentaResumenDiarioDTO> filaTotalSemana = FXCollections.observableArrayList();
-
-    private static final NumberFormat MONEDA
-            = NumberFormat.getCurrencyInstance(LOCALE_AR);
 
     private final VentasBackend backend;
     private final VBox contenido = new VBox(8);/*contenedor vertical en el que pondremos los
@@ -149,12 +144,12 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                                               inicializada en cero. Acumula todos los tipos de pago
                                               excepto el debe*/
 
-        String NombreDia = fecha.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, LOCALE_AR);/*Esta línea obtiene el nombre completo del día de la
+        String NombreDia = fecha.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, LocaleUtils.ES_AR);/*Esta línea obtiene el nombre completo del día de la
                                                                                                      semana (por ejemplo “lunes”) a partir de la fecha y
                                                                                                      lo guarda en la variable dia, usando el idioma español
                                                                                                      de Argentina (LOCALE_AR */
 
-        NombreDia = NombreDia.substring(0, 1).toUpperCase(LOCALE_AR) + NombreDia.substring(1);/*pone en mayúscula la primera letra del nombre del día
+        NombreDia = NombreDia.substring(0, 1).toUpperCase(LocaleUtils.ES_AR) + NombreDia.substring(1);/*pone en mayúscula la primera letra del nombre del día
                                                                                                             (osea, transforma "lunes" en "Lunes")*/
 
         Label tituloDia = new Label(/*crea un Label que */
@@ -211,14 +206,14 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
         }
 
-        Tabla tabla = new Tabla(filas, LOCALE_AR,
+        Tabla tabla = new Tabla(filas, LocaleUtils.ES_AR,
                 null, null);/*Creá una tabla nueva que muestre estas ventas,
                                                          usando formato argentino, sin acciones especiales
                                                          ni configuraciones extra */
         tabla.setSoloLectura(true);/*Establece que la tabla sea de solo lectura asi evitar
                                                 cualquier modificacion*/
 
-        Label lblTotalDia = new Label("Total: " + MONEDA.format(totalDia));/*Creá un Label que muestre el
+        Label lblTotalDia = new Label("Total: " + MonedaUtils.formatearMoneda(totalDia));/*Creá un Label que muestre el
                                                                            total de ventas del día,
                                                                            formateado como moneda argentina*/
         lblTotalDia.setMaxWidth(Double.MAX_VALUE);/*le dice al label que se expanda para utilizar todo el
@@ -346,9 +341,9 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                     setText(String.format(
                             "%02d-%s",/*formatea la fecha para mostrar el día con dos dígitos y el mes con su nombre abreviado, por ejemplo "05-Mar" */
                             fecha.getDayOfMonth(),/*obtiene el día del mes */
-                            fecha.getMonth().getDisplayName(TextStyle.FULL, LOCALE_AR/*obtiene el nombre del mes en formato completo y en español de Argentina*/
+                            fecha.getMonth().getDisplayName(TextStyle.FULL, LocaleUtils.ES_AR)/*obtiene el nombre del mes en formato completo y en español de Argentina*/
                             )
-                    ));
+                    );
                     getStyleClass().clear();/*limpia cualquier estilo previo de la celda para que no se acumulen estilos al actualizar el contenido de la celda*/
                 }
             }
@@ -386,7 +381,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                                              antes tenia deuda*/
 
                 } else {/* no esta vacia osea tiene contenido */
-                    setText(MONEDA.format(v));/*lo formatea como dinero argentino */
+                    setText(MonedaUtils.formatearMoneda(v));/*lo formatea como dinero argentino */
 
                     if (v.compareTo(BigDecimal.ZERO) > 0) {/* si el valor es mayor a cero*/
                         setTextFill(javafx.scene.paint.Color.RED);/*establece el color del texto como rojo */
@@ -425,7 +420,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
                 setAlignment(Pos.CENTER);/*Alinea el texto al centro de la celda*/
 
-                setText(empty || v == null ? "" : MONEDA.format(v));/*establece que si la celda esta vacia
+                setText(empty || v == null ? "" : MonedaUtils.formatearMoneda(v));/*establece que si la celda esta vacia
                                                                     o es null se vea "" sino formatea el
                                                                     numero como dinero argentino */
             }

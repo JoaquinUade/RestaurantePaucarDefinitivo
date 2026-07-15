@@ -1,11 +1,7 @@
 package paucar.resumen.clientes.semanal;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import paucar.service.VentasBackend;
+import paucar.shared.MonedaUtils;
 
 public class SemanalClientes extends BorderPane {
 
@@ -135,7 +132,7 @@ public class SemanalClientes extends BorderPane {
                                                                         desde hace un año hasta la fecha
                                                                         actual */
 
-        lblTotal.setText("Total: " + formatoDineroAR(total));
+        lblTotal.setText("Total: " + MonedaUtils.formatearMoneda(total));
     }
 
     private ComboBox<String> crearCombo(FilteredList<String> datos) {
@@ -203,18 +200,6 @@ public class SemanalClientes extends BorderPane {
         });
 
         return cb;
-    }
-
-    private String formatoDineroAR(double monto) {
-        Locale localeAR = Locale.of("es", "AR");
-
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(localeAR);
-        DecimalFormat df = new DecimalFormat("$ #,##0.00", symbols);/*Formatea números como dinero
-                                                                             en pesos con separador de
-                                                                             miles y 2 decimales */
-
-        df.setRoundingMode(RoundingMode.UP);/*Configura el redondeo para sea hacia arriba */
-        return df.format(monto);
     }
 
     public void actualizarFecha(LocalDate fecha) {

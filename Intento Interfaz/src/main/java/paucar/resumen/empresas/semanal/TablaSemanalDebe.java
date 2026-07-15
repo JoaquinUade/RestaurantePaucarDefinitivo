@@ -1,9 +1,6 @@
 package paucar.resumen.empresas.semanal;
 
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Map;
 
 import com.uade.tpo.demo.entity.TipoCliente;
@@ -17,6 +14,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import paucar.service.VentasBackend;
+import paucar.shared.FechaUtils;
+import paucar.shared.MonedaUtils;
 
 public class TablaSemanalDebe {
 
@@ -26,20 +25,6 @@ public class TablaSemanalDebe {
 
     private final TableView<Map<String, Object>> tabla;/*crea una tabla para mostrar las deudas semanales
                                                          de empresas*/
-
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");/*Define un locale específico para español de
-                                                                                    Argentina*/
-
-    private static final DateTimeFormatter FECHA_FORMATO =
-                         DateTimeFormatter.ofPattern("d MMMM yyyy", LOCALE_AR);/* Define un formato de
-                                                                                fecha específico para
-                                                                                mostrar las fechas en
-                                                                                español de Argentina*/
-
-    private static final NumberFormat MONEDA = 
-                        NumberFormat.getCurrencyInstance(LOCALE_AR);/*Define un formato de moneda
-                                                                    específico para mostrar los valores en
-                                                                    español de Argentina*/
 
     private String empresaActual;
     private LocalDate desdeActual;
@@ -68,7 +53,7 @@ public class TablaSemanalDebe {
             LocalDate fecha = (LocalDate) fila.getValue().get("fecha");/*Obtiene la fecha de la fila
                                                                            actual*/
 
-            return new SimpleObjectProperty<>(fecha == null ? "" : fecha.format(FECHA_FORMATO));/*devuelve la fecha, si la fecha es null se
+            return new SimpleObjectProperty<>(fecha == null ? "" : FechaUtils.formatearTitulo(fecha));/*devuelve la fecha, si la fecha es null se
                                                                                                   deja vacía sino muestra formateada la fecha*/
         });
 
@@ -84,7 +69,7 @@ public class TablaSemanalDebe {
 
             Number m = (Number) fila.getValue().get("monto");/* Obtiene el monto de la fila actual */
 
-            return new SimpleObjectProperty<>(MONEDA.format(m == null ? 0 : m.doubleValue()));/*si el monto es null muestra
+            return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));/*si el monto es null muestra
                                                                                                 cero, sino muestra el monto
                                                                                                 formateado a moneda*/
         });

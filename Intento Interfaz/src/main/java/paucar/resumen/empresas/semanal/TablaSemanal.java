@@ -1,9 +1,6 @@
 package paucar.resumen.empresas.semanal;
 
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Map;
 
 import com.uade.tpo.demo.entity.TipoCliente;
@@ -17,17 +14,13 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import paucar.service.VentasBackend;
+import paucar.shared.FechaUtils;
+import paucar.shared.MonedaUtils;
 
 public class TablaSemanal {
 
     private final VentasBackend backend;
     private final TableView<Map<String, Object>> tabla;
-
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");
-    private static final DateTimeFormatter FECHA_FORMATO =
-            DateTimeFormatter.ofPattern("d MMMM yyyy", LOCALE_AR);
-    private static final NumberFormat MONEDA =
-            NumberFormat.getCurrencyInstance(LOCALE_AR);
 
     public TablaSemanal(VentasBackend backend) {
         this.backend = backend;
@@ -50,7 +43,7 @@ public class TablaSemanal {
 
             LocalDate fecha = (LocalDate) fila.getValue().get("fecha");/*Obtiene la fecha de la fila 
                                                                             actual*/
-            return new SimpleObjectProperty<>(fecha == null ? "" : fecha.format(FECHA_FORMATO));/*si la fecha es null se deja vacia sino se
+            return new SimpleObjectProperty<>(fecha == null ? "" : FechaUtils.formatearTitulo(fecha));/*si la fecha es null se deja vacia sino se
                                                                                                  pone la fecha formateada */
         });
 
@@ -68,7 +61,7 @@ public class TablaSemanal {
 
             Number m = (Number) fila.getValue().get("monto");/*Obtiene el monto de la fila actual*/
 
-            return new SimpleObjectProperty<>(MONEDA.format(m == null ? 0 : m.doubleValue()));/*si el monto es null se usa 0, de
+            return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));/*si el monto es null se usa 0, de
                                                                                               locontrario se usa el valor double */
         });
 

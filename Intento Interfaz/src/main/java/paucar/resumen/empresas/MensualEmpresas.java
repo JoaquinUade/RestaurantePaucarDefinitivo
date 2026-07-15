@@ -15,6 +15,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import paucar.service.VentasBackend;
+import paucar.shared.FechaUtils;
+import paucar.shared.MonedaUtils;
 
 public class MensualEmpresas extends BorderPane {
 
@@ -176,12 +178,7 @@ public class MensualEmpresas extends BorderPane {
                     setText("TOTAL MES");
 
                 } else {
-                    setText(String.format(
-                            "%02d-%s",
-                            fecha.getDayOfMonth(),
-                            fecha.getMonth().getDisplayName(
-                                    java.time.format.TextStyle.FULL,
-                                    java.util.Locale.of("es", "AR"))));
+                    setText(FechaUtils.fechaMes(fecha));
                 }
             }
         });
@@ -207,9 +204,7 @@ public class MensualEmpresas extends BorderPane {
                 if (empty || v == null) {
                     setText("");
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
                 }
             }
         });
@@ -234,9 +229,7 @@ public class MensualEmpresas extends BorderPane {
                     setText("");
                     setTextFill(null);
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
 
                     if (v.compareTo(BigDecimal.ZERO) > 0) {
                         setTextFill(javafx.scene.paint.Color.RED);
@@ -269,9 +262,7 @@ public class MensualEmpresas extends BorderPane {
                     setText("");
                     setTextFill(null);
                 } else {
-                    setText(java.text.NumberFormat
-                            .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                            .format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
 
                     if (v.compareTo(BigDecimal.ZERO) > 0) {
                         setTextFill(javafx.scene.paint.Color.GREEN);
@@ -284,12 +275,6 @@ public class MensualEmpresas extends BorderPane {
 
         col.setSortable(false);
         return col;
-    }
-
-    private String formato(BigDecimal v) {
-        return java.text.NumberFormat
-                .getCurrencyInstance(java.util.Locale.of("es", "AR"))
-                .format(v);
     }
 
     private void RenderTotalMensual(VentaResumenDiarioDTO t) {
@@ -308,25 +293,25 @@ public class MensualEmpresas extends BorderPane {
         }
 
         grid.add(new javafx.scene.control.Label("TOTAL MES"), 0, 0);
-        grid.add(new javafx.scene.control.Label(formato(t.getVentaTotal())), 1, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getVentaTotal())), 1, 0);
 
-        javafx.scene.control.Label totalDebe = new javafx.scene.control.Label(formato(t.getDebe()));
+        javafx.scene.control.Label totalDebe = new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDebe()));
         totalDebe.setTextFill(t.getDebe().compareTo(BigDecimal.ZERO) > 0
                 ? javafx.scene.paint.Color.RED
                 : javafx.scene.paint.Color.BLACK);
         grid.add(totalDebe, 2, 0);
 
-        javafx.scene.control.Label totalPagado = new javafx.scene.control.Label(formato(t.getDeudaPagada()));
+        javafx.scene.control.Label totalPagado = new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDeudaPagada()));
         totalPagado.setTextFill(t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0
                 ? javafx.scene.paint.Color.GREEN
                 : javafx.scene.paint.Color.BLACK);
         grid.add(totalPagado, 3, 0);
 
-        grid.add(new javafx.scene.control.Label(formato(t.getDebito())), 4, 0);
-        grid.add(new javafx.scene.control.Label(formato(t.getCredito())), 5, 0);
-        grid.add(new javafx.scene.control.Label(formato(t.getTransferencia())), 6, 0);
-        grid.add(new javafx.scene.control.Label(formato(t.getMercadoPago())), 7, 0);
-        grid.add(new javafx.scene.control.Label(formato(t.getEfectivo())), 8, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getCredito())), 5, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getTransferencia())), 6, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getMercadoPago())), 7, 0);
+        grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getEfectivo())), 8, 0);
 
         footerTotal.setCenter(grid);
     }

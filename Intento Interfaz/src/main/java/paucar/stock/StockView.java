@@ -2,9 +2,7 @@ package paucar.stock;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,6 +25,7 @@ import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
+import paucar.shared.FechaUtils;
 
 public class StockView extends BorderPane {
 
@@ -316,17 +315,13 @@ if (fechaSeleccionada.isBefore(fechaNacimiento)) {
 
     private void actualizarFecha() {
 
-        DateTimeFormatter formatter
-                = DateTimeFormatter.ofPattern(
-                        "EEEE dd/MM/yyyy",
-                        new Locale("es", "ES"));
+        
+  lblFecha.setText(
+            FechaUtils.formatearTitulo(
+                    filtroFecha.getValue()
+            )
+    );
 
-        String texto = filtroFecha.getValue().format(formatter);
-
-        texto = texto.substring(0, 1).toUpperCase()
-                + texto.substring(1);
-
-        lblFecha.setText(texto);
         lblFecha.getStyleClass().add("titulo-xl-blanco");
     }
 }

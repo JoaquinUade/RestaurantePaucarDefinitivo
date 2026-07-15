@@ -1,12 +1,10 @@
 package paucar.resumen.general;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 import com.uade.tpo.demo.entity.TipoDePago;
@@ -22,13 +20,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import paucar.service.VentasBackend;
+import paucar.shared.LocaleUtils;
+import paucar.shared.MonedaUtils;
 
 public class MensualGeneral extends BorderPane {
-
-    private static final Locale LOCALE_AR = Locale.of("es", "AR");/*variable que guarda la configuración regional de Argentina para
-                                                                                    formatear fechas y monedas de acuerdo a las convenciones locales*/
-
-    private static final NumberFormat MONEDA = NumberFormat.getCurrencyInstance(LOCALE_AR);/*variable que guarda el formato de moneda para Argentina */
 
     private final VentasBackend ventasBackend;/*variable que guarda la instancia del backend de ventas */
 
@@ -201,9 +196,9 @@ public class MensualGeneral extends BorderPane {
                     setText(String.format(
                             "%02d-%s",/*formatea la fecha para mostrar el día con dos dígitos y el mes con su nombre abreviado, por ejemplo "05-Mar" */
                             fecha.getDayOfMonth(),/*obtiene el día del mes */
-                            fecha.getMonth().getDisplayName(TextStyle.FULL, LOCALE_AR/*obtiene el nombre del mes en formato completo y en español de Argentina*/
+                            fecha.getMonth().getDisplayName(TextStyle.FULL, LocaleUtils.ES_AR)/*obtiene el nombre del mes en formato completo y en español de Argentina*/
                             )
-                    ));
+                    );
                     getStyleClass().clear();/*limpia cualquier estilo previo de la celda para que no se acumulen estilos al actualizar el contenido de la celda*/
                 }
             }
@@ -231,7 +226,7 @@ public class MensualGeneral extends BorderPane {
                     setText("");
                     setTextFill(null); // limpia color previo
                 } else {
-                    setText(MONEDA.format(v));
+                    setText(MonedaUtils.formatearMoneda(v));
                     if (v.compareTo(BigDecimal.ZERO) > 0) {
                         setTextFill(javafx.scene.paint.Color.RED);
                     } else {
@@ -265,7 +260,7 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
                 setText("");
                 setTextFill(null);
             } else {
-                setText(MONEDA.format(v));
+                setText(MonedaUtils.formatearMoneda(v));
 
                 if (v.compareTo(BigDecimal.ZERO) > 0) {
                     setTextFill(javafx.scene.paint.Color.GREEN); // ✅ VERDE
@@ -295,7 +290,7 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
             @Override
             protected void updateItem(BigDecimal v, boolean empty) {
                 super.updateItem(v, empty);
-                setText(empty || v == null ? "" : MONEDA.format(v));
+                setText(empty || v == null ? "" : MonedaUtils.formatearMoneda(v));
             }
         });
 
@@ -325,13 +320,13 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
                                                                            "TOTAL MES" en la primera
                                                                            columna y primera fila del
                                                                            GridPane */
-        grid.add(new Label(MONEDA.format(t.getVentaTotal())), 1, 0);/* agrega un label con el total de ventas en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getVentaTotal())), 1, 0);/* agrega un label con el total de ventas en la
                                                                                           segunda columna y primera fila del GridPane */
 
 
-        Label totalDebe = new Label(MONEDA.format(t.getDebe()));/* crea un label con el total de debe del
+        Label totalDebe = new Label(MonedaUtils.formatearMoneda(t.getDebe()));/* crea un label con el total de debe del
                                                                 mes para mostrarlo en la fila de totales */
-        Label totalDeudaPagada = new Label(MONEDA.format(t.getDeudaPagada()));
+        Label totalDeudaPagada = new Label(MonedaUtils.formatearMoneda(t.getDeudaPagada()));
 
         if (t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0) {
             totalDeudaPagada.setTextFill(javafx.scene.paint.Color.GREEN);
@@ -349,19 +344,19 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
         grid.add(totalDebe, 2, 0);/* agrega el label con el total de debe en la
                                                         tercera columna y primera fila del GridPane */
         grid.add(totalDeudaPagada, 3, 0); 
-        grid.add(new Label(MONEDA.format(t.getDebito())), 4, 0);/* agrega un label con el total de débitos en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);/* agrega un label con el total de débitos en la
                                                                                           cuarta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getCredito())), 5, 0);/* agrega un label con el total de créditos en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getCredito())), 5, 0);/* agrega un label con el total de créditos en la
                                                                                           quinta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getTransferencia())), 6, 0);/* agrega un label con el total de transferencias en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getTransferencia())), 6, 0);/* agrega un label con el total de transferencias en la
                                                                                           sexta columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getMercadoPago())), 7, 0);/* agrega un label con el total de pagos por Mercado Pago en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getMercadoPago())), 7, 0);/* agrega un label con el total de pagos por Mercado Pago en la
                                                                                           séptima columna y primera fila del GridPane */
 
-        grid.add(new Label(MONEDA.format(t.getEfectivo())), 8, 0);/* agrega un label con el total de efectivo en la
+        grid.add(new Label(MonedaUtils.formatearMoneda(t.getEfectivo())), 8, 0);/* agrega un label con el total de efectivo en la
                                                                                           octava columna y primera fila del GridPane */
 
         footerTotal.setCenter(grid);/* agrega el GridPane al centro del pie de página de los totales */

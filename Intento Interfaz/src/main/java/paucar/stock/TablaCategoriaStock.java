@@ -20,14 +20,12 @@ public class TablaCategoriaStock extends VBox {
 
     private final StockService stockService;
 
-    public TablaCategoriaStock(
-            List<Stock> stocks,
-            Consumer<Stock> onSelect,
-            boolean modoDiario, StockService stockService, LocalDate fechaSeleccionada) {
+    public TablaCategoriaStock(List<Stock> stocks, Consumer<Stock> onSelect,
+                               boolean modoDiario, StockService stockService,
+                               LocalDate fechaSeleccionada) {
         this.stockService = stockService;
-        TableView<Stock> tabla
-                = new TableView<>();
-         tabla.setEditable(modoDiario);
+        TableView<Stock> tabla = new TableView<>();
+        tabla.setEditable(modoDiario);
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
@@ -84,26 +82,7 @@ public class TablaCategoriaStock extends VBox {
         colUnidad.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getUnidadStockMinimo()));
-        // ESTADO
-        TableColumn<Stock, String> colEstado
-                = new TableColumn<>("Estado");
-
-        colEstado.setCellValueFactory(c -> {
-
-            Stock stock = c.getValue();
-
-            boolean bajoStock
-                    = stock.getCantidad()
-                            .compareTo(
-                                    stock.getStockMinimo())
-                    <= 0;
-
-            return new SimpleStringProperty(
-                    bajoStock
-                            ? "Bajo Stock"
-                            : "OK");
-        });
-
+        
         tabla.getColumns().add(colProducto);
 
         if (modoDiario) {
@@ -144,8 +123,6 @@ public class TablaCategoriaStock extends VBox {
             tabla.getColumns().add(colCantComprada);
             tabla.getColumns().add(colMinimo);
         }
-
-        tabla.getColumns().add(colEstado);
 
         tabla.setItems(
                 FXCollections.observableArrayList(stocks));

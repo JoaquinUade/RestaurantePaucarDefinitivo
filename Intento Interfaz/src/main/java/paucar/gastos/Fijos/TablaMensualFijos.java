@@ -1,8 +1,6 @@
 package paucar.gastos.Fijos;
 
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Consumer;
 
 import com.uade.tpo.demo.entity.GastosFijos;
@@ -14,6 +12,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import paucar.shared.MonedaUtils;
 
 public class TablaMensualFijos extends VBox {
 
@@ -61,17 +60,12 @@ public class TablaMensualFijos extends VBox {
                 }
             }
         });
-        Locale locale = Locale.of("es", "AR");
-
-        NumberFormat formato
-                = NumberFormat.getCurrencyInstance(locale);
-
         TableColumn<GastosFijos, String> colMonto
                 = new TableColumn<>("Monto");
 
         colMonto.setCellValueFactory(c
                 -> new SimpleStringProperty(
-                        formato.format(c.getValue().getMonto())
+                        MonedaUtils.formatearMoneda(c.getValue().getMonto())
                 )
         );
         // ✅ ESTADO (Boolean → texto)
