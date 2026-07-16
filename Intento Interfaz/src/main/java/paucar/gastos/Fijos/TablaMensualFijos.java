@@ -80,11 +80,10 @@ public class TablaMensualFijos extends VBox {
 
         colEstado.setCellFactory(tc -> new TableCell<>() {
 
-            private final ComboBox<String> combo = new ComboBox<>();
-
+            private final ComboBox<String> combo = new ComboBox<>();     
             {
                 combo.getItems().addAll("Pendiente", "Pagado");
-
+                combo.getStyleClass().add("combo-agregar");
                 combo.valueProperty().addListener((obs, anterior, nuevo) -> {
 
                     if (getIndex() >= 0

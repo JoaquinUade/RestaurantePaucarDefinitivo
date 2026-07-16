@@ -60,3 +60,19 @@
 .scroll-pane > .corner {
     -fx-background-color: transparent;
 }
+.date-agregar {
+    -fx-background-color: #e4e4e4;
+    -fx-border-color: #000000;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.date-agregar .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
+}
+
+/* botón del calendario */
+.date-agregar .arrow-button {
+    -fx-background-color: transparent;
+}

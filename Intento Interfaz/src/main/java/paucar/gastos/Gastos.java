@@ -36,6 +36,7 @@ public class Gastos extends BorderPane {
 
         getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
                                                                                          para Admin*/
+        getStylesheets().add(getClass().getResource("/gastos.css").toExternalForm());
         botones();
     }
 

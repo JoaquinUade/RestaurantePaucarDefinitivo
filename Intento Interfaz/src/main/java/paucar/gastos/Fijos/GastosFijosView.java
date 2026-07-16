@@ -35,8 +35,8 @@ public class GastosFijosView extends VBox {
 
         // ✅ FILTRO POR MES
         filtroFecha = new DatePicker(LocalDate.now());
-        filtroFecha.getStyleClass().add("date-agregar");
         filtroFecha.setPromptText("Filtrar por mes");
+        filtroFecha.getStyleClass().add("date-agregar");
 
         // ✅ BOTÓN FILTRAR
         Button btnFiltrar = new Button("Filtrar");
@@ -105,9 +105,10 @@ public class GastosFijosView extends VBox {
         // ✅ ESPACIADOR
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
+        Label titulo = new Label("Gastos Fijos");
+        titulo.getStyleClass().add("subtitulo-mid-blanco");
         // ✅ FILA SUPERIOR
-        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar, spacer, btnAgregar);
+        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
         HBox barraBotones = crearBarraBotones();
         barraBotones.setPadding(new Insets(0));
 

@@ -12,6 +12,7 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -81,8 +82,9 @@ public class GastosVariablesView extends VBox {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar, spacer, btnAgregar);
+        Label titulo = new Label("Gastos Variables");
+        titulo.getStyleClass().add("subtitulo-mid-blanco");
+        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar,titulo, spacer, btnAgregar);
 
         fondo.getChildren().addAll(filaSuperior, scroll, barraBotones);
 
@@ -151,7 +153,7 @@ public class GastosVariablesView extends VBox {
         if (fechaFiltro != null) {
             gastos = gastos.stream()
                     .filter(g -> g.getFecha().getMonth() == fechaFiltro.getMonth()
-                            && g.getFecha().getYear() == fechaFiltro.getYear())
+                    && g.getFecha().getYear() == fechaFiltro.getYear())
                     .toList();
         }
 
@@ -160,7 +162,6 @@ public class GastosVariablesView extends VBox {
 
         porCategoria.forEach((categoria, lista) -> {
             contenedorCategorias.getChildren().add(
-
                     new PanelCategoriaGastosV(categoria, lista, gasto -> {
                         gastoSeleccionado = gasto;
                     }));

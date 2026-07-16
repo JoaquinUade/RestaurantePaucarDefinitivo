@@ -18,6 +18,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.gastos.Fijos.DialogGastosFijos;
 
 public class DialogGastosIndividuales {
 
@@ -27,13 +28,17 @@ public class DialogGastosIndividuales {
 
         Dialog<GastoIndividualRequest> dialog = new Dialog<>();
         dialog.setTitle("Agregar Gasto");
-
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
         DatePicker fecha = new DatePicker(LocalDate.now());
-
+        fecha.getStyleClass().add("date-agregar");
         ComboBox<Empleado> combo = new ComboBox<>();
         combo.getItems().addAll(empleados);
 
@@ -100,89 +105,97 @@ public class DialogGastosIndividuales {
     }
 
     public static GastoIndividualRequest mostrarEditar(
-        List<Empleado> empleados,
-        GastoIndividualRequest original) {
+            List<Empleado> empleados,
+            GastoIndividualRequest original) {
 
-    Dialog<GastoIndividualRequest> dialog = new Dialog<>();
-    dialog.setTitle("Editar Gasto");
+        Dialog<GastoIndividualRequest> dialog = new Dialog<>();
+        dialog.setTitle("Editar Gasto");
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
-    ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-    dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+        PasswordField txtPass = new PasswordField();
+        DatePicker fecha = new DatePicker(original.getFecha());
+        fecha.getStyleClass().add("date-agregar");
+        ComboBox<Empleado> combo = new ComboBox<>();
+        combo.getItems().addAll(empleados);
 
-    PasswordField txtPass = new PasswordField();
-    DatePicker fecha = new DatePicker(original.getFecha());
-
-    ComboBox<Empleado> combo = new ComboBox<>();
-    combo.getItems().addAll(empleados);
-
-    combo.setCellFactory(lv -> new ListCell<>() {
-        @Override
-        protected void updateItem(Empleado item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(empty || item == null ? null : item.getNombre());
-        }
-    });
-
-    combo.setButtonCell(new ListCell<>() {
-        @Override
-        protected void updateItem(Empleado item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(empty || item == null ? null : item.getNombre());
-        }
-    });
-
-    // seleccionar empleado original
-    empleados.stream()
-        .filter(e -> e.getIdEmpleado().equals(original.getEmpleadoId()))
-        .findFirst()
-        .ifPresent(combo::setValue);
-
-    TextField txtDetalle = new TextField(original.getDetalle());
-    TextField txtMonto = new TextField(original.getMonto().toString());
-
-    VBox form = new VBox(10,
-            new Label("Contraseña"), txtPass,
-            new Label("Fecha"), fecha,
-            new Label("Empleado"), combo,
-            new Label("Detalle"), txtDetalle,
-            new Label("Monto"), txtMonto);
-
-    form.setPadding(new Insets(15));
-    dialog.getDialogPane().setContent(form);
-
-    dialog.setResultConverter(btn -> {
-        if (btn == btnGuardar) {
-
-            if (!txtPass.getText().equals(PASSWORD)) {
-                new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
-                return null;
+        combo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Empleado item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
             }
+        });
 
-            GastoIndividualRequest req = new GastoIndividualRequest();
-
-            req.setFecha(fecha.getValue());
-            req.setDetalle(txtDetalle.getText());
-            req.setEmpleadoId(combo.getValue().getIdEmpleado());
-
-            try {
-                req.setMonto(new java.math.BigDecimal(txtMonto.getText()));
-            } catch (Exception e) {
-                req.setMonto(java.math.BigDecimal.ZERO);
+        combo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Empleado item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
             }
+        });
 
-            return req;
-        }
-        return null;
-    });
+        // seleccionar empleado original
+        empleados.stream()
+                .filter(e -> e.getIdEmpleado().equals(original.getEmpleadoId()))
+                .findFirst()
+                .ifPresent(combo::setValue);
 
-    return dialog.showAndWait().orElse(null);
-}
+        TextField txtDetalle = new TextField(original.getDetalle());
+        TextField txtMonto = new TextField(original.getMonto().toString());
+
+        VBox form = new VBox(10,
+                new Label("Contraseña"), txtPass,
+                new Label("Fecha"), fecha,
+                new Label("Empleado"), combo,
+                new Label("Detalle"), txtDetalle,
+                new Label("Monto"), txtMonto);
+
+        form.setPadding(new Insets(15));
+        dialog.getDialogPane().setContent(form);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == btnGuardar) {
+
+                if (!txtPass.getText().equals(PASSWORD)) {
+                    new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
+                    return null;
+                }
+
+                GastoIndividualRequest req = new GastoIndividualRequest();
+
+                req.setFecha(fecha.getValue());
+                req.setDetalle(txtDetalle.getText());
+                req.setEmpleadoId(combo.getValue().getIdEmpleado());
+
+                try {
+                    req.setMonto(new java.math.BigDecimal(txtMonto.getText()));
+                } catch (Exception e) {
+                    req.setMonto(java.math.BigDecimal.ZERO);
+                }
+
+                return req;
+            }
+            return null;
+        });
+
+        return dialog.showAndWait().orElse(null);
+    }
 
     public static boolean confirmarEliminacion() {
 
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Gasto");
-
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
 
         dialog.getDialogPane().getButtonTypes()
@@ -217,4 +230,3 @@ public class DialogGastosIndividuales {
         return confirmado[0];
     }
 }
- 

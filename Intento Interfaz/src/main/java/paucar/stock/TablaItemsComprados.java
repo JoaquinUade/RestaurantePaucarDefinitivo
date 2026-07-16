@@ -93,7 +93,9 @@ public class TablaItemsComprados {
                 MonedaUtils.formatearMoneda(
                         c.getValue().getMonto())
         ));
-
+        colProducto.setSortable(false);
+        colCantidad.setSortable(false);
+        colPrecio.setSortable(false);
         tabla.getColumns().add(colFecha);
         tabla.getColumns().add(colProducto);
         tabla.getColumns().add(colCantidad);

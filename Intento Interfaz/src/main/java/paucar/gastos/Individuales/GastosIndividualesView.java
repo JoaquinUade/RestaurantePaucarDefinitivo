@@ -12,6 +12,7 @@ import com.uade.tpo.demo.entity.dto.GastoIndividualRequest;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -81,8 +82,9 @@ public class GastosIndividualesView extends VBox {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox top = new HBox(10, filtroFecha, btnFiltrar, spacer, btnAgregar);
+        Label titulo = new Label("Gastos Individuales");
+        titulo.getStyleClass().add("subtitulo-mid-blanco");
+        HBox top = new HBox(10, filtroFecha, btnFiltrar,titulo, spacer, btnAgregar);
 
         fondo.getChildren().addAll(top, scroll, barraBotones);
 

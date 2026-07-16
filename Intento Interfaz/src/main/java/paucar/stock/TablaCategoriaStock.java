@@ -135,10 +135,6 @@ public class TablaCategoriaStock extends VBox {
                     if (newSel != null) {
 
                         onSelect.accept(newSel);
-
-                        System.out.println(
-                                "Seleccionado: "
-                                + newSel.getNombreProducto());
                     }
                 });
 

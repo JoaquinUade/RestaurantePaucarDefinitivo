@@ -83,7 +83,7 @@ public class TablaSemanalIndividual extends VBox {
                 tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
                         if (newSel != null) {
                                 onSelect.accept(newSel);
-                                System.out.println("Seleccionado: " + newSel.getDetalle());
+                                
                         }
                 });
                 // ✅ TOTAL

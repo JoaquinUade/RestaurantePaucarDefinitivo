@@ -45,18 +45,16 @@ public class DialogGastosFijos {
     public static Boolean preguntarSiEsPersonal() {
 
         Dialog<Boolean> dialog = new Dialog<>();
-
-        dialog.getDialogPane().getStylesheets().add(
-                DialogGastosFijos.class
-                        .getResource("/gastos.css")
-                        .toExternalForm()
-        );
-
-        dialog.setTitle("Tipo de gasto");
+         dialog.setTitle("Tipo de gasto");
+    dialog.getDialogPane().getStylesheets().add(
+        DialogGastosFijos.class
+            .getResource("/gastos.css")
+            .toExternalForm()
+    );
 
         Button btnPersonal = new Button("Personal");
         Button btnGeneral = new Button("General");
-dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
 
         btnPersonal.getStyleClass().add("btn-agregar");
         btnGeneral.getStyleClass().add("btn-agregar");
@@ -66,7 +64,7 @@ dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
 
         HBox.setHgrow(btnPersonal, Priority.ALWAYS);
         HBox.setHgrow(btnGeneral, Priority.ALWAYS);
-        
+
         btnPersonal.setOnAction(e -> {
             dialog.setResult(true);
             dialog.close();
@@ -98,12 +96,18 @@ dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Editar Gasto Fijo");
 
+    dialog.getDialogPane().getStylesheets().add(
+        DialogGastosFijos.class
+            .getResource("/gastos.css")
+            .toExternalForm()
+    );
+
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
         DatePicker fecha = new DatePicker(original.getFecha());
-
+        fecha.getStyleClass().add("date-agregar");
         TextField txtDetalle = new TextField(original.getDetalle());
         TextField txtMonto = new TextField(original.getMonto().toString());
         TextField txtObs = new TextField(original.getObservacion());
@@ -154,12 +158,19 @@ dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Pago a personal");
 
+    dialog.getDialogPane().getStylesheets().add(
+        DialogGastosFijos.class
+            .getResource("/gastos.css")
+            .toExternalForm()
+    );
+
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
         DatePicker fecha = new DatePicker(LocalDate.now());
-
+        
+        fecha.getStyleClass().add("date-agregar");
         ComboBox<Empleado> comboEmpleado = new ComboBox<>();
         comboEmpleado.getItems().addAll(empleados);
 
@@ -230,12 +241,18 @@ dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Gasto fijo");
 
+    dialog.getDialogPane().getStylesheets().add(
+        DialogGastosFijos.class
+            .getResource("/gastos.css")
+            .toExternalForm()
+    );
+
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
         DatePicker fecha = new DatePicker(LocalDate.now());
-
+        fecha.getStyleClass().add("date-agregar");
         TextField txtDetalle = new TextField();
         TextField txtMonto = new TextField();
         TextField txtObs = new TextField();
@@ -290,6 +307,12 @@ dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
 
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Gasto");
+
+    dialog.getDialogPane().getStylesheets().add(
+        DialogGastosFijos.class
+            .getResource("/gastos.css")
+            .toExternalForm()
+    );
 
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnEliminar, ButtonType.CANCEL);

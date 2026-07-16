@@ -185,17 +185,6 @@ public class StockView extends BorderPane {
         contenedorCategorias.getChildren().clear();
 
         List<Stock> stocks = service.obtenerTodos();
-        System.out.println("========== STOCKS ==========");
-
-        for (Stock s : stocks) {
-            System.out.println(
-                    "ID=" + s.getIdStock()
-                    + " | Producto=" + s.getNombreProducto()
-                    + " | Cantidad=" + s.getStockMinimo()
-                    + " | Fecha=" + s.getFecha()
-            );
-        }
-
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
         if (modoDiario) {

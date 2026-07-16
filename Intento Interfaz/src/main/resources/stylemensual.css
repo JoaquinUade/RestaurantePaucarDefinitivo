@@ -14,6 +14,16 @@
     -fx-background-radius: 14px;
     -fx-border-radius: 14px;
 }
+.subtitulo-mid-blanco {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: rgb(255, 255, 255);
+    -fx-padding: 3 28;
+    -fx-font-family: "Arial Black";
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-translate-y: -3px;
+}
 .footer-total {
     -fx-background-color: #fff2cc;
     -fx-border-color: #d6b656;
