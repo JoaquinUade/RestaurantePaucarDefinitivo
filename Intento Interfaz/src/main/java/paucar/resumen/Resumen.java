@@ -27,34 +27,37 @@ public class Resumen extends BorderPane {
                                                                    * una opción de una lista desplegable, aqui se
                                                                    * utiliza para que el usuario elija entre
                                                                    * "Mensual" y "Semanal"
-                                                                   */
+     */
 
     private final DatePicker pickerFecha = new DatePicker();/*
                                                              * DatePicker es un componente que permite al usuario
                                                              * seleccionar una fecha, aqui es para que el usuario
                                                              * elija la fecha base para mostrar el resumen mensual
                                                              * o semanal
-                                                             */
+     */
 
     private final BorderPane contenedorResultado = new BorderPane();/*
                                                                      * BorderPane es un layout que divide la ventana
                                                                      * en: top, bottom, left, right y center. Aqui es
                                                                      * para mostrar el resumen mensual o semanal en el
                                                                      * centro de la ventana
-                                                                     */
+     */
     private SemanalEmpresas vistaSemanalEmpresas;
     private SemanalClientes vistaSemanalClientes;
     private MensualEmpresas vistaMensualEmpresas;
     private MensualClientes vistaMensualClientes;
+    private MensualGeneral vistaMensualGeneral;
+    private SemanalGeneral vistaSemanalGeneral;
 
     private final ComboBox<String> tipoResumen = new ComboBox<>();
+
     public Resumen(VentasBackend backend) {
         this.backend = backend;
 
         setPadding(new Insets(16));/*
                                     * agrega un padding de 16 pixeles a todo el borde
                                     * de la pestaña Resumen, arriba abajo y los costados
-                                    */
+         */
 
         initFiltros();/* inicializa los filtros */
 
@@ -63,7 +66,7 @@ public class Resumen extends BorderPane {
         setCenter(contenedorResultado);/*
                                         * establece el centro del BorderPane como el contenedorResultado,
                                         * que es donde se mostrará el resumen mensual o semanal
-                                        */
+         */
     }
 
     private void initFiltros() {
@@ -71,7 +74,7 @@ public class Resumen extends BorderPane {
         ResumenTipo.getItems().addAll("Mensual", "Semanal");/*
                                                              * agrega las opciones "Mensual" y
                                                              * "Semanal" a ResumenTipo
-                                                             */
+         */
         ResumenTipo.getStyleClass().add("combo-agregar");
         ResumenTipo.setValue("Mensual");/* establece el valor por default */
 
@@ -95,7 +98,7 @@ public class Resumen extends BorderPane {
                                                    * cuando se hace click en el botón "Ver", se llama al método
                                                    * aplicarFiltros() para mostrar el resumen
                                                    * correspondiente según los filtros seleccionados
-                                                   */
+         */
 
         pickerFecha.setOnAction(e -> aplicarFiltros());
 
@@ -111,6 +114,40 @@ public class Resumen extends BorderPane {
         return barraFiltros;/* retorna la barra de filtros */
     }
 
+    public void actualizarDatos() {
+
+        System.out.println("ENTRO A ACTUALIZARDATOS");
+
+        if (vistaMensualClientes != null) {
+            System.out.println("MENSUAL CLIENTES");
+            vistaMensualClientes.refrescar();
+        }
+
+        if (vistaMensualEmpresas != null) {
+            System.out.println("MENSUAL EMPRESAS");
+            vistaMensualEmpresas.refrescar();
+        }
+
+        if (vistaSemanalClientes != null) {
+            System.out.println("SEMANAL CLIENTES");
+            vistaSemanalClientes.refrescar();
+        }
+
+        if (vistaSemanalEmpresas != null) {
+            System.out.println("SEMANAL EMPRESAS");
+            vistaSemanalEmpresas.refrescar();
+        }
+        if(vistaMensualGeneral != null){
+            System.out.println("MENSUAL GENERAL");
+            vistaMensualGeneral.refrescar();
+        }
+        if(vistaSemanalGeneral != null){
+System.out.println("SEMANAL GENERAL");
+vistaSemanalGeneral.refrescar();
+
+        }
+    }
+
     private void aplicarFiltros() {
 
         String periodo = ResumenTipo.getValue(); // Mensual o Semanal
@@ -124,9 +161,14 @@ public class Resumen extends BorderPane {
                 int mes = fecha.getMonthValue();
 
                 switch (tipo) {
-                    case "General" ->
-                        contenedorResultado.setCenter(
-                                new MensualGeneral(backend, anio, mes));
+                    case "General" -> {
+                        if (vistaMensualGeneral == null) {
+                            vistaMensualGeneral
+                                    = new MensualGeneral(backend, anio, mes);
+                        }
+
+                        contenedorResultado.setCenter(vistaMensualGeneral);
+                    }
                     case "Empresas" -> {
                         if (vistaMensualEmpresas == null) {
                             vistaMensualEmpresas = new MensualEmpresas(backend, anio, mes);
@@ -144,9 +186,13 @@ public class Resumen extends BorderPane {
 
             case "Semanal" -> {
                 switch (tipo) {
-                    case "General" ->
-                        contenedorResultado.setCenter(
-                                new SemanalGeneral(backend, fecha));
+                    case "General" -> {
+                        if (vistaSemanalGeneral == null) {
+                            vistaSemanalGeneral
+                                    = new SemanalGeneral(backend, fecha);
+                        }
+                        contenedorResultado.setCenter(vistaSemanalGeneral);
+                    }
                     case "Empresas" -> {
                         if (vistaSemanalEmpresas == null) {
                             vistaSemanalEmpresas = new SemanalEmpresas(backend, fecha);

@@ -2,13 +2,16 @@ package com.uade.tpo.demo.entity.dto;
 
 import com.uade.tpo.demo.entity.TipoDePago;
 import java.util.List;
+import java.time.LocalDate;
 
 public class VentaRequest {
+
     private Long idCliente;
     private List<Long> idProductos;
     private List<Integer> cantidades;
     private TipoDePago estado;
     private String observaciones;
+    private LocalDate fecha;
 
     public VentaRequest() {
     }
@@ -59,5 +62,13 @@ public class VentaRequest {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 }

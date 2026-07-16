@@ -1,10 +1,10 @@
 package paucar.resumen.clientes.semanal;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.Venta;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TableCell;
@@ -20,7 +20,7 @@ import paucar.shared.MonedaUtils;
 public class TablaSemanalCliente {
 
     private final VentasBackend backend;
-    private final TableView<Map<String, Object>> tabla;
+    private final TableView<Venta> tabla;
 
     public TablaSemanalCliente(VentasBackend backend) {
         this.backend = backend;
@@ -28,64 +28,57 @@ public class TablaSemanalCliente {
         definirColumnas();
     }
 
-    public TableView<Map<String, Object>> getTabla() {
+    public TableView<Venta> getTabla() {
         return tabla;
     }
 
     private void definirColumnas() {
 
-        TableColumn<Map<String, Object>, String> colFecha = new TableColumn<>("Fecha");/*Esa línea crea una columna de la
+        TableColumn<Venta, String> colFecha = new TableColumn<>("Fecha");/*Esa línea crea una columna de la
                                                                                              tabla que se llama “Fecha” y que va
                                                                                              a mostrar un texto para cada fila*/
 
         colFecha.setCellValueFactory(fila -> {/*Para cada fila de la tabla, yo te voy a explicar qué
                                                escribir en la columna Fecha*/
+            var fechaHora = fila.getValue().getFecha();
 
-            LocalDate fecha = (LocalDate) fila.getValue().get("fecha");/*Obtiene la fecha de la fila 
-                                                                            actual*/
-            return new SimpleObjectProperty<>(fecha == null ? "" : FechaUtils.formatearTitulo(fecha));/*si la fecha es null se deja vacia sino se
-                                                                                                 pone la fecha formateada */
+            LocalDate fecha = fechaHora == null
+                    ? null
+                    : fechaHora.toLocalDate();
+
+            return new SimpleObjectProperty<>(
+                    fecha == null ? "" : FechaUtils.formatearTitulo(fecha));
         });
 
-        TableColumn<Map<String, Object>, String> colDescripcion =
-                crearColumnaTexto("Descripción", "descripcion", 13);/*Crea la columna colDescripcion usando un
+        TableColumn<Venta, String> colDescripcion
+                = crearColumnaTexto("Descripción", "descripcion", 13);/*Crea la columna colDescripcion usando un
                                                                                         método que arma columnas de texto, y la
                                                                                         configura para mostrar la descripción de cada
                                                                                         fila*/
 
-        TableColumn<Map<String, Object>, String> colMonto = new TableColumn<>("Monto");/*Esa línea crea una columna nueva en la tabla
+        TableColumn<Venta, String> colMonto = new TableColumn<>("Monto");/*Esa línea crea una columna nueva en la tabla
                                                                                             que se llama “Monto” y que va a mostrar un texto */
 
         colMonto.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Monto
                                               usando esta función*/
 
-            Number m = (Number) fila.getValue().get("monto");/*Obtiene el monto de la fila actual*/
-
+            Number m = fila.getValue().getMonto();
             return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));/*si el monto es null se usa 0, de
                                                                                               locontrario se usa el valor double */
         });
 
-        TableColumn<Map<String, Object>, String> colTipo = new TableColumn<>("Tipo de pago");/*Esa línea crea una columna nueva en la tabla que se
+        TableColumn<Venta, String> colTipo = new TableColumn<>("Tipo de pago");/*Esa línea crea una columna nueva en la tabla que se
                                                                                                    llama “Tipo de pago” y que va a mostrar un texto */
 
-         colTipo.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Tipo de
+        colTipo.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Tipo de
                                               pago usando esta función*/
 
-            TipoDePago estado = (TipoDePago) fila.getValue().get("estado");/*Obtiene el estado de la fila actual*/
-
+            TipoDePago estado
+                    = fila.getValue().getEstado();
             return new SimpleObjectProperty<>(estado == null ? "" : estado.name());/*si el estado es null se deja vacio, de lo contrario se muestra el nombre del estado*/
         });
-        colTipo.setCellValueFactory(fila -> {/*por cada fila se va a fijar el valor de la columna Tipo de
-                                             pago usando esta función*/
 
-            TipoDePago estado = (TipoDePago) fila.getValue().get("estado");/*Obtiene el estado de la
-                                                                                fila actual*/
-
-            return new SimpleObjectProperty<>(estado == null ? "" : estado.name());/*si el estado es null se deja vacio,
-                                                                                   sino se muestra el nombre del estado*/
-        });
-
-        TableColumn<Map<String, Object>, String> colObs = crearColumnaTexto("Observaciones", "observaciones", 16);/*Crea una columna para mostrar las observaciones */
+        TableColumn<Venta, String> colObs = crearColumnaTexto("Observaciones", "observaciones", 16);/*Crea una columna para mostrar las observaciones */
 
         colFecha.setSortable(false);/*quita la posibilidad de ordenar las columnas */
         colDescripcion.setSortable(false);
@@ -104,15 +97,28 @@ public class TablaSemanalCliente {
                                                                                           sea la mas flexible */
     }
 
-    private TableColumn<Map<String, Object>, String> crearColumnaTexto(String titulo, String key,
-        int padding) {
+    private TableColumn<Venta, String> crearColumnaTexto(String titulo, String key,
+            int padding) {
 
-        TableColumn<Map<String, Object>, String> col = new TableColumn<>(titulo);/*crea una columna nueva en la tabla que
+        TableColumn<Venta, String> col = new TableColumn<>(titulo);/*crea una columna nueva en la tabla que
                                                                                  se llama como el titulo que se le pasa y
                                                                                  que va a mostrar un texto */
 
-        col.setCellValueFactory(fila -> new SimpleObjectProperty<>((String) fila.getValue().get(key)));/*por cada fila se fija en el valor de la clave
-                                                                                                       key y se muestra como texto en la columna*/
+        col.setCellValueFactory(fila -> {
+
+            Venta v = fila.getValue();
+
+            String valor = switch (key) {
+                case "descripcion" ->
+                    v.getDescripcion();
+                case "observaciones" ->
+                    v.getObservaciones();
+                default ->
+                    "";
+            };
+
+            return new SimpleObjectProperty<>(valor);
+        });
 
         col.setCellFactory(columna -> new TableCell<>() {/*decido como se va a ver cada celda en la
                                                          columna*/
@@ -150,32 +156,36 @@ public class TablaSemanalCliente {
         return col;/* Devuelve la columna creada */
     }
 
-    public double cargarSemanaCliente(String cliente, LocalDate inicio, LocalDate fin) {
+    public double cargarSemanaCliente(String cliente,
+            LocalDate inicio,
+            LocalDate fin) {
 
-        tabla.getItems().clear();/* Limpia los elementos de la tabla */
-        double total = 0;/* Variable para acumular el total de las ventas de la semana */
+        tabla.getItems().clear();
+        double total = 0;
 
-        LocalDate cursor = inicio;/* Variable para recorrer los días de la semana, comenzando desde el
-                                  inicio */
+        LocalDate cursor = inicio;
 
-        while (!cursor.isAfter(fin)) {/* Mientras el cursor no sea posterior a la fecha final */
+        while (!cursor.isAfter(fin)) {
 
-            var ventas = backend.cargarVentasDelDia(cursor);/* Carga las ventas del día */
+            var ventas = backend.cargarVentasDelDia(cursor);
 
-            for (Map<String, Object> v : ventas) {/*recorre cada una de las ventas */
+            for (Venta v : ventas) {
 
-                if (v.get("tipoCliente") == TipoCliente.CLIENTE/*si el tipo de cliente es cliente */
-                        && cliente.equals(v.get("nombre"))/* y el nombre coincide */
-                        && v.get("estado") != TipoDePago.DEBE
-                    && v.get("estado")!= TipoDePago.DEUDA_PAGADA) {/*y ademas no es debe */
+                if (v.getCliente() != null
+                        && v.getCliente().getTipoCliente() == TipoCliente.CLIENTE
+                        && cliente.equals(v.getCliente().getNombre())
+                        && v.getEstado() != TipoDePago.DEBE
+                        && v.getEstado() != TipoDePago.DEUDA_PAGADA) {
 
-                    v.put("fecha", cursor);/* Asigna la fecha al registro de venta */
-                    tabla.getItems().add(v);/* Agrega el registro de venta a la tabla */
-                    total += ((Number) v.get("monto")).doubleValue();/* Acumula el monto de la venta */
+                    tabla.getItems().add(v);
+
+                    total += v.getMonto().doubleValue();
                 }
             }
-            cursor = cursor.plusDays(1);/* Avanza al siguiente día */
+
+            cursor = cursor.plusDays(1);
         }
-        return total;/* Devuelve el total de las ventas */
+
+        return total;
     }
 }

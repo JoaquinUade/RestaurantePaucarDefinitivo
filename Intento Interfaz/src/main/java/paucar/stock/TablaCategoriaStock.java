@@ -18,12 +18,10 @@ import paucar.service.StockService;
 
 public class TablaCategoriaStock extends VBox {
 
-    private final StockService stockService;
-
     public TablaCategoriaStock(List<Stock> stocks, Consumer<Stock> onSelect,
                                boolean modoDiario, StockService stockService,
                                LocalDate fechaSeleccionada) {
-        this.stockService = stockService;
+      
         TableView<Stock> tabla = new TableView<>();
         tabla.setEditable(modoDiario);
         tabla.setColumnResizePolicy(

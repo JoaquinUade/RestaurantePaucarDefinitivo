@@ -34,8 +34,7 @@ public class StockView extends BorderPane {
     private Stock stockSeleccionado;
     private final GastosVariablesService gastosVariablesService;
     private boolean modoDiario = false;
-    private final HBox contenedorCategorias
-            = new HBox(20);
+    private final HBox contenedorCategorias = new HBox(20);
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
 
@@ -64,10 +63,10 @@ public class StockView extends BorderPane {
         btnAgregar.setOnAction(e -> {
 
             List<CategoriaGastoVariable> categorias
-                    = categoriasService.obtenerCategorias();
+                    = this.categoriasService.obtenerCategorias();
 
             List<GastosVariables> gastos
-                    = gastosVariablesService.obtenerTodos();
+                    = this.gastosVariablesService.obtenerTodos();
             List<Stock> stocks = service.obtenerTodos();
 
             StockRequest request = DialogStock.mostrar(categorias, gastos, stocks);
@@ -214,8 +213,9 @@ public class StockView extends BorderPane {
 
                         // Fecha de nacimiento
                         LocalDate fechaNacimiento = historial.stream()
-                                .map(HistorialStock::getFecha)
-                                .min(LocalDate::compareTo)
+                                .map(h -> h.getFecha())
+                                .filter(java.util.Objects::nonNull)
+                                .min(java.util.Comparator.naturalOrder())
                                 .orElse(null);
 
                         if (fechaSeleccionada.isBefore(fechaNacimiento)) {
@@ -227,29 +227,28 @@ public class StockView extends BorderPane {
                                 .filter(h
                                         -> h.getCantidad()
                                         .compareTo(BigDecimal.ZERO) == 0)
-                                .max(java.util.Comparator.comparing(
-                                        HistorialStock::getFecha))
+                                .max(java.util.Comparator.comparing(h -> h.getFecha()))
                                 .orElse(null);
 
 // DEBUG
-System.out.println("\n==== " + stock.getNombreProducto() + " ====");
+                        System.out.println("\n==== " + stock.getNombreProducto() + " ====");
 
-System.out.println("Fecha seleccionada: "
-        + fechaSeleccionada);
+                        System.out.println("Fecha seleccionada: "
+                                + fechaSeleccionada);
 
-System.out.println("Fecha nacimiento: "
-        + fechaNacimiento);
+                        System.out.println("Fecha nacimiento: "
+                                + fechaNacimiento);
 
-if (muerte != null) {
-    System.out.println("Fecha muerte: "
-            + muerte.getFecha());
-} else {
-    System.out.println("Fecha muerte: NINGUNA");
-}
+                        if (muerte != null) {
+                            System.out.println("Fecha muerte: "
+                                    + muerte.getFecha());
+                        } else {
+                            System.out.println("Fecha muerte: NINGUNA");
+                        }
 
-if (fechaSeleccionada.isBefore(fechaNacimiento)) {
-    return false;
-}
+                        if (fechaSeleccionada.isBefore(fechaNacimiento)) {
+                            return false;
+                        }
 
                         if (muerte != null
                                 && fechaSeleccionada.isAfter(
@@ -264,8 +263,8 @@ if (fechaSeleccionada.isBefore(fechaNacimiento)) {
                                         .filter(h
                                                 -> !h.getFecha()
                                                 .isAfter(fechaSeleccionada))
-                                        .max(java.util.Comparator.comparing(
-                                                HistorialStock::getFecha))
+                                        .filter(h -> h.getFecha() != null)
+                                        .max(java.util.Comparator.comparing(h -> h.getFecha()))
                                         .orElse(null);
 
                         if (ultimoRegistro == null) {
@@ -315,12 +314,11 @@ if (fechaSeleccionada.isBefore(fechaNacimiento)) {
 
     private void actualizarFecha() {
 
-        
-  lblFecha.setText(
-            FechaUtils.formatearTitulo(
-                    filtroFecha.getValue()
-            )
-    );
+        lblFecha.setText(
+                FechaUtils.formatearTitulo(
+                        filtroFecha.getValue()
+                )
+        );
 
         lblFecha.getStyleClass().add("titulo-xl-blanco");
     }

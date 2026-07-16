@@ -6,14 +6,13 @@ import java.util.concurrent.CompletableFuture;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.Venta;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -26,6 +25,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import paucar.resumen.Resumen;
 import paucar.resumen.empresas.semanal.TablaSemanalDebe;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
@@ -46,7 +46,7 @@ public final class Ventas extends BorderPane {
     private final VentasBackend backend = new VentasBackend(API_BASE, clientesService, venta);
 
     // ====== Estado de la vista ======
-    private final ObservableList<Fila> RenglonDeLaTabla = FXCollections.observableArrayList();
+    private final ObservableList<Venta> RenglonDeLaTabla = FXCollections.observableArrayList();
 
     private final ObjectProperty<BigDecimal> total = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
@@ -57,112 +57,11 @@ public final class Ventas extends BorderPane {
 
     private final ObservableList<ProductosService.ProductoItem> productos = FXCollections.observableArrayList();
     private TablaSemanalDebe tablaSemanalDebe;
-
-    // ====== Modelo de Fila (UI de la tabla) ======
-    public static class Fila {
-
-        /*Property (propiedad): es una variable con sensor que avisa cuando cambia para que la interfaz
-                               (JavaFX) se actualice sola */
-        private final StringProperty nombre = new SimpleStringProperty("");/*osea todos estos son strings que
-                                                                                         cuando se les asigne valor(porque
-                                                                                         empiezan vacios) a sus variables se
-                                                                                         actualizaran al toque sin tener que
-                                                                                         hacer refresh */
-        private final StringProperty descripcion = new SimpleStringProperty("");
-
-        /*ObjectProperty: tipo de dato de JavaFX en el que se puede guardar cualquier tipo de dato, o
-                          objeto o vector y que se actualiza para que si se cambia el contenido se pueda
-                          ver visualmente el contenido actual*/
-        private final ObjectProperty<BigDecimal> monto = new SimpleObjectProperty<>(BigDecimal.ZERO);/*el object property le meto el tipo de dato
-                                                                                                      bigdecimal qeu es un tipo de dato (que sirve
-                                                                                                      para guarda números con decimales súper
-                                                                                                      precisos, sirve para dinero)y inicializo mi
-                                                                                                      variable monto y le doy el valor zero(0.0 pesos)*/
-        private final ObjectProperty<TipoDePago> estado
-                = new SimpleObjectProperty<>(TipoDePago.DEBE);/*Al ObjectProperty le meto el enum TipoDePago
-                                                                               y creo mi variable estado La inicializo con
-                                                                               el valor DEBE (o sea, que por defecto la
-                                                                               forma de pago empieza siendo ‘debe’)*/
-
-        private final StringProperty observaciones = new SimpleStringProperty("");
-        private final ObjectProperty<Long> idVenta = new SimpleObjectProperty<>();/*ObjectProperty que guarda el ID de la venta en el backend,
-                                                                                  para poder eliminarla después si se necesita */
-        public String getNombre() {
-            return nombre.get();
-        }/*retorna el valor que está guardado en el StringProperty nombre*/
-
-        public void setNombre(String v) {
-            nombre.set(v);
-        }/*setea osea le da valor a la variable nombre */
-
-        public StringProperty nombreProperty() {
-            return nombre;
-        }/*retorna nombre porque la UI la requiere */
-
-        public String getDescripcion() {
-            return descripcion.get();
-        }/*retorna el contenido de la descripcion*/
-
-        public void setDescripcion(String v) {
-            descripcion.set(v);
-        }/*le da valor a la variable descripcion */
-
-        public StringProperty descripcionProperty() {
-            return descripcion;
-        }/*retorna la descripcion porque la UI la requiere*/
-
-        public BigDecimal getMonto() {
-            return monto.get();
-        }/*retorna el valor del monto*/
-
-        public void setMonto(BigDecimal v) {
-            monto.set(v);
-        }/*setea el valor de monto */
-
-        public ObjectProperty<BigDecimal> montoProperty() {
-            return monto;
-        }/*retorna el object property del monto porque la UI la requiere */
-
-        public TipoDePago getEstado() {
-            return estado.get();
-        }/*obtiene(retorna) el valor de estado*/
-
-        public void setEstado(TipoDePago v) {
-            estado.set(v);
-        }/*setea el valor de estado */
-
-        public ObjectProperty<TipoDePago> estadoProperty() {
-            return estado;
-        }/*retorna el object property del estado porque la UI la requiere */
-
-        public String getObservaciones() {
-            return observaciones.get();
-        }
-
-        public void setObservaciones(String v) {
-            observaciones.set(v);
-        }
-
-        public StringProperty observacionesProperty() {
-            return observaciones;
-        }
-
-        public Long getIdVenta() {
-            return idVenta.get();
-        }
-
-        public void setIdVenta(Long id) {
-            idVenta.set(id);
-        }
-
-        public ObjectProperty<Long> idVentaProperty() {
-            return idVenta;
-        }
-
-    }
+    private final Resumen resumen;
 
     // ====== Constructor ======
-    public Ventas() {
+    public Ventas(Resumen resumen) {
+        this.resumen = resumen;
         setPadding(new Insets(16));
         venta.setEstado(TipoDePago.DEBE);
         venta.setObservaciones("");
@@ -184,7 +83,7 @@ public final class Ventas extends BorderPane {
     }
 
     private void initBindings() {
-        RenglonDeLaTabla.addListener((javafx.collections.ListChangeListener<Fila>) c -> MontoTotalActual());/*Cada vez que cambia la tabla (se agrega, quita o
+        RenglonDeLaTabla.addListener((javafx.collections.ListChangeListener<Venta>) c -> MontoTotalActual());/*Cada vez que cambia la tabla (se agrega, quita o
                                                                                                             modifica una fila), se vuelve a calcular el total */
     }
 
@@ -265,7 +164,7 @@ public final class Ventas extends BorderPane {
         return box;/*retorna la box */
     }
 
-    private void eliminarVentaDesdeBackend(Fila fila) {
+    private void eliminarVentaDesdeBackend(Venta fila) {
 
         if (fila == null || fila.getIdVenta() == null) {
             return;
@@ -285,7 +184,7 @@ public final class Ventas extends BorderPane {
         }));
     }
 
-    private void actualizarEstadoEnBackend(Fila fila, TipoDePago nuevoEstado) {
+    private void actualizarEstadoEnBackend(Venta fila, TipoDePago nuevoEstado) {
 
         CompletableFuture
                 .supplyAsync(()
@@ -301,7 +200,11 @@ public final class Ventas extends BorderPane {
                         "No se pudo guardar el estado"
                 ).showAndWait();
             } else {
-                tablaSemanalDebe.actualizar();
+
+                if (tablaSemanalDebe != null) {
+                    tablaSemanalDebe.actualizar();
+                }
+
             }
         }));
     }
@@ -318,33 +221,7 @@ public final class Ventas extends BorderPane {
                                                               código usando Platform.runLater para actualizar la
                                                               interfaz gráfica */
 
-            var nuevas = FXCollections.<Fila>observableArrayList();/*Crea una lista VACÍA que va a contener objetos Fila,
-                                                                   será usada para construir el NUEVO contenido de la
-                                                                   tabla antes de reemplazar lo que está actualmente en pantalla*/
-
-            for (java.util.Map<String, Object> dto : lista) {/*Recorre cada elemento de lista con dto*/
-
-                Fila f = new Fila();/*Esa línea crea un objeto nuevo de tipo Fila, o sea, crea un NUEVO
-                                     renglón para la tabla */
-                f.setNombre((String) dto.getOrDefault("nombre", ""));/*Tomá del mapa dto el valor de la clave "nombre" (o "" si no existe), 
-                                                                                       convertí ese valor a String y ponelo en el campo nombre de la Fila f */
-                f.setDescripcion((String) dto.getOrDefault("descripcion", ""));
-                f.setMonto((java.math.BigDecimal) dto.getOrDefault("monto", java.math.BigDecimal.ZERO));/*Obtiene del mapa dto el valor asociado a la clave
-                                                                                                            "monto" (o BigDecimal.ZERO si no está), lo castea a
-                                                                                                            BigDecimal y lo asigna al campo monto de la Fila f */
-                f.setEstado((com.uade.tpo.demo.entity.TipoDePago) dto.getOrDefault(
-                        "estado", com.uade.tpo.demo.entity.TipoDePago.DEBE));/*Toma del mapa dto el valor de la clave "estado" (si existe), y si falta usa
-                                                                                  TipoDePago.DEBE como valor por defecto; luego convierte ese valor al tipo
-                                                                                  TipoDePago y se lo asigna al campo estado de la Fila f */
-                f.setObservaciones((String) dto.getOrDefault("observaciones", ""));
-
-                f.setIdVenta((Long) dto.get("idVenta"));
-
-                nuevas.add(f);/*Agrega la fila f (que acabás de construir con los datos de una venta)
-                              dentro de la lista nuevas */
-            }
-
-            RenglonDeLaTabla.setAll(nuevas);
+            RenglonDeLaTabla.setAll(lista);
             MontoTotalActual();
         }));
     }
@@ -372,16 +249,13 @@ public final class Ventas extends BorderPane {
     // Utilitarios
     // =========================================================================================
     private void MontoTotalActual() {
-        BigDecimal t = RenglonDeLaTabla.stream()/*convierto la lista RenglonDeLaTabla en un Stream, que es
-                                                una forma de recorrer la lista como una secuencia de
-                                                elementos para poder aplicar operaciones como map, filter y
-                                                reduce */
-                .filter(f -> f != null/*filtra si la fila es valida (tambien podria ser un renglon vacio */
-                && f.getEstado() != null/*filtra si tiene estado */
-                && f.getEstado() != TipoDePago.DEBE)/*y filtra si el tipodepago no es "DEBE"*/
-                .map(Fila::getMonto)/*de cada fila obtengo solo el monto */
-                .reduce(BigDecimal.ZERO, BigDecimal::add);/*recorro los montos y los junto en un único
-                                                          resultado sumándolos, empezando desde 0 */
+        BigDecimal t = RenglonDeLaTabla.stream()
+                .filter(f -> f != null)
+                .filter(f -> f.getEstado() != null)
+                .filter(f -> f.getEstado() != TipoDePago.DEBE)
+                .map(f -> f.getMonto())
+                .filter(m -> m != null)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
         total.set(t.setScale(2, RoundingMode.HALF_UP));/*ajusto el total a 2 decimales con
                                                                  redondeo clásico y actualizo la propiedad
                                                                  'total' para refrescar la UI */
@@ -450,6 +324,16 @@ public final class Ventas extends BorderPane {
                 }
                 recargarDelBackend();/*recargá la tabla para que aparezca el nuevo pedido que se acaba de
                                      guardar */
+
+                System.out.println("VENTA GUARDADA");
+
+                if (resumen == null) {
+                    System.out.println("RESUMEN NULL");
+                } else {
+                    System.out.println("ACTUALIZANDO RESUMEN");
+                    resumen.actualizarDatos();
+                }
+
             }
         }));
     }

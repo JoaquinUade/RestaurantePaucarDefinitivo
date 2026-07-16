@@ -147,9 +147,10 @@ public class Aplicacion extends Application {
 
         root.setLeft(menuScroll);
         root.setCenter(contenido);
-        vistaVentas = new Ventas();// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
-        // escrita en ventas
+        
         vistaResumen = new Resumen(backend);
+        vistaVentas = new Ventas(vistaResumen);// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
+        // escrita en ventas
         AdminService adminService = new AdminService(API_BASE);
         GastosVariablesService gastosVService = new GastosVariablesService(API_BASE);
         CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);

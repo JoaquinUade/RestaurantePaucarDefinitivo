@@ -3,6 +3,7 @@ package paucar.resumen.empresas.semanal;
 import java.util.Map;
 
 import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.Venta;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -27,13 +28,15 @@ import paucar.shared.MonedaUtils;
 public class VentanaPagoDeudas {
 
     private final VentasBackend backend;
+    private final Map<Long, Boolean> seleccionados
+            = new java.util.HashMap<>();
 
     public VentanaPagoDeudas(VentasBackend backend) {
         this.backend = backend;
     }
 
-    public void mostrar(TableView<Map<String, Object>> tabla, String empresaActual,
-                       java.time.LocalDate desdeActual, Runnable refrescarTabla) {
+    public void mostrar(TableView<Venta> tabla, String empresaActual,
+            java.time.LocalDate desdeActual, Runnable refrescarTabla) {
 
         Stage ventana = new Stage();/*crea ventana emergente */
         ventana.setTitle("Pagar Deudas");
@@ -46,26 +49,30 @@ public class VentanaPagoDeudas {
         Label lblPass = new Label("Contraseña:");
         PasswordField txtPass = new PasswordField();/*Campo de texto para ingresar contraseña*/
 
-        TableView<Map<String, Object>> tablaDeudas = new TableView<>();/*crea la tabladeudas*/
+        TableView<Venta> tablaDeudas = new TableView<>();/*crea la tabladeudas*/
 
-        TableColumn<Map<String, Object>, Boolean> colCheck = new TableColumn<>("Seleccionar");
+        TableColumn<Venta, Boolean> colCheck = new TableColumn<>("Seleccionar");
         colCheck.setSortable(false);
 
         colCheck.setCellValueFactory(fila -> {
-            Boolean seleccionado = (Boolean) fila.getValue().get("selected");/*Obtiene el valor
-                                                                                  "selected" de la fila y 
-                                                                                  lo guarda como Boolean*/
-            if (seleccionado == null)
+            Boolean seleccionado
+                    = seleccionados.getOrDefault(
+                            fila.getValue().getIdVenta(),
+                            false
+                    );
+            if (seleccionado == null) {
                 seleccionado = false;
+            }
 
             SimpleObjectProperty<Boolean> prop = new SimpleObjectProperty<>(seleccionado);/*Crea una propiedad observable (SimpleObjectProperty) con
                                                                                           el valor seleccionado, permitiendo que JavaFX detecte
                                                                                           cambios y actualice la interfaz*/
 
-            prop.addListener((obs, oldVal, newVal) ->
-                    fila.getValue().put("selected", newVal));/*Cuando cambia la propiedad (por ejemplo
-                                                                 el CheckBox), guarda el nuevo valor en
-                                                                 "selected" dentro de la fila*/
+            prop.addListener((obs, oldVal, newVal)
+                    -> seleccionados.put(
+                            fila.getValue().getIdVenta(),
+                            newVal
+                    ));
 
             return prop;/*retorna prop*/
         });
@@ -73,14 +80,18 @@ public class VentanaPagoDeudas {
         colCheck.setCellFactory(tc -> new TableCell<>() {/*Defino cómo se construyen y se muestran las
                                                          celdas de esta columna*/
             private final CheckBox checkBox = new CheckBox();
+
             {
-             checkBox.setOnAction(e -> {/*si presionas la checkbox */
-                 Map<String, Object> fila = getTableView().getItems().get(getIndex());/*obtiene la fila
-                                                                                     a la que presionaste */
-                 fila.put("selected", checkBox.isSelected());/*Guarda en la fila si el CheckBox
-                                                                  está marcado o no*/
+                checkBox.setOnAction(e -> {/*si presionas la checkbox */
+                    Venta fila = getTableView().getItems().get(getIndex());
+
+                    seleccionados.put(
+                            fila.getIdVenta(),
+                            checkBox.isSelected()
+                    );
                 });
             }
+
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
@@ -88,8 +99,14 @@ public class VentanaPagoDeudas {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    Map<String, Object> fila = getTableView().getItems().get(getIndex());
-                    Boolean seleccionado = (Boolean) fila.get("selected");
+                    Venta fila
+                            = getTableView().getItems().get(getIndex());
+
+                    Boolean seleccionado
+                            = seleccionados.getOrDefault(
+                                    fila.getIdVenta(),
+                                    false
+                            );
 
                     checkBox.setSelected(seleccionado != null && seleccionado);
                     setGraphic(checkBox);
@@ -100,29 +117,29 @@ public class VentanaPagoDeudas {
         tablaDeudas.getColumns().add(colCheck);
 
         // ✅ MONTO (IGUAL FORMATO AR)
-        TableColumn<Map<String, Object>, String> colMonto = new TableColumn<>("Monto");
+        TableColumn<Venta, String> colMonto = new TableColumn<>("Monto");
         colMonto.setCellValueFactory(fila -> {
-            Number m = (Number) fila.getValue().get("monto");
+            Number m = fila.getValue().getMonto();
             return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));
         });
 
-        TableColumn<Map<String, Object>, String> colDesc = crearColumnaTexto
-                    ("Descripción", "descripcion", 13);/*crea la descripcion con wrap*/
+        TableColumn<Venta, String> colDesc = crearColumnaTexto("Descripción", "descripcion", 13);/*crea la descripcion con wrap*/
 
-        TableColumn<Map<String, Object>, String> colObs =
-                    new TableColumn<>("Observaciones");/*crea la columna observaciones */
+        TableColumn<Venta, String> colObs
+                = new TableColumn<>("Observaciones");/*crea la columna observaciones */
 
-        colObs.setCellValueFactory(fila ->
-                new SimpleObjectProperty<>((String) fila.getValue().get("observaciones"))
+        colObs.setCellValueFactory(fila
+                -> new SimpleObjectProperty<>((String) fila.getValue().getObservaciones())
         );
 
         colObs.setCellFactory(tc -> new TableCell<>() {
 
             private final TextField txtObservaciones = new TextField();
+
             {
                 txtObservaciones.setOnAction(e -> guardar());/*si presionas el campo observaciones*/
                 txtObservaciones.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal){/*Detecta cuándo el usuario deja de editar el campo*/
+                    if (!newVal) {/*Detecta cuándo el usuario deja de editar el campo*/
 
                         guardar();/*Guarda el nuevo contenido de observaciones*/
                     }
@@ -130,11 +147,12 @@ public class VentanaPagoDeudas {
             }
 
             private void guardar() {
-                Map<String, Object> fila = getTableView().getItems().get(getIndex());
-                fila.put("observaciones", txtObservaciones.getText());/*Guardá en la fila el texto que el
+                Venta fila = getTableView().getItems().get(getIndex());
+                fila.setObservaciones(txtObservaciones.getText());/*Guardá en la fila el texto que el
                                                                     usuario escribió en el campo de
                                                                     observaciones */
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -155,14 +173,13 @@ public class VentanaPagoDeudas {
         tablaDeudas.getColumns().add(colMonto);
         tablaDeudas.getColumns().add(colObs);
 
-        tablaDeudas.setColumnResizePolicy
-                    (TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);/*Define que las columnas se
+        tablaDeudas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);/*Define que las columnas se
                                                                            redimensionen para ocupar todo el
                                                                            ancho disponible */
 
-        for (Map<String, Object> v : tabla.getItems()) {/*recorre las filas de la tabla */
+        for (Venta v : tabla.getItems()) {/*recorre las filas de la tabla */
 
-            if (v.get("estado") == TipoDePago.DEBE) {/*si el tipo de pago es debe */
+            if (v.getEstado() == TipoDePago.DEBE) {/*si el tipo de pago es debe */
 
                 tablaDeudas.getItems().add(v);/*la agrega a la tablaDeudas*/
             }
@@ -178,16 +195,17 @@ public class VentanaPagoDeudas {
                 return;
             }
 
-            for (Map<String, Object> v : tablaDeudas.getItems()) {/*recorre todas las filas */
+            for (Venta v : tablaDeudas.getItems()) {/*recorre todas las filas */
 
-                Boolean seleccionado = (Boolean) v.get("selected");/*Guarda si la fila está
-                                                                        seleccionada (true o false) */
+                Boolean seleccionado
+                        = seleccionados.getOrDefault(
+                                v.getIdVenta(),
+                                false
+                        );
 
                 if (Boolean.TRUE.equals(seleccionado)) {/*Verifica si la fila está seleccionada */
 
-                    Long idVenta = ((Number) v.get("idVenta")).longValue();/*Obtené el id de la venta
-                                                                                de la fila y guardalo como
-                                                                                un número tipo Long */
+                    Long idVenta = v.getIdVenta();
 
                     backend.actualizarEstadoVenta(idVenta, TipoDePago.DEUDA_PAGADA);/*Actualiza el estado de
                                                                                     la venta a DEUDA_PAGADA*/
@@ -209,23 +227,33 @@ public class VentanaPagoDeudas {
         ventana.show();/*muestra la ventana */
     }
 
-    private TableColumn<Map<String, Object>, String> crearColumnaTexto(
+    private TableColumn<Venta, String> crearColumnaTexto(
             String titulo, String key, int padding) {
 
-        TableColumn<Map<String, Object>, String> col = new TableColumn<>(titulo);
+        TableColumn<Venta, String> col = new TableColumn<>(titulo);
 
-        col.setCellValueFactory(fila ->
-                new SimpleObjectProperty<>((String) fila.getValue().get(key)));/* define qué valor
-                                                                               específico de la fila se
-                                                                               muestra en esa columna*/
+        col.setCellValueFactory(fila -> {
+
+    Venta v = fila.getValue();
+
+    String valor = switch (key) {
+        case "descripcion" -> v.getDescripcion();
+        case "observaciones" -> v.getObservaciones();
+        default -> "";
+    };
+
+    return new SimpleObjectProperty<>(valor);
+});
+
 
         col.setCellFactory(columna -> new TableCell<>() {/*Por cada columna, devolveme una nueva celda
                                                          (TableCell) */
 
             private final Text text = new Text();
+
             {
                 text.wrappingWidthProperty()
-                    .bind(columna.widthProperty().subtract(padding));/*Hacé que el ancho máximo del texto
+                        .bind(columna.widthProperty().subtract(padding));/*Hacé que el ancho máximo del texto
                                                                     sea igual al ancho menos margen, y que
                                                                     se actualice si cambia de tamaño*/
 

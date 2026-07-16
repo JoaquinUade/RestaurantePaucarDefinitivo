@@ -1,5 +1,6 @@
 package paucar.ventas;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -195,7 +197,8 @@ public class Agregar {
         btnAgregarLinea.getStyleClass().add("btn-primary");
         btnAgregarLinea.setOnAction(e -> contLineas.getChildren().add(crearLineaProducto(contLineas)));
         contLineas.getChildren().add(crearLineaProducto(contLineas)); // al menos una línea inicial
-
+        DatePicker dpFecha = crearSelectorFecha();
+        dpFecha.getStyleClass().add("date-agregar");
         // --- 6) Estado y observaciones ---
         ComboBox<TipoDePago> cbEstado = crearComboEstado();
         cbEstado.getStyleClass().add("combo-agregar");
@@ -203,7 +206,7 @@ public class Agregar {
         TextField tfObs = TextFieldObservaciones();
 
         // --- 7) Layout ---
-        GridPane grid = buildFormularioPedido(cbCliente, contLineas, btnAgregarLinea, cbEstado, tfObs, selectorTipoCliente);
+        GridPane grid = buildFormularioPedido(cbCliente, dpFecha, contLineas, btnAgregarLinea, cbEstado, tfObs, selectorTipoCliente);
 
         // --- 8) Validación del botón OK ---
         HBox fila0 = (HBox) contLineas.getChildren().get(0);
@@ -241,7 +244,7 @@ public class Agregar {
                 // Guardar el tipo
                 this.tipoSeleccionado = (TipoCliente) tgTipoCliente.getSelectedToggle().getUserData();
                 // Construir la venta y devolver el nombre
-                return ConstruirVentaDirectoEnRequest(cbCliente, cbEstado, tfObs, contLineas);
+                return ConstruirVentaDirectoEnRequest(cbCliente,dpFecha, cbEstado, tfObs, contLineas);
             }
             return null;
         });
@@ -356,9 +359,11 @@ public class Agregar {
     private ComboBox<TipoDePago> crearComboEstado() {
         ComboBox<TipoDePago> cbEstado = new ComboBox<>();/*crea un ComboBox vacío que podrá contener
                                                          valores del enum TipoDePago */
-        cbEstado.getItems().setAll(TipoDePago.values());/*Carga al ComboBox todas las opciones posibles de
-                                                        tipo de pago para que el usuario pueda elegir
-                                                        cualquiera de ellas*/
+        cbEstado.getItems().setAll(
+                java.util.Arrays.stream(TipoDePago.values())
+                        .filter(tipo -> tipo != TipoDePago.DEUDA_PAGADA)
+                        .toList()
+        );
         cbEstado.setValue(TipoDePago.DEBE);/*establece que por defecto el valor seleccionado en el
                                            ComboBox sea DEBE, es decir, que el pedido recién creado esté
                                            marcado como pendiente de pago hasta que se cambie a otro
@@ -375,7 +380,7 @@ public class Agregar {
         return inputObservaciones;/*retorna inputobservaciones */
     }
 
-    private GridPane buildFormularioPedido(ComboBox<String> cbCliente, VBox ListaDeProductos, Button btnAñadirProducto,
+    private GridPane buildFormularioPedido(ComboBox<String> cbCliente, DatePicker dpFecha, VBox ListaDeProductos, Button btnAñadirProducto,
             ComboBox<TipoDePago> cbEstado, TextField inputObservaciones, Node selectorTipoCliente) {
 
         GridPane grid = new GridPane();/*Crea un contenedor en forma de grilla para colocar las etiquetas
@@ -406,6 +411,9 @@ public class Agregar {
 
         grid.add(cbCliente, 1, r++);/*agrega el ComboBox del cliente(la parte donde escribimos
                                                 el nombre del cliente) en columna 1 y fila r*/
+
+        grid.add(new Label("Fecha:"), 0, r);/*añade la etiqueta fecha */
+        grid.add(dpFecha, 1, r++);/*añade el selector de fecha */
 
         grid.add(new Label("Productos:"), 0, r);/*añade la etiqueta productos*/
 
@@ -438,7 +446,7 @@ public class Agregar {
         // Combo de productos con autocompletar y filtro "contiene"
         ComboBox<ProductosService.ProductoItem> cbProd = new ComboBox<>(productosFiltrados);
         cbProd.getStyleClass().add("combo-agregar");
-        
+
         cbProd.setPrefWidth(280);
         cbProd.setPromptText("Producto");
         cbProd.setEditable(true);
@@ -617,29 +625,27 @@ public class Agregar {
     }
 
     private boolean BotonAgregarInhabilitado(ComboBox<String> cbCliente, VBox contLineas) {
-        
-        String nombre = cbCliente.getEditor().getText();/*Guarda en la variable nombre el texto que el
-                                                         usuario escribió en el ComboBox cbCliente */
-        boolean nombreVacio = (nombre == null || nombre.isBlank()) && cbCliente.getValue() == null;/*guarda en nombrevacio si el nombre no
-                                                                                                   tiene valor o si esta en blanco y tambien
-                                                                                                   si cbcliente carece de valor */
-        if (nombreVacio) {/*si nombre vacio es true retorna true, ya que este metodo es para verificar si es invalido */
-            return true;
-        }
-        if (contLineas.getChildren().isEmpty()) {/*No hay filas → deshabilitado */
+
+        // Debe existir una selección real del ComboBox
+        boolean clienteValido
+                = cbCliente.getValue() != null
+                && clientes.contains(cbCliente.getValue());
+
+        if (!clienteValido) {
             return true;
         }
 
-        for (var n : contLineas.getChildren()) {/*recorre todas las filas si encuentra un producto valido
-                                               con una cantidad valida almenos 1 ya lo toma como valido
-                                               y retorna false*/
+        if (contLineas.getChildren().isEmpty()) {
+            return true;
+        }
+
+        for (var n : contLineas.getChildren()) {
             if (n instanceof HBox fila && ValidarFichaPedido(fila)) {
-                return false;/*el false habilita el boton agregar pporque almenos encontro una ficha
-                               valida*/
+                return false;
             }
         }
+
         return true;
-        /* si retorna true es que no encontro ninguno y queda inhabilitado el boton agregar */
     }
 
     private boolean ValidarFichaPedido(HBox fila) {
@@ -675,7 +681,7 @@ public class Agregar {
         }
     }
 
-    private String ConstruirVentaDirectoEnRequest(ComboBox<String> cbCliente, ComboBox<TipoDePago> cbEstado,
+    private String ConstruirVentaDirectoEnRequest(ComboBox<String> cbCliente,DatePicker dpFecha, ComboBox<TipoDePago> cbEstado,
             TextField tfObs, VBox contLineas) {
 
         // 1) Nombre (cliente/mesa/empresa)
@@ -687,7 +693,7 @@ public class Agregar {
 
         // 2) Estado y observaciones -> directo a VentaRequest
         venta.setEstado(cbEstado.getValue());
-
+        venta.setFecha(dpFecha.getValue());
         venta.setObservaciones(tfObs.getText() == null ? "" : tfObs.getText().trim());
 
         // 3) Asegurar listas y limpiarlas
@@ -713,6 +719,15 @@ public class Agregar {
         }
         // 5) El diálogo devuelve SOLO el nombre; Ventas resuelve idCliente y hace el POST
         return nombreLimpio;
+    }
+
+    private DatePicker crearSelectorFecha() {
+        DatePicker dpFecha = new DatePicker();
+
+        // Fecha actual por defecto
+        dpFecha.setValue(LocalDate.now());
+
+        return dpFecha;
     }
 
     private Optional<Formulario> FichaPedido(HBox fila) {

@@ -2,10 +2,10 @@ package paucar.resumen.clientes.semanal;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.Venta;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
@@ -36,8 +36,8 @@ public class SemanalClientes extends BorderPane {
     private TablaSemanalCliente tablaSemanal;
     private TablaSemanalDebeCliente tablaDebe;
 
-    private TableView<Map<String, Object>> tablaVentas;
-    private TableView<Map<String, Object>> tablaVentasDebe;
+    private TableView<Venta> tablaVentas;
+    private TableView<Venta> tablaVentasDebe;
 
     private Label lblTotal;
 
@@ -137,7 +137,7 @@ public class SemanalClientes extends BorderPane {
 
     private ComboBox<String> crearCombo(FilteredList<String> datos) {
         ComboBox<String> cb = new ComboBox<>(datos);/*Crea un ComboBox con la lista de clientes*/
-        
+        cb.getStyleClass().add("combo-agregar");
         cb.setEditable(true);
 
         AtomicBoolean actualizar = new AtomicBoolean(false);/*Bandera para saber si el cambio
@@ -211,4 +211,7 @@ public class SemanalClientes extends BorderPane {
             cargarVentasSemanalClientes();/*carga las ventas de ese cliente*/
         }
     }
+    public void refrescar() {
+    cargarVentasSemanalClientes();
+}
 }

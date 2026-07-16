@@ -1,15 +1,14 @@
 package paucar.resumen.general;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.Venta;
 import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 
 import javafx.collections.FXCollections;
@@ -30,7 +29,6 @@ import paucar.service.VentasBackend;
 import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 import paucar.ventas.Tabla;
-import paucar.ventas.Ventas;
 
 public class SemanalGeneral extends BorderPane {
 
@@ -42,10 +40,10 @@ public class SemanalGeneral extends BorderPane {
     private final VBox contenido = new VBox(8);/*contenedor vertical en el que pondremos los
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
-
+    private final LocalDate fechaBase;
     public SemanalGeneral(VentasBackend backend, LocalDate fechaBase) {
         this.backend = backend;
-
+        this.fechaBase = fechaBase;
         initUI();
 
         LocalDate lunes = obtenerLunes(fechaBase);
@@ -85,27 +83,30 @@ public class SemanalGeneral extends BorderPane {
         setCenter(scroll);
 
     }
-private void cargarSemanaDesdeLunes(LocalDate lunes) {
-    contenido.getChildren().clear();/*Borrá de la pantalla todos los días que estaban mostrados antes*/
 
-    actualizarTotalSemana(lunes);/*Actualiza el total de la semana*/
+    private void cargarSemanaDesdeLunes(LocalDate lunes) {
+        contenido.getChildren().clear();/*Borrá de la pantalla todos los días que estaban mostrados antes*/
 
-    for (int i = 0; i < 5; i++) {/*for que da 5 vueltas, una por cada día de la semana */
+        actualizarTotalSemana(lunes);/*Actualiza el total de la semana*/
 
-        LocalDate dia = lunes.plusDays(i);/*Calcula una fecha sumando i días al lunes y la guarda en la
+        for (int i = 0; i < 5; i++) {/*for que da 5 vueltas, una por cada día de la semana */
+
+            LocalDate dia = lunes.plusDays(i);/*Calcula una fecha sumando i días al lunes y la guarda en la
                                           variable dia */
-        agregarDia(dia);/*Agrega el día a la pantalla */
+            agregarDia(dia);/*Agrega el día a la pantalla */
+        }
     }
-}
-private LocalDate obtenerLunes(LocalDate fecha) {
-    LocalDate lunes = fecha;/*Inicializa la variable lunes con la fecha proporcionada */
-    while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {/*Mientras que el día de la semana que tenga la
+
+    private LocalDate obtenerLunes(LocalDate fecha) {
+        LocalDate lunes = fecha;/*Inicializa la variable lunes con la fecha proporcionada */
+        while (lunes.getDayOfWeek() != DayOfWeek.MONDAY) {/*Mientras que el día de la semana que tenga la
                                                       variable lunes no sea monday*/
-        lunes = lunes.minusDays(1);/*iremos retrocediendo en 1 dia la fecha obviamente con
+            lunes = lunes.minusDays(1);/*iremos retrocediendo en 1 dia la fecha obviamente con
                                                    un maximo de 5 veces*/
+        }
+        return lunes;/*Devuelve la fecha del lunes de esa semana */
     }
-    return lunes;/*Devuelve la fecha del lunes de esa semana */
-}
+
     private List<TableColumn<VentaResumenDiarioDTO, ?>> crearColumnas() {/*Este método define las columnas
                                                                         de la tabla y qué información del 
                                                                         resumen diario va en cada columna*/
@@ -159,51 +160,23 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
         tituloDia.getStyleClass().add("title-xl");/*agrega la clase CSS para el estilo del título */
 
-        ObservableList<Ventas.Fila> filas = FXCollections.observableArrayList();/*agrupás todas las ventas del día en una
+        ObservableList<Venta> filas = FXCollections.observableArrayList();/*agrupás todas las ventas del día en una
                                                                                 lista para pasarlas juntas a la tabla y
                                                                                 mostrarlas en pantalla */
 
-        List<Map<String, Object>> ventas = backend.cargarVentasDelDia(fecha);/*Carga las ventas del día
+        List<Venta> ventas = backend.cargarVentasDelDia(fecha);/*Carga las ventas del día
                                                                              desde el backend */
 
-        for (Map<String, Object> dto : ventas) {/*Para cada venta (cada Map osea por ejemplo monto 500
-                                                descripcion empanada estado debito) guardada en ventas,
-                                                el código entra al bloque */
+        for (Venta venta : ventas) {
 
-            BigDecimal monto = ConvertirABigDecimal(dto.get("monto"));/*Toma el monto de la venta y se asegura de
-                                                                          convertirlo correctamente a un número usable
-                                                                          en la tabla*/
+            BigDecimal monto = venta.getMonto();
+            TipoDePago tipo = venta.getEstado();
 
-            TipoDePago tipo = ConvertirATipoDePago(dto.get("estado"));/*Toma el estado de la venta (que es el tipo de pago) y se asegura de convertirlo
-                                                               correctamente a un valor del enum TipoDePago*/
+            filas.add(venta);
 
-            Ventas.Fila f = new Ventas.Fila();/*Crea una nueva fila vacía (f) que va a representar una
-                                              venta en la tabla */
-
-            f.setNombre((String) dto.getOrDefault("nombre", ""));/*Agarra el valor que
-                                                                                  tenga el campo nombre en
-                                                                                  esta venta y guardalo en
-                                                                                  la fila de la tabla*/
-
-            f.setDescripcion((String) dto.getOrDefault("descripcion", ""));/*Agarra el valor que tenga el
-                                                                                             campo descripcion en esta venta
-                                                                                             y guardalo en la fila de la tabla*/
-            f.setMonto(monto);/*Pone el monto que se calculó antes en la fila de la tabla*/
-            f.setEstado(tipo);/*Pone el estado que se calculó antes en la fila de la tabla*/
-            f.setObservaciones((String) dto.getOrDefault("observaciones", ""));/*Agarra el valor que tenga el
-                                                                                             campo observaciones en esta venta
-                                                                                             y guardalo en la fila de la tabla*/
-
-            filas.add(f);/*Agrega la fila f a la lista de filas que se van a mostrar en la tabla*/
-
-            if (tipo != TipoDePago.DEBE) {/*si el tipo de pago no es "DEBE" */
-
-                totalDia = totalDia.add(monto);/*entonces sumá el monto de esta venta al total del día,
-                                               porque el "DEBE" no es plata que entra ese día, sino que
-                                               es plata que se va a cobrar después, entonces no se cuenta
-                                               en el total del día*/
+            if (tipo != TipoDePago.DEBE) {
+                totalDia = totalDia.add(monto);
             }
-
         }
 
         Tabla tabla = new Tabla(filas, LocaleUtils.ES_AR,
@@ -230,33 +203,6 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                                                                    tabla y el label del total*/
     }
 
-    private BigDecimal ConvertirABigDecimal(Object o) {
-        if (o instanceof BigDecimal bd) {/*si el parametro que se me pasa es un big decimal */
-
-            return bd.setScale(2, RoundingMode.HALF_UP);/*lo formateo para que tenga 2 decimales
-                                                                  y lo devuelvo */
-        }
-        if (o instanceof Number n) {/*si el parametro que se me pasa es un número y no un big decimal */
-            return BigDecimal.valueOf(n.doubleValue()).setScale(2, RoundingMode.HALF_UP);/*lo convierto en un big decimal
-                                                                                                  con 2 decimales y lo devuelvo */
-        }
-        return BigDecimal.ZERO;/*si el parametro no es ni un big decimal ni un número, devuelvo cero para
-                               evitar errores*/
-    }
-
-    private TipoDePago ConvertirATipoDePago(Object o) {
-        if (o instanceof TipoDePago t) {/*si el parametro que se me pasa es un tipo de pago */
-            return t;/*lo retorno tal cual */
-        }
-        if (o instanceof String s) {/*si el parametro que se me pasa es un string */
-
-            return TipoDePago.valueOf(s);/*intenta convertir el string en un valor del enum TipoDePago,
-                                             por ejemplo "DEBITO" se convierte en TipoDePago.DEBITO */
-        }
-        return TipoDePago.DEBE;/*si el parametro no es ni un tipo de pago ni un string, devuelvo el valor
-                               por defecto */
-    }
-
     private void actualizarTotalSemana(LocalDate lunes) {
 
         VentaResumenDiarioDTO total = new VentaResumenDiarioDTO(null);/*crea un objeto que se va a
@@ -270,11 +216,8 @@ private LocalDate obtenerLunes(LocalDate fecha) {
 
             for (var ventaIndividual : backend.cargarVentasDelDia(dia)) {/*recorre una por una todas las ventas que hubo
                                                            en un día específico */
-
-                BigDecimal monto = new BigDecimal(ventaIndividual.get("monto").toString());/*obtiene el monto de una venta y
-                                                                                         lo transforma en un número usable */
-
-                TipoDePago tipo = (TipoDePago) ventaIndividual.get("estado");/*obtiene el tipo de pago de una venta */
+                BigDecimal monto = ventaIndividual.getMonto();
+                TipoDePago tipo = ventaIndividual.getEstado();
 
                 switch (tipo) {/*Según el tipo de pago de la venta, se suma el monto al total correspondiente*/
 
@@ -342,7 +285,7 @@ private LocalDate obtenerLunes(LocalDate fecha) {
                             "%02d-%s",/*formatea la fecha para mostrar el día con dos dígitos y el mes con su nombre abreviado, por ejemplo "05-Mar" */
                             fecha.getDayOfMonth(),/*obtiene el día del mes */
                             fecha.getMonth().getDisplayName(TextStyle.FULL, LocaleUtils.ES_AR)/*obtiene el nombre del mes en formato completo y en español de Argentina*/
-                            )
+                    )
                     );
                     getStyleClass().clear();/*limpia cualquier estilo previo de la celda para que no se acumulen estilos al actualizar el contenido de la celda*/
                 }
@@ -402,10 +345,9 @@ private LocalDate obtenerLunes(LocalDate fecha) {
         TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);/*Crea una columna*/
 
 //en otras palabras, esta línea le dice a la columna qué número del resumen diario mostrar en cada fila.
-        col.setCellValueFactory(filaDeTotales->
-              new javafx.beans.property.SimpleObjectProperty<>(/*define qué valor se muestra en esta
+        col.setCellValueFactory(filaDeTotales
+                -> new javafx.beans.property.SimpleObjectProperty<>(/*define qué valor se muestra en esta
                                                                 columna para cada fila */
-
                         ExtractorDeMonto.apply(filaDeTotales.getValue())));/*Extrae el monto correspondiente
                                                                            a esta columna desde el resumen
                                                                            del día*/
@@ -429,4 +371,10 @@ private LocalDate obtenerLunes(LocalDate fecha) {
         col.setSortable(false);/*desactiva la opción de ordenar la tabla*/
         return col;/*retorna la columna configurada */
     }
+
+    public void refrescar() {
+        LocalDate lunes = obtenerLunes(fechaBase);
+        cargarSemanaDesdeLunes(lunes);
+    }
+
 }

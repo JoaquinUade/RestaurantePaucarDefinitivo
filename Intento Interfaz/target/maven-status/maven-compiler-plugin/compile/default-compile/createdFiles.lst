@@ -1,4 +1,3 @@
-paucar\ventas\Ventas$Fila.class
 paucar\gastos\Fijos\GastosFijosView.class
 paucar\resumen\clientes\semanal\TablaSemanalDebeCliente$1.class
 paucar\resumen\empresas\MensualEmpresas$4.class
@@ -39,6 +38,7 @@ paucar\admin\Admin.class
 paucar\service\VentasBackend$1.class
 paucar\gastos\Individuales\TablaSemanalIndividual.class
 paucar\stock\PanelCategoriaStock.class
+paucar\shared\FechaUtils.class
 paucar\admin\platos\Platos.class
 paucar\admin\categoriasgastos\TablaCategoriasGastos.class
 paucar\resumen\general\MensualGeneral.class
@@ -89,6 +89,7 @@ paucar\resumen\general\SemanalGeneral.class
 paucar\stock\DialogStock.class
 paucar\gastos\Variables\TablaSemanalGastosV.class
 paucar\ventas\Tabla$2.class
+paucar\shared\LocaleUtils.class
 paucar\ventas\Agregar.class
 paucar\service\CategoriasGastosService.class
 paucar\gastos\Individuales\PanelGastosIndividuales.class

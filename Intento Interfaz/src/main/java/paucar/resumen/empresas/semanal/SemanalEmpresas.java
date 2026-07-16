@@ -2,10 +2,10 @@ package paucar.resumen.empresas.semanal;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.Venta;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
@@ -37,8 +37,8 @@ public class SemanalEmpresas extends BorderPane {
     private TablaSemanal tablaSemanal;
     private TablaSemanalDebe tablaDebe;
 
-    private TableView<Map<String, Object>> tablaVentas;
-    private TableView<Map<String, Object>> tablaVentasDebe;
+    private TableView<Venta> tablaVentas;
+    private TableView<Venta> tablaVentasDebe;
 
     private Label lblTotal;
 
@@ -181,7 +181,7 @@ public class SemanalEmpresas extends BorderPane {
 
         ComboBox<String> cbEmpresa = new ComboBox<>(empresasFiltradas);/*Crea el ComboBox para seleccionar
                                                                         la empresa*/
-
+        cbEmpresa.getStyleClass().add("combo-agregar");
         cbEmpresa.setEditable(true);/* Permite que el usuario edite el texto en el ComboBox */
 
         AtomicBoolean ActualizarTrasAccionUser = new AtomicBoolean(false);/*sirve para que cuando el programa escribe
@@ -311,4 +311,8 @@ public class SemanalEmpresas extends BorderPane {
             cargarVentasSemanalesEmpresas();
         }
     }
+    public void refrescar() {
+    cargarVentasSemanalesEmpresas();
+}
+
 }

@@ -105,11 +105,6 @@ public class ClientesService {
                                                  vacios se salga del metodo*/
             return;
         }
-        if (tipoCli == TipoCliente.MESA) {/*si el tipo de cliente es mesa salga del metodo ya que no nos interesa
-                                       recordar el historial de compra de la gente de las mesas */
-            return;
-        }
-
         try {
             var payload = TraductorJSON.createObjectNode()/*Pensalo como: “arranco un JSON {} para llenarlo con nombre y tipCliente */
                     .put("nombre", nombre.trim())/* Agrega al ObjectNode el campo "nombre" y el valor

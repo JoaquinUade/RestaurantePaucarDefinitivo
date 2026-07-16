@@ -30,7 +30,7 @@ public class DialogEmpresasClientes {
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();/*Combo para tipo de cliente */
 
         txtNombre.setPromptText("Nombre");
-        cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA);
+        cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA, TipoCliente.MESA);
         cmbTipo.setValue(TipoCliente.CLIENTE);
 
         VBox form = new VBox(10,
@@ -77,8 +77,8 @@ public class DialogEmpresasClientes {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);/*Campo con dato precargado */
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();
-
-        cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA);
+        
+        cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA, TipoCliente.MESA);
         cmbTipo.setValue(tipoOriginal);
 
         VBox form = new VBox(10,

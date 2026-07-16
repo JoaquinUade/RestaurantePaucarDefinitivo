@@ -1,4 +1,3 @@
-
 package paucar.admin.empresasClientes;
 
 import java.util.List;
@@ -6,8 +5,15 @@ import java.util.List;
 import com.uade.tpo.demo.entity.TipoCliente;
 
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import paucar.service.ClientesService;
 
 public class EmpresasClientes extends BorderPane {
@@ -23,7 +29,7 @@ public class EmpresasClientes extends BorderPane {
     private List<String> clientesOriginal;
     private List<String> empresasOriginal;
 
-public EmpresasClientes(ClientesService clientesService) {
+    public EmpresasClientes(ClientesService clientesService) {
         this.clientesService = clientesService;
 
         Label titulo = new Label("Administración de Clientes y Empresas");
@@ -41,20 +47,20 @@ public EmpresasClientes(ClientesService clientesService) {
         cargarDatos();/*Traé los clientes y empresas desde el servicio y mostralos en las listas */
 
         listaClientes.getSelectionModel().selectedItemProperty()
-            .addListener((obs, oldVal, newVal) -> {/*Cuando cambie el elemento seleccionado en la lista de
+                .addListener((obs, oldVal, newVal) -> {/*Cuando cambie el elemento seleccionado en la lista de
                                                     clientes, ejecutá ese bloque de codigo */
 
-            if (newVal != null) {/*Si seleccionaste un cliente*/
-                listaEmpresas.getSelectionModel().clearSelection();/*entonces deseleccioná las empresas */
-            }
-        });
+                    if (newVal != null) {/*Si seleccionaste un cliente*/
+                        listaEmpresas.getSelectionModel().clearSelection();/*entonces deseleccioná las empresas */
+                    }
+                });
 
         listaEmpresas.getSelectionModel().selectedItemProperty()
-            .addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {/*si seleccionaste una empresa*/
-                listaClientes.getSelectionModel().clearSelection();/*entonces deselecciona clientes */
-            }
-        });
+                .addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {/*si seleccionaste una empresa*/
+                        listaClientes.getSelectionModel().clearSelection();/*entonces deselecciona clientes */
+                    }
+                });
 
         // Buscador
         TextField txtBuscar = new TextField();
@@ -65,8 +71,8 @@ public EmpresasClientes(ClientesService clientesService) {
                                                                        y reaccioná automáticamente */
             String texto = newVal.toLowerCase();/*lo vuelve minuscula */
 
-            List<String> clientesFiltrados = clientesOriginal.stream().filter(c ->
-            c.toLowerCase().contains(texto)).toList();/*Filtra la lista de clientes y se queda solo con
+            List<String> clientesFiltrados = clientesOriginal.stream().filter(c
+                    -> c.toLowerCase().contains(texto)).toList();/*Filtra la lista de clientes y se queda solo con
                                                        los que coinciden con lo que escribió el usuario */
             List<String> empresasFiltradas = empresasOriginal.stream()
                     .filter(e -> e.toLowerCase().contains(texto))
@@ -102,9 +108,10 @@ public EmpresasClientes(ClientesService clientesService) {
 
         setCenter(pantalla);/*centra la caja vertical llamada pantalla */
     }
+
     private void cargarDatos() {
         clientesOriginal = clientesService
-            .obtenerNombresPorTipo(TipoCliente.CLIENTE);/*Le pide al clientesService todos los nombres
+                .obtenerNombresPorTipo(TipoCliente.CLIENTE);/*Le pide al clientesService todos los nombres
                                                         de clientes y los guarda en una lista */
         empresasOriginal = clientesService.obtenerNombresPorTipo(TipoCliente.EMPRESA);
 
@@ -112,7 +119,6 @@ public EmpresasClientes(ClientesService clientesService) {
         listaEmpresas.getItems().setAll(empresasOriginal);
     }
 
-    
     private HBox crearBotones() {
 
         Button btnCrear = new Button("Crear");
@@ -133,7 +139,7 @@ public EmpresasClientes(ClientesService clientesService) {
 
                 String nombre = (String) resultado[0];/*Obtiene el nombre ingresado del diálogo*/
                 TipoCliente tipo = (TipoCliente) resultado[1];/*obtiene el tipo ingresado en el dialogo */
-
+                System.out.println("Tipo elegido: " + tipo);
                 clientesService.crearClienteSiNoExiste(nombre, tipo);/*Crea el cliente si no existe
                                                                       previamente*/
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */
@@ -149,11 +155,11 @@ public EmpresasClientes(ClientesService clientesService) {
             }
 
             TipoCliente tipo = listaClientes.getSelectionModel().getSelectedItem() != null
-            ? TipoCliente.CLIENTE: TipoCliente.EMPRESA;/*Si hay un cliente seleccionado, es CLIENTE; si
+                    ? TipoCliente.CLIENTE : TipoCliente.EMPRESA;/*Si hay un cliente seleccionado, es CLIENTE; si
                                                        no, es EMPRESA */
 
             Object[] resultado = DialogEmpresasClientes
-                .abrirDialogEditar(seleccionado, tipo);/*Abre el diálogo de editar y guarda los datos que
+                    .abrirDialogEditar(seleccionado, tipo);/*Abre el diálogo de editar y guarda los datos que
                                                        ingresó el usuario en un arreglo */
 
             if (resultado != null) {

@@ -79,7 +79,7 @@ public class MensualEmpresas extends BorderPane {
             javafx.collections.transformation.FilteredList<String> empresasFiltradas) {
 
         ComboBox<String> cb = new ComboBox<>(empresasFiltradas);
-        
+        cb.getStyleClass().add("combo-agregar");
         cb.setEditable(true);
 
         java.util.concurrent.atomic.AtomicBoolean updating = new java.util.concurrent.atomic.AtomicBoolean(false);
@@ -335,11 +335,12 @@ public class MensualEmpresas extends BorderPane {
 
                 for (var v : ventas) {
 
-                    if (v.get("tipoCliente") == TipoCliente.EMPRESA &&
-                            empresaSeleccionada.equals(v.get("nombre"))) {
+                    if (v.getCliente() != null
+        && v.getCliente().getTipoCliente() == TipoCliente.EMPRESA
+        && empresaSeleccionada.equals(v.getCliente().getNombre()))  {
 
-                        BigDecimal monto = (BigDecimal) v.get("monto");
-                        TipoDePago tipo = (TipoDePago) v.get("estado");
+                        BigDecimal monto = (BigDecimal) v.getMonto();
+                        TipoDePago tipo = (TipoDePago) v.getEstado();
 
                         switch (tipo) {
                             case EFECTIVO -> resumen.setEfectivo(resumen.getEfectivo().add(monto));
@@ -379,5 +380,9 @@ public class MensualEmpresas extends BorderPane {
         }
 
         RenderTotalMensual(total);
+    }
+    
+    public void refrescar() {
+        cargarMes();
     }
 }

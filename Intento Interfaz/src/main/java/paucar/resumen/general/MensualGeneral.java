@@ -27,6 +27,9 @@ public class MensualGeneral extends BorderPane {
 
     private final VentasBackend ventasBackend;/*variable que guarda la instancia del backend de ventas */
 
+    private int anio;
+    private int mes;
+
     private final TableView<VentaResumenDiarioDTO> tabla = new TableView<>();/*variable que guarda la tabla de visualización
                                                                              de los datos resumidos diarios */
 
@@ -36,6 +39,8 @@ public class MensualGeneral extends BorderPane {
 
     public MensualGeneral(VentasBackend backend, int anio, int mes) {
         this.ventasBackend = backend;
+        this.anio = anio;
+        this.mes = mes;
 
         tabla.setItems(RenglonResumenDiario);
         tabla.getColumns().addAll(crearColumnas());
@@ -76,10 +81,8 @@ public class MensualGeneral extends BorderPane {
                 var ventasDelDia = ventasBackend.cargarVentasDelDia(fecha);/*variable que guarda la lista de ventas de un día */
 
                 for (var v : ventasDelDia) {/*recorre cada venta del día */
-                    BigDecimal monto = new BigDecimal(v.get("monto").toString());/*variable que guarda el monto de la venta actual */
-
-                    TipoDePago tipo = (TipoDePago) v.get("estado");/*variable que guarda el tipo de pago de la venta actual */
-
+                    BigDecimal monto = v.getMonto();
+                    TipoDePago tipo = v.getEstado();
                     switch (tipo) {/*segun el tipo de pago */
                         case EFECTIVO ->
                             ResumenDelDia.setEfectivo(ResumenDelDia.getEfectivo().add(monto));/*si es efectivo, se acumula el monto en el campo de efectivo del resumen del día */
@@ -197,7 +200,7 @@ public class MensualGeneral extends BorderPane {
                             "%02d-%s",/*formatea la fecha para mostrar el día con dos dígitos y el mes con su nombre abreviado, por ejemplo "05-Mar" */
                             fecha.getDayOfMonth(),/*obtiene el día del mes */
                             fecha.getMonth().getDisplayName(TextStyle.FULL, LocaleUtils.ES_AR)/*obtiene el nombre del mes en formato completo y en español de Argentina*/
-                            )
+                    )
                     );
                     getStyleClass().clear();/*limpia cualquier estilo previo de la celda para que no se acumulen estilos al actualizar el contenido de la celda*/
                 }
@@ -239,41 +242,43 @@ public class MensualGeneral extends BorderPane {
         col.setSortable(false);
         return col;
     }
-private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
-        String titulo,
-        Function<VentaResumenDiarioDTO, BigDecimal> getter) {
 
-    TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
+    private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
+            String titulo,
+            Function<VentaResumenDiarioDTO, BigDecimal> getter) {
 
-    col.setCellValueFactory(c ->
-            new javafx.beans.property.SimpleObjectProperty<>(
-                    getter.apply(c.getValue())
-            )
-    );
+        TableColumn<VentaResumenDiarioDTO, BigDecimal> col = new TableColumn<>(titulo);
 
-    col.setCellFactory(tc -> new TableCell<>() {
-        @Override
-        protected void updateItem(BigDecimal v, boolean empty) {
-            super.updateItem(v, empty);
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(
+                        getter.apply(c.getValue())
+                )
+        );
 
-            if (empty || v == null) {
-                setText("");
-                setTextFill(null);
-            } else {
-                setText(MonedaUtils.formatearMoneda(v));
+        col.setCellFactory(tc -> new TableCell<>() {
+            @Override
+            protected void updateItem(BigDecimal v, boolean empty) {
+                super.updateItem(v, empty);
 
-                if (v.compareTo(BigDecimal.ZERO) > 0) {
-                    setTextFill(javafx.scene.paint.Color.GREEN); // ✅ VERDE
+                if (empty || v == null) {
+                    setText("");
+                    setTextFill(null);
                 } else {
-                    setTextFill(javafx.scene.paint.Color.BLACK);
+                    setText(MonedaUtils.formatearMoneda(v));
+
+                    if (v.compareTo(BigDecimal.ZERO) > 0) {
+                        setTextFill(javafx.scene.paint.Color.GREEN); // ✅ VERDE
+                    } else {
+                        setTextFill(javafx.scene.paint.Color.BLACK);
+                    }
                 }
             }
-        }
-    });
+        });
 
-    col.setSortable(false);
-    return col;
-}
+        col.setSortable(false);
+        return col;
+    }
+
     private TableColumn<VentaResumenDiarioDTO, BigDecimal> colMonto(
             String titulo,
             Function<VentaResumenDiarioDTO, BigDecimal> getter) {
@@ -343,7 +348,7 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
 
         grid.add(totalDebe, 2, 0);/* agrega el label con el total de debe en la
                                                         tercera columna y primera fila del GridPane */
-        grid.add(totalDeudaPagada, 3, 0); 
+        grid.add(totalDeudaPagada, 3, 0);
         grid.add(new Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);/* agrega un label con el total de débitos en la
                                                                                           cuarta columna y primera fila del GridPane */
 
@@ -360,5 +365,16 @@ private TableColumn<VentaResumenDiarioDTO, BigDecimal> colDeudaPagada(
                                                                                           octava columna y primera fila del GridPane */
 
         footerTotal.setCenter(grid);/* agrega el GridPane al centro del pie de página de los totales */
+    }
+
+    public void actualizarMes(int anio, int mes) {
+        this.anio = anio;
+        this.mes = mes;
+
+        cargarMes(anio, mes);
+    }
+
+    public void refrescar() {
+        cargarMes(anio, mes);
     }
 }

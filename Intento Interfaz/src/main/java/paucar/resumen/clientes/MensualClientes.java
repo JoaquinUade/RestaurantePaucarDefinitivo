@@ -81,6 +81,7 @@ public class MensualClientes extends BorderPane {
             javafx.collections.transformation.FilteredList<String> filtradas) {
 
         ComboBox<String> cb = new ComboBox<>(filtradas);
+        cb.getStyleClass().add("combo-agregar");
         cb.setEditable(true);
 
         java.util.concurrent.atomic.AtomicBoolean updating = new java.util.concurrent.atomic.AtomicBoolean(false);
@@ -335,11 +336,12 @@ public class MensualClientes extends BorderPane {
 
                 for (var v : ventas) {
 
-                    if (v.get("tipoCliente") == TipoCliente.CLIENTE
-                            && clienteSeleccionado.equals(v.get("nombre"))) {
+                    if (v.getCliente() != null
+                            && v.getCliente().getTipoCliente() == TipoCliente.CLIENTE
+                            && clienteSeleccionado.equals(v.getCliente().getNombre())) {
 
-                        BigDecimal monto = (BigDecimal) v.get("monto");
-                        TipoDePago tipo = (TipoDePago) v.get("estado");
+                        BigDecimal monto = v.getMonto();
+                        TipoDePago tipo = v.getEstado();
 
                         switch (tipo) {
                             case EFECTIVO ->
@@ -384,5 +386,8 @@ public class MensualClientes extends BorderPane {
         }
 
         RenderTotalMensual(total);
+    }
+    public void refrescar() {
+        cargarMes();
     }
 }

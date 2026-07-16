@@ -18,24 +18,25 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
+import com.uade.tpo.demo.entity.Venta;
 
 @SuppressWarnings("unused")
 public class Tabla extends VBox {
 
-    private final TableView<Ventas.Fila> tabla = new TableView<>();/*crea una tabla para mostrar las ventas, con filas del tipo Ventas.Fila*/
+    private final TableView<Venta> tabla = new TableView<>();
 
     private final Button btnEliminar = new Button("Eliminar Venta");/*crea un botón para eliminar una venta seleccionada en la tabla*/
 
-    private final Consumer<Ventas.Fila> OnEliminar;/*declara un campo OnEliminar que es una función que acepta una fila de venta y
+    private final Consumer<Venta> OnEliminar;/*declara un campo OnEliminar que es una función que acepta una fila de venta y
                                                    no devuelve nada, se usará para manejar la eliminación de ventas*/
 
-    private final BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado;
+    private final BiConsumer<Venta, TipoDePago> onCambiarEstado;
     private final NumberFormat moneda;
 
     private boolean soloLectura = false;
 
-    public Tabla(ObservableList<Ventas.Fila> items, Locale locale, Consumer<Ventas.Fila> onEliminar,
-            BiConsumer<Ventas.Fila, TipoDePago> onCambiarEstado) {
+    public Tabla(ObservableList<Venta> items, Locale locale, Consumer<Venta> onEliminar,
+            BiConsumer<Venta, TipoDePago> onCambiarEstado) {
         this.moneda = NumberFormat.getCurrencyInstance(locale);
         this.OnEliminar = onEliminar;
         this.onCambiarEstado = onCambiarEstado;
@@ -64,7 +65,7 @@ public class Tabla extends VBox {
         getChildren().addAll(tabla, btnEliminar);
     }
 
-    private List<TableColumn<Ventas.Fila, ?>> crearColumnas() {
+    private List<TableColumn<Venta, ?>> crearColumnas() {
         return List.of(
                 colNombre(),
                 colDescripcion(),
@@ -74,20 +75,28 @@ public class Tabla extends VBox {
         );
     }
 
-    private TableColumn<Ventas.Fila, String> colNombre() {
-        var col = new TableColumn<Ventas.Fila, String>("Nombre");
-        col.setCellValueFactory(c -> c.getValue().nombreProperty());
-        col.setCellFactory(TextFieldTableCell.forTableColumn());
-        col.setOnEditCommit(e -> e.getRowValue().setNombre(e.getNewValue()));
+    private TableColumn<Venta, String> colNombre() {
+
+        var col = new TableColumn<Venta, String>("Nombre");
+
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getCliente().getNombre()
+                ));
+
         col.setPrefWidth(200);
-        col.setSortable(false);
 
         return col;
     }
 
-    private TableColumn<Ventas.Fila, String> colDescripcion() {
-        var col = new TableColumn<Ventas.Fila, String>("Descripción");
-        col.setCellValueFactory(c -> c.getValue().descripcionProperty());
+    private TableColumn<Venta, String> colDescripcion() {
+        var col = new TableColumn<Venta, String>("Descripción");
+
+        col.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getDescripcion()
+                ));
+
         col.setCellFactory(tc -> new TableCell<>() {
             private final javafx.scene.text.Text text = new javafx.scene.text.Text();
 
@@ -118,14 +127,14 @@ public class Tabla extends VBox {
         return col;
     }
 
-    private TableColumn<Ventas.Fila, String> colMonto() {
-        var col = new TableColumn<Ventas.Fila, String>("Monto");
+    private TableColumn<Venta, String> colMonto() {
+        var col = new TableColumn<Venta, String>("Monto");
+
         col.setCellValueFactory(c
-                -> Bindings.createStringBinding(
-                        () -> formatMoneda(c.getValue().getMonto()),
-                        c.getValue().montoProperty()
-                )
-        );
+                -> new javafx.beans.property.SimpleStringProperty(
+                        formatMoneda(c.getValue().getMonto())
+                ));
+
         col.setCellFactory(TextFieldTableCell.forTableColumn());
         col.setEditable(false);
         col.setPrefWidth(140);
@@ -134,9 +143,12 @@ public class Tabla extends VBox {
         return col;
     }
 
-    private TableColumn<Ventas.Fila, TipoDePago> colEstado() {
-        var col = new TableColumn<Ventas.Fila, TipoDePago>("Estado");
-        col.setCellValueFactory(c -> c.getValue().estadoProperty());
+    private TableColumn<Venta, TipoDePago> colEstado() {
+        var col = new TableColumn<Venta, TipoDePago>("Estado");
+        col.setCellValueFactory(c ->
+        new javafx.beans.property.SimpleObjectProperty<>(
+                c.getValue().getEstado()
+        ));
 
         col.setCellFactory(tc -> new TableCell<>() {
 
@@ -144,7 +156,11 @@ public class Tabla extends VBox {
             private final Label label = new Label();
 
             {
-                combo.getItems().setAll(TipoDePago.values());
+                combo.getItems().setAll(
+        java.util.Arrays.stream(TipoDePago.values())
+                .filter(tipo -> tipo != TipoDePago.DEUDA_PAGADA)
+                .toList());
+                combo.getStyleClass().add("combo-agregar");
 
                 combo.valueProperty().addListener((obs, anterior, nuevo) -> {
                     if (Tabla.this.soloLectura) {
@@ -152,7 +168,7 @@ public class Tabla extends VBox {
                     }
 
                     if (getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
-                        Ventas.Fila fila = getTableView().getItems().get(getIndex());
+                        Venta fila = getTableView().getItems().get(getIndex());
                         fila.setEstado(nuevo);
 
                         if (onCambiarEstado != null && fila.getIdVenta() != null) {
@@ -187,9 +203,12 @@ public class Tabla extends VBox {
         return col;
     }
 
-    private TableColumn<Ventas.Fila, String> colObservaciones() {
-        var col = new TableColumn<Ventas.Fila, String>("Observaciones");
-        col.setCellValueFactory(c -> c.getValue().observacionesProperty());
+    private TableColumn<Venta, String> colObservaciones() {
+        var col = new TableColumn<Venta, String>("Observaciones");
+        col.setCellValueFactory(c ->
+        new javafx.beans.property.SimpleStringProperty(
+                c.getValue().getObservaciones()
+        ));
         col.setCellFactory(tc -> new TableCell<>() {
             private final javafx.scene.text.Text text = new javafx.scene.text.Text();
 
@@ -226,7 +245,7 @@ public class Tabla extends VBox {
         return moneda.format(v);
     }
 
-    public TableView<Ventas.Fila> getTable() {
+    public TableView<Venta> getTable() {
         return tabla;
     }
 

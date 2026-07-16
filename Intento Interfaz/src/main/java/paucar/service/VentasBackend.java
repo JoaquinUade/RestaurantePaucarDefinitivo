@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uade.tpo.demo.entity.Cliente;
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.Venta;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 public class VentasBackend {
@@ -44,7 +46,7 @@ public class VentasBackend {
                                                vas a usar para hacer GET/POST al backend */
 
         this.TraductorJSON = new ObjectMapper();/*El campo traductorJson ahora va a contener un ObjectMapper nuevo */
-
+        this.TraductorJSON.findAndRegisterModules();
         this.clientesService = Objects.requireNonNull(clientesService);/*valida que el servicio de clientes no sea
                                                                        null, sino lanza una excepción inmediatamente */
 
@@ -99,8 +101,10 @@ public class VentasBackend {
             System.out.println("DEBUG idCliente=" + venta.getIdCliente());
             System.out.println("DEBUG estado=" + venta.getEstado());
             System.out.println("DEBUG observaciones=" + venta.getObservaciones());
+            System.out.println("DEBUG fecha=" + venta.getFecha());
 
             // Serializar el MISMO VentaRequest compartido
+            System.out.println("Fecha enviada = " + venta.getFecha());
             String body = TraductorJSON.writeValueAsString(venta);
 
             var solicitud = HttpRequest.newBuilder()
@@ -151,7 +155,7 @@ public class VentasBackend {
         return GuardarPedidos(idMesa, idProductos, cantidades, estado, observaciones);
     }
 
-    public List<java.util.Map<String, Object>> cargarVentasDelDia(LocalDate fecha) {
+    public List<Venta> cargarVentasDelDia(LocalDate fecha) {
         try {
             var solicitud = HttpRequest.newBuilder()
                     .uri(URI.create(
@@ -174,9 +178,7 @@ public class VentasBackend {
                                                                    convierte en un objeto java (un árbol
                                                                    JSON) que se puede leer por campos*/
 
-                var out = new ArrayList<java.util.Map<String, Object>>();/*Lista donde se van a guardar
-                                                                         los datos de las ventas obtenidas
-                                                                         de forma ordenada */
+                var out = new ArrayList<Venta>();
 
                 if (array.isArray()) {/*Si lo que me devolvió el backend es una lista de elementos,
                                       entonces vamos a recorrerla uno por uno */
@@ -250,16 +252,26 @@ public class VentasBackend {
                             idVenta = n.get("idVenta").asLong();/*convierte el valor del campo idVenta del JSON a un Long y lo asigna a la variable idVenta*/
                         }
 
-                        var fila = new java.util.HashMap<String, Object>();/*inicializa la variable fila con un nuevo HashMap */
-                        fila.put("nombre", nombre);
-                        fila.put("descripcion", desc);
-                        fila.put("monto", monto);
-                        fila.put("estado", estado);
-                        fila.put("observaciones", obs);
-                        fila.put("idCliente", idCliente);
-                        fila.put("tipoCliente", tipoCli);
-                        fila.put("idVenta", idVenta);
-                        out.add(fila);/*agrega la fila a la lista de ventas */
+                        Venta ventaLeida = new Venta();
+
+                        Cliente cliente = new Cliente();
+
+                        cliente.setIdCliente(idCliente);
+                        cliente.setNombre(nombre);
+
+                        if (tipoCli != null) {
+                            cliente.setTipoCliente(tipoCli);
+                        }
+
+                        ventaLeida.setCliente(cliente);
+                        ventaLeida.setFecha(fecha.atStartOfDay());
+                        ventaLeida.setDescripcion(desc);
+                        ventaLeida.setMonto(monto);
+                        ventaLeida.setEstado(estado);
+                        ventaLeida.setObservaciones(obs);
+                        ventaLeida.setIdVenta(idVenta);
+
+                        out.add(ventaLeida);
                     }
                 }
                 return out;/*devuelve la lista de filas de ventas obtenidas del JSON, donde cada fila es un mapa con los
@@ -367,26 +379,27 @@ public class VentasBackend {
             return false;
         }
     }
-public boolean pagarDeuda(Long idVenta) {
-    try {
-        var bodyMap = new java.util.HashMap<String, Object>();
-        bodyMap.put("estado", TipoDePago.EFECTIVO); // ✅ pasa de DEBE a EFECTIVO
 
-        String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
+    public boolean pagarDeuda(Long idVenta) {
+        try {
+            var bodyMap = new java.util.HashMap<String, Object>();
+            bodyMap.put("estado", TipoDePago.EFECTIVO); // ✅ pasa de DEBE a EFECTIVO
 
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
-                .header("Content-Type", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))
-                .build();
+            String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
 
-        var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
+                    .header("Content-Type", "application/json")
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))
+                    .build();
 
-        return response.statusCode() >= 200 && response.statusCode() < 300;
+            var response = http.send(request, HttpResponse.BodyHandlers.ofString());
 
-    } catch (java.io.IOException | InterruptedException e) {
-        System.err.println("Error pagando deuda: " + e.getMessage());
-        return false;
+            return response.statusCode() >= 200 && response.statusCode() < 300;
+
+        } catch (java.io.IOException | InterruptedException e) {
+            System.err.println("Error pagando deuda: " + e.getMessage());
+            return false;
+        }
     }
-}
 }
