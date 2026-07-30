@@ -25,6 +25,12 @@ public class VentasController {
         return ResponseEntity.status(HttpStatus.CREATED).body(venta);
     }
 
+    @PostMapping("/muchas")
+    public ResponseEntity<Venta> crearMuchasVentas(@RequestBody List<VentaRequest> ventasRequests) {
+        List<Venta> ventas = ventaService.crearMuchasVentas(ventasRequests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ventas.get(0));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<Venta> actualizarParcialVenta(@PathVariable Long id, @RequestBody Venta venta) {
         Venta mod = ventaService.modificarVenta(id, venta);

@@ -282,4 +282,14 @@ public class VentaServiceImpl implements VentaService {
                 .sorted((r1, r2) -> r1.getFecha().compareTo(r2.getFecha()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Venta> crearMuchasVentas(List<VentaRequest> ventasRequests) {
+        List<Venta> ventasCreadas = new ArrayList<>();
+        for (VentaRequest ventaRequest : ventasRequests) {
+            Venta ventaCreada = crearVenta(ventaRequest);
+            ventasCreadas.add(ventaCreada);
+        }
+        return ventasCreadas;
+    }
 }

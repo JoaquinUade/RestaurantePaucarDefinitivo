@@ -16,7 +16,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 @Query("""
 SELECT s
 FROM Stock s
-WHERE s.stockMinimo <= 0
+WHERE s.cantidad <= s.stockMinimo
 """)
     List<Stock> findStockBajoMinimo();
 }

@@ -16,6 +16,7 @@ public interface VentaService {
     List<Venta> obtenerTodas();
     List<VentaDTO> obtenerVentasOrdenadas(Integer mes, Integer anio);
     List<VentaResumenDiarioDTO> obtenerResumenDiarioPorTipoPago(Integer mes, Integer anio);
+    List<Venta> crearMuchasVentas(List<VentaRequest> ventasRequests);
 
     /**
      * Actualiza parcialmente los datos de una venta existente.
