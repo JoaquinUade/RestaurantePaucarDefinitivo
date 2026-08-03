@@ -17,7 +17,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
@@ -25,8 +24,6 @@ public class DialogStock {
 
     public static StockRequest mostrar(List<CategoriaGastoVariable> categorias,
             List<GastosVariables> gastos, List<Stock> stocks) {
-        TableView<GastosVariables> tabla
-                = TablaItemsComprados.crear();
         Dialog<StockRequest> dialog = new Dialog<>();
 
         dialog.setTitle("Agregar Stock");
@@ -74,63 +71,23 @@ public class DialogStock {
                                 : item.getNombre());
             }
         });
-        comboCategoria.setOnAction(e -> {
 
-            CategoriaGastoVariable categoria
-                    = comboCategoria.getValue();
-
-            if (categoria == null) {
-                return;
-            }
-
-            List<GastosVariables> filtrados
-                    = gastos.stream()
-                            .filter(g
-                                    -> g.getCategoria()
-                                    .getIdCategoria()
-                                    .equals(
-                                            categoria.getIdCategoria()))
-                            .filter(g
-                                    -> stocks.stream()
-                                    .noneMatch(s
-                                            -> s.getNombreProducto()
-                                            .equalsIgnoreCase(
-                                                    g.getProducto())))
-                            .filter(g -> {
-
-                                boolean existe = stocks.stream()
-                                        .anyMatch(s
-                                                -> s.getNombreProducto()
-                                                .equalsIgnoreCase(
-                                                        g.getProducto()));
-
-                                System.out.println(
-                                        g.getProducto()
-                                        + " -> existe en stock: "
-                                        + existe);
-
-                                return !existe;
-                            })
-                            .toList();
-
-            tabla.getItems().setAll(filtrados);
-
-            System.out.println(
-                    "Productos encontrados: "
-                    + filtrados.size());
-        });
-
+        TextField txtProducto = new TextField();
         TextField txtStockMinimo = new TextField();
-
+        TextField txtUnidad = new TextField();
+        txtUnidad.setPromptText(
+                "kg, unidad, caja, cajón..."
+        );
         VBox form = new VBox(
                 10,
                 new Label("Categoría"),
                 comboCategoria,
                 new Label("Producto"),
-                tabla,
+                txtProducto,
                 new Label("Stock mínimo"),
-                txtStockMinimo
-        );
+                txtStockMinimo,
+                new Label("Unidad"),
+                txtUnidad);
 
         form.setPadding(new Insets(15));
 
@@ -149,16 +106,11 @@ public class DialogStock {
 
                     return null;
                 }
-
-                GastosVariables seleccionado
-                        = tabla.getSelectionModel()
-                                .getSelectedItem();
-
-                if (seleccionado == null) {
+                if (txtProducto.getText().isBlank()) {
 
                     new Alert(
                             Alert.AlertType.WARNING,
-                            "Seleccione un producto"
+                            "Ingrese un producto"
                     ).showAndWait();
 
                     return null;
@@ -174,44 +126,20 @@ public class DialogStock {
                 );
 
                 request.setNombreProducto(
-                        seleccionado.getProducto()
+                        txtProducto.getText().trim()
                 );
-                request.setGastoVariableId(
-                        seleccionado.getIdGastoVariable()
-                );
-                request.setCantidad(
-                        seleccionado.getCantidad()
-                );
+                request.setGastoVariableId(null);
 
-                request.setUnidadCantidad(
-                        seleccionado.getMedida()
-                );
+                request.setCantidad(BigDecimal.ZERO);
 
+                request.setUnidadCantidad(txtUnidad.getText().trim());
                 try {
 
-                    String texto
-                            = txtStockMinimo.getText().trim();
-
-                    java.util.regex.Pattern pattern
-                            = java.util.regex.Pattern.compile(
-                                    "(\\d+(?:\\.\\d+)?)(.*)"
-                            );
-
-                    java.util.regex.Matcher matcher
-                            = pattern.matcher(texto);
-
-                    if (matcher.matches()) {
-
-                        request.setStockMinimo(
-                                new BigDecimal(
-                                        matcher.group(1)
-                                )
-                        );
-
-                        request.setUnidadStockMinimo(
-                                matcher.group(2).trim()
-                        );
-                    }
+                    request.setStockMinimo(
+                            new BigDecimal(
+                                    txtStockMinimo.getText().trim()
+                            )
+                    );
 
                 } catch (Exception e) {
 
@@ -299,7 +227,9 @@ public class DialogStock {
                         original.getStockMinimo()
                                 .stripTrailingZeros()
                                 .toPlainString());
-
+        TextField txtUnidad
+                = new TextField(
+                        original.getUnidadCantidad());
         VBox form = new VBox(
                 10,
                 new Label("Categoría"),
@@ -307,8 +237,9 @@ public class DialogStock {
                 new Label("Producto"),
                 txtProducto,
                 new Label("Stock mínimo"),
-                txtStockMinimo
-        );
+                txtStockMinimo,
+                new Label("Unidad"),
+                txtUnidad);
 
         form.setPadding(new Insets(15));
 
@@ -331,11 +262,7 @@ public class DialogStock {
                 req.setCantidad(original.getCantidad());
 
                 req.setUnidadCantidad(
-                        original.getUnidadCantidad()
-                );
-
-                req.setUnidadStockMinimo(
-                        original.getUnidadStockMinimo()
+                        txtUnidad.getText().trim()
                 );
 
                 try {

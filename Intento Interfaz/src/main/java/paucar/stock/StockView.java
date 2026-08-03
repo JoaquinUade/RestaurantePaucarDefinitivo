@@ -32,6 +32,7 @@ public class StockView extends BorderPane {
     private final StockService service;
     private final CategoriasGastosService categoriasService;
     private Stock stockSeleccionado;
+    private StockRequest stockPendiente;
     private final GastosVariablesService gastosVariablesService;
     private boolean modoDiario = false;
     private final HBox contenedorCategorias = new HBox(20);
@@ -98,11 +99,11 @@ public class StockView extends BorderPane {
                 stockSeleccionado.setNombreProducto(
                         editado.getNombreProducto());
 
-                stockSeleccionado.setStockMinimo(
-                        editado.getStockMinimo());
+                stockSeleccionado.setCantidad(
+                        editado.getCantidad());
 
-                stockSeleccionado.setUnidadStockMinimo(
-                        editado.getUnidadStockMinimo());
+                stockSeleccionado.setUnidadCantidad(
+                        editado.getUnidadCantidad());
 
                 service.editar(
                         stockSeleccionado.getIdStock(),
@@ -260,7 +261,7 @@ public class StockView extends BorderPane {
                             return false;
                         }
 
-                        stock.setStockMinimo(
+                        stock.setCantComprada(
                                 ultimoRegistro.getCantidad());
 
                         return true;
@@ -296,7 +297,10 @@ public class StockView extends BorderPane {
                             categoria,
                             lista,
                             stock -> stockSeleccionado = stock,
-                            modoDiario, service,
+                            modoDiario,
+                            service,
+                            gastosVariablesService,
+                            categoriasService,
                             fechaSeleccionada));
         });
     }

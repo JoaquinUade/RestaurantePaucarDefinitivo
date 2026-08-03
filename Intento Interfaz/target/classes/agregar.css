@@ -39,3 +39,18 @@
     -fx-background-color: #6a5acd;
     -fx-text-fill: rgb(255, 255, 255);
 }
+
+.restante-pendiente {
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+}
+
+.restante-completo {
+    -fx-text-fill: green;
+    -fx-font-weight: bold;
+}
+
+.restante-excedido {
+    -fx-text-fill: orange;
+    -fx-font-weight: bold;
+}

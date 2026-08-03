@@ -68,7 +68,7 @@ public class TablaSemanalGastosV extends VBox {
                 colCantidad.setCellValueFactory(c -> {
 
                         String cantidad = c.getValue()
-                                        .getCantidad()
+                                        .getCantComprada()
                                         .stripTrailingZeros()
                                         .toPlainString();
 
@@ -101,7 +101,6 @@ public class TablaSemanalGastosV extends VBox {
                 tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
                         if (newSel != null) {
                                 onSelect.accept(newSel);
-                                System.out.println("Seleccionado: " + newSel.getProducto());
                         }
                 });
                 // ✅ TOTAL

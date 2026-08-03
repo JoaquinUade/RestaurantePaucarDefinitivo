@@ -28,7 +28,7 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
         GastosVariables gasto = new GastosVariables();
         gasto.setFecha(request.getFecha() != null ? request.getFecha() : LocalDate.now());
         gasto.setProducto(request.getProducto());
-        gasto.setCantidad(request.getCantidad());
+        gasto.setCantComprada(request.getCantComprada());
         gasto.setMedida(request.getMedida());
         gasto.setMonto(request.getMonto());
         if (request.getCargadoEnStock() != null) {
@@ -51,7 +51,7 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
             GastosVariables gasto = optional.get();
             if (gastoActualizado.getFecha() != null) gasto.setFecha(gastoActualizado.getFecha());
             if (gastoActualizado.getProducto() != null) gasto.setProducto(gastoActualizado.getProducto());
-            if (gastoActualizado.getCantidad() != null) gasto.setCantidad(gastoActualizado.getCantidad());
+            if (gastoActualizado.getCantComprada() != null) gasto.setCantComprada(gastoActualizado.getCantComprada());
             if (gastoActualizado.getMedida() != null) gasto.setMedida(gastoActualizado.getMedida());
             if (gastoActualizado.getMonto() != null) gasto.setMonto(gastoActualizado.getMonto());
             if (gastoActualizado.getCargadoEnStock() != null) gasto.setCargadoEnStock(gastoActualizado.getCargadoEnStock());

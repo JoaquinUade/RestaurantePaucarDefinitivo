@@ -2,17 +2,14 @@ package paucar.ventas;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,16 +21,24 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 import paucar.service.ClientesService;
 import paucar.service.ProductosService;
+import paucar.ventas.ui.ClienteAutoCompletar;
+import paucar.ventas.ui.ClienteTipoManager;
+import paucar.ventas.ui.EstadoPagoCombo;
+import paucar.ventas.ui.FormularioPedidoBuilder;
+import paucar.ventas.ui.PanelPagadores;
+import paucar.ventas.ui.PanelProductos;
+import paucar.ventas.ui.ProductoLinea;
+import paucar.ventas.ui.SelectorTipoCliente;
+import paucar.ventas.util.CalculadoraVenta;
+import paucar.ventas.util.ValidadorVenta;
+import paucar.ventas.util.VentaBuilder;
 
 public class Agregar {
 
@@ -90,135 +95,147 @@ public class Agregar {
         dialog.getDialogPane().getButtonTypes().addAll(okType, ButtonType.CANCEL);
 
         // --- 1) Selector tipo cliente (Mesa - Cliente - Empresa) ---
-        ToggleGroup tgTipoCliente = new ToggleGroup();
-        ToggleButton btnMesa = new ToggleButton("Mesa");
-        ToggleButton btnCliente = new ToggleButton("Cliente");
-        ToggleButton btnEmpresa = new ToggleButton("Empresa");
+        SelectorTipoCliente selector
+                = SelectorTipoCliente.crear();
 
-        btnMesa.setToggleGroup(tgTipoCliente);
-        btnCliente.setToggleGroup(tgTipoCliente);
-        btnEmpresa.setToggleGroup(tgTipoCliente);
+        ToggleGroup tgTipoCliente
+                = selector.getToggleGroup();
 
-        // Por defecto: Cliente seleccionado (centro)
-        btnCliente.setSelected(true);
-
-        // Guardamos el valor de dominio en userData para leerlo fácil más adelante
-        btnMesa.setUserData(TipoCliente.MESA);
-        btnCliente.setUserData(TipoCliente.CLIENTE);
-        btnEmpresa.setUserData(TipoCliente.EMPRESA);
-
-        HBox selectorTipoCliente = new HBox(6, btnMesa, btnCliente, btnEmpresa);
+        HBox selectorTipoCliente
+                = selector.getContenedor();
         selectorTipoCliente.setAlignment(Pos.CENTER_LEFT);
-
-        // (Opcional) estilos de “segmentado”
-        btnMesa.getStyleClass().add("segmented-left");
-        btnCliente.getStyleClass().add("segmented-center");
-        btnEmpresa.getStyleClass().add("segmented-right");
 
         // --- 2) Combo de clientes (tu autocompletar por texto se mantiene)
         FilteredList<String> clientesFiltrados = new FilteredList<>(clientes, s -> true);
-        ComboBox<String> cbCliente = crearComboClientes(clientesFiltrados);
+        ComboBox<String> cbCliente
+                = ClienteAutoCompletar.crear(
+                        clientesFiltrados);
         cbCliente.getStyleClass().add("combo-agregar");
 
-        // --- 3) CARGA INICIAL según el tipo seleccionado (por defecto CLIENTE) ---
-        if (tgTipoCliente.getSelectedToggle() != null && clientesService != null) {
-            var tipo = (TipoCliente) tgTipoCliente.getSelectedToggle().getUserData();
-            cbCliente.setDisable(true);
+        ClienteTipoManager.cargarInicial(
+                tgTipoCliente,
+                clientesService,
+                clientes,
+                clientesFiltrados,
+                cbCliente);
 
-            new Thread(() -> {
-                java.util.List<String> nombres;
-                try {
-                    // Consulta al backend (ya ordena y de-duplica en tu servicio)
-                    nombres = clientesService.obtenerNombresPorTipo(tipo);
-                } catch (Exception ex) {
-                    System.err.println("Carga inicial nombres por tipo: " + ex.getMessage());
-                    nombres = java.util.List.of(); // fallback
-                }
-                final java.util.List<String> nombresFinal = nombres;
-
-                Platform.runLater(() -> {
-                    System.out.println("[Agregar] " + tipo + " => " + nombresFinal.size());
-                    // Reemplaza la lista base: desde acá el FilteredList filtra por texto como siempre
-                    clientes.setAll(nombresFinal);
-
-                    // Reaplico tu predicate de texto actual (autocompletar)
-                    String txt = cbCliente.getEditor().getText();
-                    String lower = (txt == null ? "" : txt.trim().toLowerCase());
-                    clientesFiltrados.setPredicate(s -> s != null && (lower.isEmpty() || s.toLowerCase().contains(lower)));
-
-                    cbCliente.setDisable(false);
-                });
-            }, "cargar-clientes-inicial").start();
-        }
-
-        // --- 4) RECARGA al cambiar el TipoCliente (Mesa/Cliente/Empresa) ---
-        tgTipoCliente.selectedToggleProperty().addListener((o, a, b) -> {
-            if (b == null || clientesService == null) {
-                return;
-            }
-
-            var tipo = (TipoCliente) b.getUserData();
-            cbCliente.setDisable(true);
-
-            new Thread(() -> {
-                java.util.List<String> nombres;
-                try {
-                    nombres = clientesService.obtenerNombresPorTipo(tipo);
-                } catch (Exception ex) {
-                    System.err.println("Carga nombres por tipo: " + ex.getMessage());
-                    nombres = java.util.List.of(); // fallback
-                }
-                final java.util.List<String> nombresFinal = nombres;
-
-                Platform.runLater(() -> {
-                    String sel = cbCliente.getValue();
-
-                    clientes.setAll(nombresFinal);
-
-                    String txt = cbCliente.getEditor().getText();
-                    String lower = (txt == null ? "" : txt.trim().toLowerCase());
-                    clientesFiltrados.setPredicate(s -> s != null && (lower.isEmpty() || s.toLowerCase().contains(lower)));
-
-                    // Si lo elegido dejó de existir para el nuevo tipo, limpiamos
-                    if (sel != null && !nombresFinal.contains(sel)) {
-                        cbCliente.setValue(null);
-                        cbCliente.getEditor().clear();
-                    }
-
-                    cbCliente.setDisable(false);
-                });
-            }, "cargar-clientes-por-tipo").start();
-        });
+        ClienteTipoManager.configurarCambioTipo(
+                tgTipoCliente,
+                clientesService,
+                clientes,
+                clientesFiltrados,
+                cbCliente);
 
         // --- 5) Productos (líneas dinámicas) ---
-        VBox contLineas = new VBox(6);
-        contLineas.setPadding(new Insets(6));
-        Button btnAgregarLinea = new Button("+ Producto");
-        btnAgregarLinea.getStyleClass().add("btn-primary");
-        btnAgregarLinea.setOnAction(e -> contLineas.getChildren().add(crearLineaProducto(contLineas)));
-        contLineas.getChildren().add(crearLineaProducto(contLineas)); // al menos una línea inicial
+        PanelProductos panelProductos
+                = new PanelProductos(productos);
+
+        VBox contLineas
+                = panelProductos.getContLineas();
+
+        Label lblTotal
+                = panelProductos.getLblTotal();
+
+        Label lblRestante
+                = panelProductos.getLblRestante();
+
+        Button btnAgregarLinea
+                = panelProductos.getBtnAgregarLinea();
+        contLineas.getChildren().add(
+        ProductoLinea.crear(
+                contLineas,
+                productos));
         DatePicker dpFecha = crearSelectorFecha();
         dpFecha.getStyleClass().add("date-agregar");
         // --- 6) Estado y observaciones ---
-        ComboBox<TipoDePago> cbEstado = crearComboEstado();
-        cbEstado.getStyleClass().add("combo-agregar");
+        ComboBox<TipoDePago> cbEstado
+                = EstadoPagoCombo.crear();
+
+        cbEstado.getStyleClass()
+                .add("combo-agregar");
 
         TextField tfObs = TextFieldObservaciones();
+        VBox contPagadores
+                = PanelPagadores.crearContenedor();
 
+        TextField tfCantidadPagadores
+                = PanelPagadores.crearCantidadPagadores(
+                        contPagadores,
+                        () -> actualizarTotales(
+                                contLineas,
+                                contPagadores,
+                                lblTotal,
+                                lblRestante));
+        tfCantidadPagadores.setText("1");
+        actualizarTotales(contLineas, contPagadores, lblTotal, lblRestante);
         // --- 7) Layout ---
-        GridPane grid = buildFormularioPedido(cbCliente, dpFecha, contLineas, btnAgregarLinea, cbEstado, tfObs, selectorTipoCliente);
-
+        GridPane grid = FormularioPedidoBuilder.construir(
+                cbCliente,
+                dpFecha,
+                contLineas,
+                btnAgregarLinea,
+                cbEstado,
+                tfObs,
+                selectorTipoCliente,
+                tfCantidadPagadores,
+                contPagadores,
+                lblTotal,
+                lblRestante
+        );
         // --- 8) Validación del botón OK ---
         HBox fila0 = (HBox) contLineas.getChildren().get(0);
         @SuppressWarnings("unchecked")
         ComboBox<ProductosService.ProductoItem> cbProd0 = (ComboBox<ProductosService.ProductoItem>) fila0.getChildren().get(0);
         TextField tfCant0 = (TextField) fila0.getChildren().get(1);
+cbProd0.valueProperty().addListener((obs, oldValue, newValue) ->
+        actualizarTotales(
+                contLineas,
+                contPagadores,
+                lblTotal,
+                lblRestante));
 
+tfCant0.textProperty().addListener((obs, oldValue, newValue) ->
+        actualizarTotales(
+                contLineas,
+                contPagadores,
+                lblTotal,
+                lblRestante));
         Node okBtn = dialog.getDialogPane().lookupButton(okType);
         okBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(
-                        () -> BotonAgregarInhabilitado(cbCliente, contLineas)
-                        || tgTipoCliente.getSelectedToggle() == null,
+                        () -> {
+
+                            boolean invalido
+                            = ValidadorVenta.botonAgregarInhabilitado(
+                                    cbCliente,
+                                    clientes,
+                                    contLineas)
+                            || tgTipoCliente.getSelectedToggle() == null;
+
+                            double total
+                            = CalculadoraVenta.calcularTotal(contLineas);
+
+                            double pagado = 0;
+
+                            for (Node n : contPagadores.getChildren()) {
+
+                                HBox fila = (HBox) n;
+
+                                TextField tfMonto
+                                = (TextField) fila.getChildren().get(1);
+
+                                if (!tfMonto.getText().isBlank()) {
+
+                                    try {
+                                        pagado += Double.parseDouble(
+                                                tfMonto.getText());
+                                    } catch (NumberFormatException ex) {
+                                    }
+                                }
+                            }
+
+                            return invalido || (total - pagado) > 0;
+                        },
                         cbCliente.getEditor().textProperty(),
                         contLineas.getChildren(),
                         cbProd0.valueProperty(),
@@ -244,131 +261,18 @@ public class Agregar {
                 // Guardar el tipo
                 this.tipoSeleccionado = (TipoCliente) tgTipoCliente.getSelectedToggle().getUserData();
                 // Construir la venta y devolver el nombre
-                return ConstruirVentaDirectoEnRequest(cbCliente,dpFecha, cbEstado, tfObs, contLineas);
+                return VentaBuilder.construirVenta(
+                        venta,
+                        cbCliente,
+                        dpFecha,
+                        cbEstado,
+                        tfObs,
+                        contLineas);
             }
             return null;
         });
 
         return dialog;
-    }
-
-    private ComboBox<String> crearComboClientes(FilteredList<String> clientesFiltrados) {
-        ComboBox<String> cbCliente = new ComboBox<>(clientesFiltrados);/*Hacé una cajita para elegir clientes, 
-                                                                   y llenala con los papelitos que están
-                                                                   en la bolsa clientesFiltrados */
-
-        cbCliente.setEditable(true);/*permite escribir para filtrarclientes, por alguna razon si quito
-                                           esto si se puede seleccionar un cliente */
-        cbCliente.setPromptText("Nombre (cliente/mesa/empresa)");
-
-        AtomicBoolean actualizandoEditor = new AtomicBoolean(false);
-
-        // 1) Filtrado en vivo mientras escribe
-        cbCliente.getEditor().textProperty().addListener((obs, TextoPrevio, TextoActual) -> {/*Cada vez que el usuario escribe
-                                                                         en el ComboBox, este listener se
-                                                                         activa y ejecuta tu código para
-                                                                         filtrar las opciones y mostrar
-                                                                         solo las que coinciden */
-            if (actualizandoEditor.get()) {
-                return;
-            }
-            String txt = (TextoActual == null ? "" : TextoActual.trim().toLowerCase());/*Convierte lo que
-                                                                                   escribió el usuario en
-                                                                                   un texto limpio, sin
-                                                                                   espacios raros, en
-                                                                                   minúsculas, o vacío si
-                                                                                   es null */
-            clientesFiltrados.setPredicate(s -> s == null || txt.isEmpty() || s.toLowerCase().contains(txt));/*Esa línea decide, para cada cliente s, si se muestra o no 
-                                                                                                         en el ComboBox según lo que escribió el usuario (txt): si
-                                                                                                         txt está vacío, muestra todo; si no, muestra solo los que
-                                                                                                         contienen ese texto (ignorando mayúsculas/minúsculas) */
-            if (!cbCliente.isShowing() && !txt.isEmpty()) {
-                cbCliente.show();/* Si el ComboBox NO está abierto y el usuario escribió algo, entonces
-                                 abrilo */
-            }
-        });
-
-        // 2) Interceptar el clic en cada celda de la lista para forzar la selección por ÍTEM (no por índice)
-        cbCliente.setCellFactory(listView -> {
-            var cell = new javafx.scene.control.ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item);
-                }
-            };
-
-            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, ev -> {
-                if (!cell.isEmpty()) {
-                    String item = cell.getItem();
-
-                    // Seleccionar explícitamente por ítem y reflejar en el editor
-                    actualizandoEditor.set(true);
-                    try {
-                        cbCliente.getSelectionModel().select(item); // <- selecciono por ítem (no índice)
-                        cbCliente.setValue(item);                   // <- alinear value
-                        cbCliente.getEditor().setText(item);        // <- mostrar en el editor
-                        cbCliente.getEditor().positionCaret(item.length());
-                    } finally {
-                        actualizandoEditor.set(false);
-                    }
-
-                    // Cerrar el popup y consumir el evento para que el SelectionModel no re-seleccione por índice
-                    cbCliente.hide();
-                    ev.consume();
-                }
-            });
-
-            return cell;
-        });
-
-        // Botón del combo (lo que se ve cuando está cerrado): que muestre el texto del ítem
-        cbCliente.setButtonCell(new javafx.scene.control.ListCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item);
-            }
-        });
-
-        // 3) NO restaures predicate en selección ni al cerrar; si querés, al ABRIR sí:
-        cbCliente.showingProperty().addListener((o, was, is) -> {
-            if (is) {
-                // Mostrar Todo al abrir (opcional). Si preferís, podés quitar esta línea también.
-                clientesFiltrados.setPredicate(s -> true);
-            }
-            // Al cerrar: NO toques el predicate (evita carreras de índice).
-        });
-
-        // 4) (Opcional) Alinear editor y value cuando se dispare la acción (Enter)
-        cbCliente.setOnAction(e -> {
-            String v = cbCliente.getValue();
-            if (v != null) {
-                actualizandoEditor.set(true);
-                try {
-                    cbCliente.getEditor().setText(v);
-                    cbCliente.getEditor().positionCaret(v.length());
-                } finally {
-                    actualizandoEditor.set(false);
-                }
-            }
-        });
-        return cbCliente;
-    }
-
-    private ComboBox<TipoDePago> crearComboEstado() {
-        ComboBox<TipoDePago> cbEstado = new ComboBox<>();/*crea un ComboBox vacío que podrá contener
-                                                         valores del enum TipoDePago */
-        cbEstado.getItems().setAll(
-                java.util.Arrays.stream(TipoDePago.values())
-                        .filter(tipo -> tipo != TipoDePago.DEUDA_PAGADA)
-                        .toList()
-        );
-        cbEstado.setValue(TipoDePago.DEBE);/*establece que por defecto el valor seleccionado en el
-                                           ComboBox sea DEBE, es decir, que el pedido recién creado esté
-                                           marcado como pendiente de pago hasta que se cambie a otro
-                                           estado*/
-        return cbEstado;/*retorna el cbestado*/
     }
 
     private TextField TextFieldObservaciones() {
@@ -380,347 +284,6 @@ public class Agregar {
         return inputObservaciones;/*retorna inputobservaciones */
     }
 
-    private GridPane buildFormularioPedido(ComboBox<String> cbCliente, DatePicker dpFecha, VBox ListaDeProductos, Button btnAñadirProducto,
-            ComboBox<TipoDePago> cbEstado, TextField inputObservaciones, Node selectorTipoCliente) {
-
-        GridPane grid = new GridPane();/*Crea un contenedor en forma de grilla para colocar las etiquetas
-                                       y los campos a rellenar del formulario */
-
-        grid.setHgap(15);/*establece que haya 15 pixeles de separación horizontal entre la etiqueta
-                                y el campo a rellenar y la respuesta */
-
-        grid.setVgap(15);/*establece que haya 10 pixeles de separación vertical entre las etiquetas
-                                y los campos a rellenar */
-
-        grid.setPadding(new Insets(10));/*establece que hay un margen 10px alrededor
-                                                            de dialog para que se vea estetico*/
-
-        int r = 1;/*esta variable r es para controlar la fila en la que se va a colocar cada elemento del
-                  formulario, y se va incrementando cada vez que se agrega un nuevo elemento para que no
-                  se sobrepongan */
-
-        grid.add(new Label("Tipo de cliente:"), 0, r);/*Esta línea agrega la etiqueta
-                                                                        “Tipo de cliente:” en la columna
-                                                                        0 y la fila r del GridPane */
-        grid.add(selectorTipoCliente, 1, r++);/*Esta línea agrega el selector de tipo de
-                                                           cliente (que es un HBox con los botones) en la
-                                                           columna 1 y la fila r++*/
-
-        grid.add(new Label("Nombre:"), 0, r);/*Esta línea agrega la etiqueta “Nombre:” 
-                                                               en la columna 0 y la fila r del GridPane */
-
-        grid.add(cbCliente, 1, r++);/*agrega el ComboBox del cliente(la parte donde escribimos
-                                                el nombre del cliente) en columna 1 y fila r*/
-
-        grid.add(new Label("Fecha:"), 0, r);/*añade la etiqueta fecha */
-        grid.add(dpFecha, 1, r++);/*añade el selector de fecha */
-
-        grid.add(new Label("Productos:"), 0, r);/*añade la etiqueta productos*/
-
-        VBox productosBox = new VBox(6, ListaDeProductos, btnAñadirProducto);/*Crea un contenedor
-                                                                                   vertical (VBox) con 6
-                                                                                   píxeles de espacio entre
-                                                                                   cada producto y el 
-                                                                                   botón btnAñadirProducto*/
-
-        grid.add(productosBox, 1, r++);/*Esta línea coloca el contenedor productosBox en la
-                                                    columna 1 y fila r del GridPane, y después aumenta r
-                                                    para pasar a la siguiente fila */
-
-        grid.add(new Label("Estado:"), 0, r);/*añade la etiqueta estado */
-
-        grid.add(cbEstado, 1, r++);/*añade el selector de tipodepago o el estado del pago */
-
-        grid.add(new Label("Observaciones:"), 0, r);/*añade la etiqueta observaciones */
-        grid.add(inputObservaciones, 1, r++);/*añade el campo de texto para las observaciones */
-
-        return grid;/*devuelve el GridPane completo con todos los elementos del formulario ya organizados
-                     en filas y columnas */
-    }
-
-    private HBox crearLineaProducto(VBox contLineas) {
-        // Lista filtrada que "envuelve" a la lista original de productos
-        FilteredList<ProductosService.ProductoItem> productosFiltrados
-                = new FilteredList<>(productos, p -> true);
-
-        // Combo de productos con autocompletar y filtro "contiene"
-        ComboBox<ProductosService.ProductoItem> cbProd = new ComboBox<>(productosFiltrados);
-        cbProd.getStyleClass().add("combo-agregar");
-
-        cbProd.setPrefWidth(280);
-        cbProd.setPromptText("Producto");
-        cbProd.setEditable(true);
-
-        final AtomicBoolean actualizandoProd = new AtomicBoolean(false);
-
-        configurarConverterProducto(cbProd);
-        configurarAutocompletarProducto(cbProd, productosFiltrados, actualizandoProd);
-        configurarRendererProducto(cbProd, actualizandoProd);
-
-        // Campo cantidad
-        TextField tfCant = new TextField();
-        tfCant.setPromptText("Cant.");
-        tfCant.setPrefWidth(70);
-        tfCant.textProperty().addListener((o, a, b) -> {
-            if (b != null && !b.matches("\\d*")) {
-                tfCant.setText(b.replaceAll("[^\\d]", ""));
-            }
-        });
-
-        // Botón eliminar
-        Button btnDelete = new Button("✕");
-        btnDelete.getStyleClass().add("btn-danger");
-
-        HBox fila = new HBox(6, cbProd, tfCant, btnDelete);
-        fila.setAlignment(Pos.CENTER_LEFT);
-        btnDelete.setOnAction(e -> contLineas.getChildren().remove(fila));
-
-        return fila;
-    }
-
-    private void configurarConverterProducto(ComboBox<ProductosService.ProductoItem> cbProd) {
-        cbProd.setConverter(new StringConverter<>() {
-            @Override
-            /*toString:es un metodo que convierte un objeto en texto */
-            public String toString(ProductosService.ProductoItem p) {/*p es un objeto productoitem */
-
-                if (p == null) {/*si no tiene valor retorna vacio*/
-                    return "";
-                } else {
-                    return p.nombre();/*sino retorna nombre */
-                }/*La condición sirve para que el ComboBox muestre el nombre del producto cuando existe,
-                   y muestre vacío sin errores cuando no hay ningún producto seleccionado por ejemplo,
-                   las casillas vacias de la tabla*/
-            }
-
-            @Override
-            public ProductosService.ProductoItem fromString(String text) {
-                if (text == null) {
-                    return null;
-                }
-                String s = text.trim();
-                if (s.isEmpty()) {
-                    return null;
-                }
-                for (ProductosService.ProductoItem p : productos) {
-                    if (p.nombre().equalsIgnoreCase(s)) {
-                        return p; // solo match exacto
-
-                    }
-                }
-                return null;
-            }
-        });
-    }
-
-    private void configurarAutocompletarProducto(
-            ComboBox<ProductosService.ProductoItem> cbProd,
-            FilteredList<ProductosService.ProductoItem> productosFiltrados,
-            java.util.concurrent.atomic.AtomicBoolean actualizandoProd) {
-
-        // 1) Filtrar en vivo mientras escribe (contiene)
-        cbProd.getEditor().textProperty().addListener((obs, TextoPrevio, TextoActual) -> {
-            if (actualizandoProd.get()) {
-                return; // NO filtrar si estoy seteando por código
-
-            }
-            String txt = (TextoActual == null ? "" : TextoActual.trim().toLowerCase());
-            if (txt.isEmpty()) {
-                // Mostrar Todo cuando no hay texto
-                productosFiltrados.setPredicate(p -> true);
-            } else {
-                productosFiltrados.setPredicate(p
-                        -> p != null && p.nombre() != null && p.nombre().toLowerCase().contains(txt)
-                );
-                if (!cbProd.isShowing()) {
-                    cbProd.show();
-                }
-            }
-        });
-// 2) Al seleccionar: reflejar selección SIN tocar predicate ni limpiar editor
-        cbProd.getSelectionModel().selectedItemProperty().addListener((o, a, b) -> {
-            if (b != null) {
-                Platform.runLater(() -> {
-                    actualizandoProd.set(true);
-                    try {
-                        cbProd.setValue(b);
-                        cbProd.getEditor().setText(b.nombre());
-                        cbProd.getEditor().positionCaret(b.nombre().length());
-                    } finally {
-                        actualizandoProd.set(false);
-                    }
-                });
-            }
-        });
-
-        // 3) Al abrir el popup, asegurate de mostrar todo
-        cbProd.showingProperty().addListener((o, was, is) -> {
-            if (is) {
-                productosFiltrados.setPredicate(p -> true);
-            }
-        });
-
-        // 4) Al perder foco, intentá resolver el texto contra la lista (match exacto),
-        //    pero NO borres la selección si no hay match y NO limpies value cuando el editor queda vacío.
-        cbProd.getEditor().focusedProperty().addListener((o, was, is) -> {
-            if (!is) {
-                var elegido = cbProd.getConverter().fromString(cbProd.getEditor().getText());
-                if (elegido != null) {
-                    actualizandoProd.set(true);
-                    try {
-                        cbProd.setValue(elegido);
-                        cbProd.getEditor().setText(elegido.nombre());
-                        cbProd.getEditor().positionCaret(elegido.nombre().length());
-                        productosFiltrados.setPredicate(p -> true);
-                    } finally {
-                        actualizandoProd.set(false);
-                    }
-                } else {
-                    productosFiltrados.setPredicate(p -> true);
-                }
-            }
-        });
-    }
-
-    private void configurarRendererProducto(
-            ComboBox<ProductosService.ProductoItem> cbProd,
-            java.util.concurrent.atomic.AtomicBoolean actualizandoProd) {
-        cbProd.setCellFactory(list -> {
-            javafx.scene.control.ListCell<ProductosService.ProductoItem> cell
-                    = new javafx.scene.control.ListCell<>() {
-                @Override
-                protected void updateItem(ProductosService.ProductoItem item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.nombre());
-                }
-            };
-
-            // Interceptar el clic: seleccionar por OBJETO, actualizar editor, cerrar y consumir
-            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, ev -> {
-                if (!cell.isEmpty()) {
-                    var item = cell.getItem();
-                    actualizandoProd.set(true);
-                    try {
-                        cbProd.getSelectionModel().select(item); // seleccionar por objeto (no índice)
-                        cbProd.setValue(item);
-                        cbProd.getEditor().setText(item.nombre());
-                        cbProd.getEditor().positionCaret(item.nombre().length());
-                    } finally {
-                        actualizandoProd.set(false);
-                    }
-                    cbProd.hide();
-                    ev.consume(); // evita que el SelectionModel re-mapée por índice
-                }
-            });
-
-            return cell;
-        });
-        cbProd.setButtonCell(new javafx.scene.control.ListCell<>() {
-            @Override
-            protected void updateItem(ProductosService.ProductoItem item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.nombre());
-            }
-        });
-    }
-
-    private boolean BotonAgregarInhabilitado(ComboBox<String> cbCliente, VBox contLineas) {
-
-        // Debe existir una selección real del ComboBox
-        boolean clienteValido
-                = cbCliente.getValue() != null
-                && clientes.contains(cbCliente.getValue());
-
-        if (!clienteValido) {
-            return true;
-        }
-
-        if (contLineas.getChildren().isEmpty()) {
-            return true;
-        }
-
-        for (var n : contLineas.getChildren()) {
-            if (n instanceof HBox fila && ValidarFichaPedido(fila)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean ValidarFichaPedido(HBox fila) {
-        @SuppressWarnings("unchecked")
-        ComboBox<ProductosService.ProductoItem> ComboProductos/*Esta es la variable que contiene todos los
-                                                              productos que el usuario puede elegir */
-                = (ComboBox<ProductosService.ProductoItem>) fila.getChildren().get(0);/*ComboProductos contiene el primer elemento
-                                                                                             del HBox, que es un ComboBox, y esa línea lo
-                                                                                            convierte (cast) al tipo ComboBox<ProductosService.ProductoItem>
-                                                                                            para poder usarlo como un ComboBox de productos */
-        TextField Cant = (TextField) fila.getChildren().get(1);/* se le asigna a cant el segundo
-                                                                     elemento que es la cantidad*/
-
-        if (ComboProductos.getValue() == null) {/*Revisa si no hay ningún producto seleccionado en el
-                                                ComboBox; si no hay nada elegido, devuelve false porque
-                                                la línea es inválida */
-            return false;
-        }
-        if (Cant.getText() == null || Cant.getText().isBlank()) {/*revisa si el campo cantidad esta vacio
-                                                                 o en blanco y retorna false si esto es
-                                                                 asi*/
-            return false;
-        }
-        try {
-
-            if (Cant.getText().isBlank()) {
-                return false;
-            }
-            return Integer.parseInt(Cant.getText()) >= 1;
-
-        } catch (NumberFormatException ignore) {
-            return false;/*si el usuario puso un valor que no es un numero */
-        }
-    }
-
-    private String ConstruirVentaDirectoEnRequest(ComboBox<String> cbCliente,DatePicker dpFecha, ComboBox<TipoDePago> cbEstado,
-            TextField tfObs, VBox contLineas) {
-
-        // 1) Nombre (cliente/mesa/empresa)
-        String nombre = cbCliente.getEditor().getText();
-        if (nombre == null || nombre.isBlank()) {
-            nombre = cbCliente.getValue();
-        }
-        String nombreLimpio = (nombre == null ? "" : nombre.trim());
-
-        // 2) Estado y observaciones -> directo a VentaRequest
-        venta.setEstado(cbEstado.getValue());
-        venta.setFecha(dpFecha.getValue());
-        venta.setObservaciones(tfObs.getText() == null ? "" : tfObs.getText().trim());
-
-        // 3) Asegurar listas y limpiarlas
-        if (venta.getIdProductos() == null) {
-            venta.setIdProductos(new java.util.ArrayList<>());
-        } else {
-            venta.getIdProductos().clear();
-        }
-        if (venta.getCantidades() == null) {
-            venta.setCantidades(new java.util.ArrayList<>());
-        } else {
-            venta.getCantidades().clear();
-        }
-
-        // 4) Volcar cada fila válida usando tu FichaPedido(...)
-        for (var n : contLineas.getChildren()) {
-            if (n instanceof HBox fila) {
-                FichaPedido(fila).ifPresent(linea -> {
-                    venta.getIdProductos().add(linea.idProducto());
-                    venta.getCantidades().add(linea.cantidad());
-                });
-            }
-        }
-        // 5) El diálogo devuelve SOLO el nombre; Ventas resuelve idCliente y hace el POST
-        return nombreLimpio;
-    }
-
     private DatePicker crearSelectorFecha() {
         DatePicker dpFecha = new DatePicker();
 
@@ -730,32 +293,107 @@ public class Agregar {
         return dpFecha;
     }
 
-    private Optional<Formulario> FichaPedido(HBox fila) {
-        @SuppressWarnings("unchecked")
-        ComboBox<ProductosService.ProductoItem> ComboProducto /*comboproducto es la lista entera de todos
-                                                               los productos disponibles para elegir */
-                = (ComboBox<ProductosService.ProductoItem>) fila.getChildren().get(0);/*Esa línea agarra el primer elemento del HBox
-                                                                                             (que es un ComboBox de productos) y lo convierte
-                                                                                             al tipo correcto para poder usarlo */
-        TextField Cant = (TextField) fila.getChildren().get(1);/*obtiene la cantidad que es el
-                                                                     segundo elemento de fila y es un
-                                                                     textfield, un texto visual */
+    private void actualizarTotales(
+            VBox contLineas,
+            VBox contPagadores,
+            Label lblTotal,
+            Label lblRestante) {
+        System.out.println("ACTUALIZANDO");
+        double total
+                = CalculadoraVenta.calcularTotal(contLineas);
+int cantidadPagadores =
+        contPagadores.getChildren().size();
 
-        var ProdElegido = ComboProducto.getValue();/*se le asigna el producto que eligio el usuario de
-                                                   toda la lista de productos de comboproducto*/
-        if (ProdElegido == null) {/*si el usuario no eligio ningun producto y por lo tanto queda null */
-            return Optional.empty();/*Devuelve un Optional vacío para indicar que
-                                      no se construye ninguna LineaPedido */
+if (cantidadPagadores > 0) {
+
+    double base =
+            Math.floor((total / cantidadPagadores) * 100)
+            / 100;
+
+    double restanteDivision = total;
+
+    for (int i = 0; i < cantidadPagadores; i++) {
+
+        HBox fila =
+                (HBox) contPagadores
+                        .getChildren()
+                        .get(i);
+
+        TextField tfMonto =
+                (TextField) fila.getChildren().get(1);
+
+        double sugerencia;
+
+        if (i == cantidadPagadores - 1) {
+            sugerencia = restanteDivision;
+        } else {
+            sugerencia = base;
+            restanteDivision -= base;
         }
-        int CantElegida = Integer.parseInt(Cant.getText());/*convierte la cantidad que escribio el
-                                                               usuario de texto a un numero entero y lo
-                                                               guarda en CantElegida */
-        if (CantElegida >= 1) {/*si la cantidad elegida es mayor o igual a 1 */
-            return Optional.of(new Formulario(ProdElegido.id(), CantElegida));/*Devuelve un Optional
-                                                                                   con la línea de pedido
-                                                                                   construida */
+
+        tfMonto.setPromptText(
+                String.format("$ %.2f", sugerencia));
+    }
+}
+        lblTotal.setText("Total: $" + total);
+        System.out.println("TOTAL = " + total);
+        lblTotal.setText("Total: $" + total);
+        double pagado = 0;
+
+        for (Node n : contPagadores.getChildren()) {
+
+            HBox fila = (HBox) n;
+
+            TextField tfMonto
+                    = (TextField) fila.getChildren().get(1);
+
+            if (!tfMonto.getText().isBlank()) {
+
+                try {
+                    pagado += Double.parseDouble(
+                            tfMonto.getText());
+                } catch (NumberFormatException ex) {
+                }
+            }
         }
-        return Optional.empty();/*sino devuelve un Optional vacío para indicar que no se construye ninguna
-                                LineaPedido */
+        if (contPagadores.getChildren().isEmpty()) {
+
+    lblRestante.setVisible(false);
+    lblRestante.setManaged(false);
+
+    return;
+}
+
+// Si hay 2 o más pagadores, mostrar el label
+        lblRestante.setVisible(true);
+        lblRestante.setManaged(true);
+
+        double restante = total - pagado;
+
+        lblRestante.getStyleClass().removeAll(
+                "restante-pendiente",
+                "restante-completo",
+                "restante-excedido");
+
+        if (restante > 0) {
+            lblRestante.setText(
+                    String.format("Restan pagar: $%.2f", restante));
+
+            lblRestante.getStyleClass().add(
+                    "restante-pendiente");
+        } else if (restante < 0) {
+            lblRestante.setText(
+                    String.format(
+                            "El cliente está pagando de más: $%.2f",
+                            Math.abs(restante)));
+
+            lblRestante.getStyleClass().add(
+                    "restante-excedido");
+        } else {
+            lblRestante.setText("Pago completo");
+
+            lblRestante.getStyleClass().add(
+                    "restante-completo");
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 public class GastoVariableRequest {
     private LocalDate fecha;
     private String producto;
-    private BigDecimal cantidad;
+    private BigDecimal cantComprada;
     private String medida;
     private BigDecimal monto;
     private Boolean cargadoEnStock;
@@ -15,10 +15,10 @@ public class GastoVariableRequest {
     public GastoVariableRequest() {
     }
 
-    public GastoVariableRequest(LocalDate fecha, String producto, BigDecimal cantidad, String medida, BigDecimal monto) {
+    public GastoVariableRequest(LocalDate fecha, String producto, BigDecimal cantComprada, String medida, BigDecimal monto) {
         this.fecha = fecha;
         this.producto = producto;
-        this.cantidad = cantidad;
+        this.cantComprada = cantComprada;
         this.medida = medida;
         this.monto = monto;
     }
@@ -55,12 +55,12 @@ public class GastoVariableRequest {
         this.producto = producto;
     }
 
-    public BigDecimal getCantidad() {
-        return cantidad;
+    public BigDecimal getCantComprada() {
+        return cantComprada;
     }
 
-    public void setCantidad(BigDecimal cantidad) {
-        this.cantidad = cantidad;
+    public void setCantComprada(BigDecimal cantComprada) {
+        this.cantComprada = cantComprada;
     }
 
     public String getMedida() {

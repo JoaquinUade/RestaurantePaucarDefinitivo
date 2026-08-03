@@ -139,7 +139,7 @@ public class EmpresasClientes extends BorderPane {
 
                 String nombre = (String) resultado[0];/*Obtiene el nombre ingresado del diálogo*/
                 TipoCliente tipo = (TipoCliente) resultado[1];/*obtiene el tipo ingresado en el dialogo */
-                System.out.println("Tipo elegido: " + tipo);
+              
                 clientesService.crearClienteSiNoExiste(nombre, tipo);/*Crea el cliente si no existe
                                                                       previamente*/
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */

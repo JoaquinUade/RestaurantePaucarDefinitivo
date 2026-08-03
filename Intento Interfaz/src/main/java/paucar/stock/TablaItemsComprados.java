@@ -78,7 +78,7 @@ public class TablaItemsComprados {
         colCantidad.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue()
-                                .getCantidad()
+                                .getCantComprada()
                                 .stripTrailingZeros()
                                 .toPlainString()
                         + " "

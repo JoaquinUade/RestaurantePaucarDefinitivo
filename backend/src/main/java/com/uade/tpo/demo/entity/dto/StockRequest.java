@@ -7,25 +7,32 @@ public class StockRequest {
     private Long categoriaId;
     private String nombreProducto;
 
+    private BigDecimal cantComprada;
+    private String unidadCantComprada;
+
     private BigDecimal cantidad;
     private String unidadCantidad;
 
-    private BigDecimal stockMinimo;
-    private String unidadStockMinimo;
-
     private Long gastoVariableId;
-
+    private BigDecimal stockMinimo;
     public StockRequest() {
     }
 
-    public StockRequest(Long categoriaId, String nombreProducto, BigDecimal cantidad,
-            String unidadCantidad, BigDecimal stockMinimo, String unidadStockMinimo) {
+    public StockRequest(
+            Long categoriaId,
+            String nombreProducto,
+            BigDecimal cantComprada,
+            String unidadCantComprada,
+            BigDecimal cantidad,
+            String unidadCantidad,
+            BigDecimal stockMinimo) {
         this.categoriaId = categoriaId;
         this.nombreProducto = nombreProducto;
+        this.cantComprada = cantComprada;
+        this.unidadCantComprada = unidadCantComprada;
         this.cantidad = cantidad;
         this.unidadCantidad = unidadCantidad;
         this.stockMinimo = stockMinimo;
-        this.unidadStockMinimo = unidadStockMinimo;
     }
 
     public Long getCategoriaId() {
@@ -44,6 +51,22 @@ public class StockRequest {
         this.nombreProducto = nombreProducto;
     }
 
+    public BigDecimal getCantComprada() {
+        return cantComprada;
+    }
+
+    public void setCantComprada(BigDecimal cantidad) {
+        this.cantComprada = cantidad;
+    }
+
+    public String getUnidadCantComprada() {
+        return unidadCantComprada;
+    }
+
+    public void setUnidadCantComprada(String unidadCantComprada) {
+        this.unidadCantComprada = unidadCantComprada;
+    }
+
     public BigDecimal getCantidad() {
         return cantidad;
     }
@@ -60,27 +83,19 @@ public class StockRequest {
         this.unidadCantidad = unidadCantidad;
     }
 
-    public BigDecimal getStockMinimo() {
-        return stockMinimo;
-    }
-
-    public void setStockMinimo(BigDecimal stockMinimo) {
-        this.stockMinimo = stockMinimo;
-    }
-
-    public String getUnidadStockMinimo() {
-        return unidadStockMinimo;
-    }
-
-    public void setUnidadStockMinimo(String unidadStockMinimo) {
-        this.unidadStockMinimo = unidadStockMinimo;
-    }
-
     public Long getGastoVariableId() {
         return gastoVariableId;
     }
 
     public void setGastoVariableId(Long gastoVariableId) {
         this.gastoVariableId = gastoVariableId;
+    }
+
+    public BigDecimal getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(BigDecimal stockMinimo) {
+        this.stockMinimo = stockMinimo;
     }
 }

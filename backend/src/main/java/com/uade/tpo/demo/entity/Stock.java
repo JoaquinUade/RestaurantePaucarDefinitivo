@@ -18,23 +18,26 @@ public class Stock {
     private CategoriaGastoVariable categoriaGastoVariable;
 
     @OneToOne
-    @JoinColumn(name = "id_gasto_variable", nullable = false, unique = true)
+    @JoinColumn(name = "id_gasto_variable", unique = true)
     private GastosVariables gastoVariable;
 
     @Column(name = "nombre_producto", nullable = false)
     private String nombreProducto;
 
+    @Column(name = "cant_comprada", nullable = false, precision = 19, scale = 4)
+    private BigDecimal cantComprada;
+
     @Column(name = "cantidad", nullable = false, precision = 19, scale = 4)
     private BigDecimal cantidad;
 
-    @Column(name = "stock_minimo", nullable = false, precision = 19, scale = 4)
-    private BigDecimal stockMinimo;
+    @Column(name = "unidad_cant_comprada")
+    private String unidadCantComprada;
 
     @Column(name = "unidad_cantidad")
     private String unidadCantidad;
 
-    @Column(name = "unidad_stock_minimo")
-    private String unidadStockMinimo;
+    @Column(name = "stock_minimo", nullable = false, precision = 19, scale = 4)
+    private BigDecimal stockMinimo;
 
     @Column(name = "fecha")
     private LocalDate fecha;
@@ -42,16 +45,21 @@ public class Stock {
     public Stock() {
     }
 
-    public Stock(CategoriaGastoVariable categoriaGastoVariable, String nombreProducto,
-            BigDecimal cantidad, BigDecimal stockMinimo, String unidadCantidad,
-            String unidadStockMinimo) {
+    public Stock(CategoriaGastoVariable categoriaGastoVariable,
+            String nombreProducto,
+            BigDecimal cantComprada,
+            BigDecimal cantidad,
+            BigDecimal stockMinimo,
+            String unidadCantComprada,
+            String unidadCantidad) {
 
         this.categoriaGastoVariable = categoriaGastoVariable;
         this.nombreProducto = nombreProducto;
+        this.cantComprada = cantComprada;
         this.cantidad = cantidad;
         this.stockMinimo = stockMinimo;
+        this.unidadCantComprada = unidadCantComprada;
         this.unidadCantidad = unidadCantidad;
-        this.unidadStockMinimo = unidadStockMinimo;
     }
 
     public Long getIdStock() {
@@ -78,6 +86,14 @@ public class Stock {
         this.nombreProducto = nombreProducto;
     }
 
+    public BigDecimal getCantComprada() {
+        return cantComprada;
+    }
+
+    public void setCantComprada(BigDecimal cantidad) {
+        this.cantComprada = cantidad;
+    }
+
     public BigDecimal getCantidad() {
         return cantidad;
     }
@@ -86,12 +102,12 @@ public class Stock {
         this.cantidad = cantidad;
     }
 
-    public BigDecimal getStockMinimo() {
-        return stockMinimo;
+    public String getUnidadCantComprada() {
+        return unidadCantComprada;
     }
 
-    public void setStockMinimo(BigDecimal stockMinimo) {
-        this.stockMinimo = stockMinimo;
+    public void setUnidadCantComprada(String unidadCantidad) {
+        this.unidadCantComprada = unidadCantidad;
     }
 
     public String getUnidadCantidad() {
@@ -102,20 +118,20 @@ public class Stock {
         this.unidadCantidad = unidadCantidad;
     }
 
-    public String getUnidadStockMinimo() {
-        return unidadStockMinimo;
-    }
-
-    public void setUnidadStockMinimo(String unidadStockMinimo) {
-        this.unidadStockMinimo = unidadStockMinimo;
-    }
-
     public GastosVariables getGastoVariable() {
         return gastoVariable;
     }
 
     public void setGastoVariable(GastosVariables gastoVariable) {
         this.gastoVariable = gastoVariable;
+    }
+
+    public BigDecimal getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(BigDecimal stockMinimo) {
+        this.stockMinimo = stockMinimo;
     }
 
     public LocalDate getFecha() {

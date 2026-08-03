@@ -116,33 +116,25 @@ public class Resumen extends BorderPane {
 
     public void actualizarDatos() {
 
-        System.out.println("ENTRO A ACTUALIZARDATOS");
-
         if (vistaMensualClientes != null) {
-            System.out.println("MENSUAL CLIENTES");
             vistaMensualClientes.refrescar();
         }
 
         if (vistaMensualEmpresas != null) {
-            System.out.println("MENSUAL EMPRESAS");
             vistaMensualEmpresas.refrescar();
         }
 
         if (vistaSemanalClientes != null) {
-            System.out.println("SEMANAL CLIENTES");
             vistaSemanalClientes.refrescar();
         }
 
         if (vistaSemanalEmpresas != null) {
-            System.out.println("SEMANAL EMPRESAS");
             vistaSemanalEmpresas.refrescar();
         }
         if(vistaMensualGeneral != null){
-            System.out.println("MENSUAL GENERAL");
             vistaMensualGeneral.refrescar();
         }
         if(vistaSemanalGeneral != null){
-System.out.println("SEMANAL GENERAL");
 vistaSemanalGeneral.refrescar();
 
         }

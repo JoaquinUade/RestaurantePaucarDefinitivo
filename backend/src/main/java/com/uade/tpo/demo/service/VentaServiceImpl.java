@@ -39,7 +39,6 @@ public class VentaServiceImpl implements VentaService {
     @Override
     public Venta crearVenta(VentaRequest ventaRequest) {
         // Obtener el cliente
-        System.out.println("Fecha recibida = " + ventaRequest.getFecha());
         Cliente cliente = clienteRepository.findById(ventaRequest.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
@@ -57,8 +56,6 @@ public class VentaServiceImpl implements VentaService {
             // Si el producto ya existe en el mapa, sumamos la cantidad
             if (productosMap.containsKey(idProducto)) {
                 productosMap.put(idProducto, productosMap.get(idProducto) + cantidad);
-                System.out.println("Producto duplicado encontrado - ID: " + idProducto
-                        + ", sumando " + cantidad + " unidades. Total: " + productosMap.get(idProducto));
             } else {
                 productosMap.put(idProducto, cantidad);
             }

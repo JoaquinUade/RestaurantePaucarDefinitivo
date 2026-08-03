@@ -114,7 +114,7 @@ public class GastosVariablesView extends VBox {
             original.setFecha(gastoSeleccionado.getFecha());
             original.setCategoriaId(gastoSeleccionado.getCategoria().getIdCategoria());
             original.setProducto(gastoSeleccionado.getProducto());
-            original.setCantidad(gastoSeleccionado.getCantidad());
+            original.setCantComprada(gastoSeleccionado.getCantComprada());
             original.setMedida(gastoSeleccionado.getMedida());
             original.setMonto(gastoSeleccionado.getMonto());
 

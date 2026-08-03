@@ -325,8 +325,6 @@ public final class Ventas extends BorderPane {
                 recargarDelBackend();/*recargá la tabla para que aparezca el nuevo pedido que se acaba de
                                      guardar */
 
-                System.out.println("VENTA GUARDADA");
-
                 if (resumen == null) {
                     System.out.println("RESUMEN NULL");
                 } else {

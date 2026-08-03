@@ -20,8 +20,8 @@ public class GastosVariables {
     @Column(name = "producto", nullable = false)
     private String producto;
 
-    @Column(name = "cantidad", nullable = false, precision = 19, scale = 4)
-    private BigDecimal cantidad;
+    @Column(name = "cant_comprada", nullable = false, precision = 19, scale = 4)
+    private BigDecimal cantComprada;
 
     @Column(name = "medida")
     private String medida;
@@ -38,10 +38,10 @@ public class GastosVariables {
     public GastosVariables() {
     }
 
-    public GastosVariables(LocalDate fecha, String producto, BigDecimal cantidad, String medida, BigDecimal monto) {
+    public GastosVariables(LocalDate fecha, String producto, BigDecimal cantComprada, String medida, BigDecimal monto) {
         this.fecha = fecha;
         this.producto = producto;
-        this.cantidad = cantidad;
+        this.cantComprada = cantComprada;
         this.medida = medida;
         this.monto = monto;
     }
@@ -77,12 +77,12 @@ public class GastosVariables {
         this.producto = producto;
     }
 
-    public BigDecimal getCantidad() {
-        return cantidad;
+    public BigDecimal getCantComprada() {
+        return cantComprada;
     }
 
-    public void setCantidad(BigDecimal cantidad) {
-        this.cantidad = cantidad;
+    public void setCantComprada(BigDecimal cantComprada) {
+        this.cantComprada = cantComprada;
     }
 
     public String getMedida() {

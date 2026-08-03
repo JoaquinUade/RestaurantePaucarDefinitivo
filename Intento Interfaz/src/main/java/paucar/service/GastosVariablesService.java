@@ -56,38 +56,46 @@ public class GastosVariablesService {
         try {
             String json = mapper.writeValueAsString(gasto);
 
+            System.out.println("JSON ENVIADO:");
+            System.out.println(json);
+
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            http.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("STATUS: " + response.statusCode());
+            System.out.println("BODY: " + response.body());
 
         } catch (IOException | InterruptedException e) {
             System.err.println("Error creando gasto: " + e.getMessage());
         }
     }
 // ✅ EDITAR
-public void editar(Long id, GastoVariableRequest gasto) {
-    try {
-        String json = mapper.writeValueAsString(gasto);
 
-        var request = HttpRequest.newBuilder()
-        .uri(URI.create(BASE_URL + "/" + id))
-        .header("Content-Type", "application/json")
-        .method(
-                "PATCH",
-                HttpRequest.BodyPublishers.ofString(json)
-        )
-        .build();
+    public void editar(Long id, GastoVariableRequest gasto) {
+        try {
+            String json = mapper.writeValueAsString(gasto);
 
-        http.send(request, HttpResponse.BodyHandlers.ofString());
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/" + id))
+                    .header("Content-Type", "application/json")
+                    .method(
+                            "PATCH",
+                            HttpRequest.BodyPublishers.ofString(json)
+                    )
+                    .build();
 
-    } catch (IOException | InterruptedException e) {
-        System.err.println("Error editando gasto: " + e.getMessage());
+            http.send(request, HttpResponse.BodyHandlers.ofString());
+
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error editando gasto: " + e.getMessage());
+        }
     }
-}
+
     // ✅ ELIMINAR (opcional por ahora)
     public void eliminar(Long id) {
         try {

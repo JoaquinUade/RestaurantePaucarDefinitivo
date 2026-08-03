@@ -1,7 +1,6 @@
 package com.uade.tpo.demo.service.impl;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
-import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
@@ -44,36 +43,39 @@ public class StockServiceImpl implements StockService {
         CategoriaGastoVariable categoria = categoriaRepository.findById(request.getCategoriaId())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + request.getCategoriaId()));
 
-        BigDecimal cantidad = request.getCantidad() != null ? request.getCantidad() : BigDecimal.ZERO;
-        BigDecimal stockMinimo = request.getStockMinimo() != null ? request.getStockMinimo() : BigDecimal.ZERO;
-        if (cantidad.signum() == 0) {
-            throw new IllegalArgumentException("La cantidad debe ser distinta de cero");
-        }
+        BigDecimal cantComprada = request.getCantComprada() != null
+                ? request.getCantComprada()
+                : BigDecimal.ZERO;
+
+        BigDecimal cantidad = request.getCantidad() != null
+                ? request.getCantidad()
+                : BigDecimal.ZERO;
+        BigDecimal stockMinimo = request.getStockMinimo() != null
+                ? request.getStockMinimo()
+                : BigDecimal.ZERO;
+        
+        System.out.println("UNIDAD CANTIDAD = "+ request.getUnidadCantidad());
         if (cantidad.signum() < 0) {
             throw new IllegalArgumentException("No se puede crear stock con una cantidad negativa");
         }
-        GastosVariables gasto = gastosVariablesRepository
-                .findById(request.getGastoVariableId())
-                .orElseThrow(()
-                        -> new IllegalArgumentException(
-                        "Gasto no encontrado con id: "
-                        + request.getGastoVariableId()));
+
         Stock stock = new Stock(
                 categoria,
                 request.getNombreProducto().trim(),
+                cantComprada,
                 cantidad,
                 stockMinimo,
-                request.getUnidadCantidad(),
-                request.getUnidadStockMinimo()
+                request.getUnidadCantComprada(),
+                request.getUnidadCantidad()
         );
-        stock.setGastoVariable(gasto);
-        stock.setFecha(gasto.getFecha());
+        System.out.println("STOCK UNIDAD = "+ stock.getUnidadCantidad());
+        stock.setFecha(LocalDate.now());
 
         Stock stockGuardado = stockRepository.save(stock);
 
         HistorialStock historial = new HistorialStock();
         historial.setStock(stockGuardado);
-        historial.setCantidad(stock.getStockMinimo());
+        historial.setCantidad(stock.getCantComprada());
 
         historial.setFecha(stockGuardado.getFecha());
 
@@ -82,53 +84,55 @@ public class StockServiceImpl implements StockService {
         return stockGuardado;
     }
 
- @Override
-public Stock ajustarStockDisponible( Long id, BigDecimal stockDisponible, LocalDate fecha) {
-System.out.println(
-        "AJUSTANDO STOCK: "
-        + id
-        + " -> "
-        + stockDisponible);
-    Stock stock = stockRepository.findById(id)
-            .orElseThrow(() ->
-                    new IllegalArgumentException(
-                            "Stock no encontrado con id: "
-                                    + id));
+    @Override
+    public Stock ajustarStockDisponible(Long id, BigDecimal stockDisponible, LocalDate fecha) {
+        System.out.println(
+                "AJUSTANDO STOCK: "
+                + id
+                + " -> "
+                + stockDisponible);
+        Stock stock = stockRepository.findById(id)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado con id: "
+                        + id));
 
-    if (stockDisponible == null) {
-        throw new IllegalArgumentException(
-                "La cantidad no puede ser nula");
+        if (stockDisponible == null) {
+            throw new IllegalArgumentException(
+                    "La cantidad no puede ser nula");
+        }
+
+        if (stockDisponible.signum() < 0) {
+            throw new IllegalArgumentException(
+                    "La cantidad no puede ser negativa");
+        }
+
+        stock.setCantidad(stockDisponible);
+
+        HistorialStock historial = new HistorialStock();
+        historial.setStock(stock);
+        historial.setCantidad(stockDisponible);
+        historial.setFecha(fecha);
+
+        historialStockRepository.save(historial);
+
+        return stockRepository.save(stock);
     }
-
-    if (stockDisponible.signum() < 0) {
-        throw new IllegalArgumentException(
-                "La cantidad no puede ser negativa");
-    }
-
-    stock.setStockMinimo(stockDisponible);
-
-    HistorialStock historial = new HistorialStock();
-    historial.setStock(stock);
-    historial.setCantidad(stockDisponible);
-    historial.setFecha(fecha);
-
-    historialStockRepository.save(historial);
-
-    return stockRepository.save(stock);
-}
 
     @Override
     public Stock modificarStock(Long id, Stock stockActualizado) {
         Stock stock = stockRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Stock no encontrado con id: " + id));
 
+        if (stockActualizado.getCantComprada() != null) {
+            stock.setCantComprada(stockActualizado.getCantComprada());
+        }
         if (stockActualizado.getCantidad() != null) {
             stock.setCantidad(stockActualizado.getCantidad());
         }
         if (stockActualizado.getStockMinimo() != null) {
             stock.setStockMinimo(stockActualizado.getStockMinimo());
         }
-
         if (stockActualizado.getFecha() != null) {
             stock.setFecha(stockActualizado.getFecha());
         }
@@ -140,12 +144,12 @@ System.out.println(
                     .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada con id: " + stockActualizado.getCategoriaGastoVariable().getIdCategoria()));
             stock.setCategoriaGastoVariable(categoria);
         }
-        if (stockActualizado.getUnidadCantidad() != null) {
-            stock.setUnidadCantidad(stockActualizado.getUnidadCantidad());
+        if (stockActualizado.getUnidadCantComprada() != null) {
+            stock.setUnidadCantComprada(stockActualizado.getUnidadCantComprada());
         }
 
-        if (stockActualizado.getUnidadStockMinimo() != null) {
-            stock.setUnidadStockMinimo(stockActualizado.getUnidadStockMinimo());
+        if (stockActualizado.getUnidadCantidad() != null) {
+            stock.setUnidadCantidad(stockActualizado.getUnidadCantidad());
         }
 
         return stockRepository.save(stock);

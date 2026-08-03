@@ -156,44 +156,57 @@ public class StockService {
     }
 
     // EDITAR
-    public void editar(
-            Long id,
-            Stock stock) {
+  public void editar(
+        Long id,
+        Stock stock) {
 
-        try {
-            System.out.println("EDITANDO STOCK " + id);
-            String json
-                    = mapper.writeValueAsString(stock);
+    try {
 
-            var request = HttpRequest.newBuilder()
-                    .uri(
-                            URI.create(
-                                    BASE_URL + "/" + id
-                            )
-                    )
-                    .header(
-                            "Content-Type",
-                            "application/json"
-                    )
-                    .PUT(
-                            HttpRequest.BodyPublishers
-                                    .ofString(json)
-                    )
-                    .build();
+        System.out.println("EDITANDO STOCK " + id);
 
-            http.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofString()
-            );
+        String json
+                = mapper.writeValueAsString(stock);
 
-        } catch (IOException | InterruptedException e) {
+        System.out.println("JSON EDITAR:");
+        System.out.println(json);
 
-            System.err.println(
-                    "Error editando stock: "
-                    + e.getMessage()
-            );
-        }
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL + "/" + id
+                        )
+                )
+                .header(
+                        "Content-Type",
+                        "application/json"
+                )
+                .PUT(
+                        HttpRequest.BodyPublishers
+                                .ofString(json)
+                )
+                .build();
+
+        var response = http.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+        );
+
+        System.out.println(
+                "STATUS PUT: "
+                + response.statusCode());
+
+        System.out.println(
+                "BODY PUT: "
+                + response.body());
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error editando stock: "
+                + e.getMessage()
+        );
     }
+}
 
     // ELIMINAR
     public void eliminar(Long id) {

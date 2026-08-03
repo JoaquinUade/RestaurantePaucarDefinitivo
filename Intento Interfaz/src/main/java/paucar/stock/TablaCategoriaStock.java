@@ -5,28 +5,39 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.uade.tpo.demo.entity.CategoriaGastoVariable;
+import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
+import paucar.service.CategoriasGastosService;
+import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
 
 public class TablaCategoriaStock extends VBox {
 
-    public TablaCategoriaStock(List<Stock> stocks, Consumer<Stock> onSelect,
-                               boolean modoDiario, StockService stockService,
-                               LocalDate fechaSeleccionada) {
-      
+    public TablaCategoriaStock(
+            List<Stock> stocks,
+            Consumer<Stock> onSelect,
+            boolean modoDiario,
+            StockService stockService,
+            GastosVariablesService gastosVariablesService,
+            CategoriasGastosService categoriasService,
+            LocalDate fechaSeleccionada) {
+
         TableView<Stock> tabla = new TableView<>();
         tabla.setEditable(modoDiario);
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
+        tabla.setPrefWidth(400);
         // PRODUCTO
         TableColumn<Stock, String> colProducto
                 = new TableColumn<>("Producto");
@@ -36,11 +47,10 @@ public class TablaCategoriaStock extends VBox {
                         c.getValue()
                                 .getNombreProducto()));
 
-        // CANTIDAD
-        TableColumn<Stock, String> colCantComprada
-                = new TableColumn<>("Cantidad comprada");
+        TableColumn<Stock, String> colCantidadStock
+                = new TableColumn<>("Stock actual");
 
-        colCantComprada.setCellValueFactory(c -> {
+        colCantidadStock.setCellValueFactory(c -> {
 
             Stock stock = c.getValue();
 
@@ -66,60 +76,113 @@ public class TablaCategoriaStock extends VBox {
                     .stripTrailingZeros()
                     .toPlainString();
 
-            if (!modoDiario) {
-                texto += " " + stock.getUnidadStockMinimo();
-            }
-
             return new SimpleStringProperty(texto);
         });
 
-        // UNIDAD
-        TableColumn<Stock, String> colUnidad
-                = new TableColumn<>("Unidad");
+        TableColumn<Stock, Void> colSubir
+                = new TableColumn<>("+");
 
-        colUnidad.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue().getUnidadStockMinimo()));
-        
+        colSubir.setCellFactory(param -> new TableCell<>() {
+
+            private final Button btn = new Button("+");
+
+            {
+                btn.setOnAction(event -> {
+
+                    Stock stock = getTableView()
+                            .getItems()
+                            .get(getIndex());
+
+                    List<GastosVariables> gastos
+                            = gastosVariablesService.obtenerTodos();
+
+                    List<CategoriaGastoVariable> categorias
+                            = categoriasService.obtenerCategorias();
+
+                    BigDecimal cantidadIngresada
+                            = DialogSumarStock.mostrar(
+                                    categorias,
+                                    gastos);
+
+                    if (cantidadIngresada != null) {
+
+                        System.out.println(
+                                "STOCK: "
+                                + stock.getNombreProducto()
+                        );
+
+                        BigDecimal nuevaCantidad
+                                = stock.getCantidad()
+                                        .add(cantidadIngresada);
+
+                        System.out.println(
+                                "NUEVA CANTIDAD: "
+                                + nuevaCantidad);
+                        stockService.ajustarStockDisponible(
+                                stock.getIdStock(),
+                                nuevaCantidad,
+                                fechaSeleccionada);
+                        stock.setCantidad(nuevaCantidad);
+                        tabla.refresh();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(
+                    Void item,
+                    boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
         tabla.getColumns().add(colProducto);
 
         if (modoDiario) {
-                 colMinimo.setCellFactory(
-                TextFieldTableCell.forTableColumn());
-                colMinimo.setOnEditCommit(event -> {
+            colMinimo.setCellFactory(
+                    TextFieldTableCell.forTableColumn());
+            colMinimo.setOnEditCommit(event -> {
 
-            Stock stock = event.getRowValue();
+                Stock stock = event.getRowValue();
 
-            try {
+                try {
 
-                BigDecimal nuevoMinimo
-                        = new BigDecimal(
-                                event.getNewValue());
+                    BigDecimal nuevoMinimo
+                            = new BigDecimal(
+                                    event.getNewValue());
 
-                stock.setStockMinimo(nuevoMinimo);
+                    stock.setCantidad(nuevoMinimo);
 
-                stock.setFecha(fechaSeleccionada);
+                    stock.setFecha(fechaSeleccionada);
 
-                stockService.ajustarStockDisponible(
-                        stock.getIdStock(),
-                        nuevoMinimo,
-                        fechaSeleccionada);
+                    stockService.ajustarStockDisponible(
+                            stock.getIdStock(),
+                            nuevoMinimo,
+                            LocalDate.now());
 
-                tabla.refresh();
+                    tabla.refresh();
 
-            } catch (Exception e) {
+                } catch (Exception e) {
 
-                System.err.println(
-                        "Error al editar stock mínimo: "
-                        + e.getMessage());
-            }
-        });
+                    System.err.println(
+                            "Error al editar stock mínimo: "
+                            + e.getMessage());
+                }
+            });
+            tabla.getColumns().add(colCantidadStock);
             tabla.getColumns().add(colMinimo);
-            tabla.getColumns().add(colUnidad);
+            tabla.getColumns().add(colSubir);
         } else {
 
-            tabla.getColumns().add(colCantComprada);
+            tabla.getColumns().add(colCantidadStock);
             tabla.getColumns().add(colMinimo);
+            tabla.getColumns().add(colSubir);
         }
 
         tabla.setItems(

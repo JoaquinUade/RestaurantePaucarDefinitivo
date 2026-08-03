@@ -102,9 +102,9 @@ fecha.getStyleClass().add("date-agregar");
 
                     // ✅ número (ej: 3 / 2 / 1.5)
                     try {
-                        req.setCantidad(new java.math.BigDecimal(matcher.group(1)));
+                        req.setCantComprada(new java.math.BigDecimal(matcher.group(1)));
                     } catch (Exception e) {
-                        req.setCantidad(java.math.BigDecimal.ZERO);
+                        req.setCantComprada(java.math.BigDecimal.ZERO);
                     }
 
                     // ✅ medida (ej: kg / litros / packs)
@@ -174,7 +174,7 @@ fecha.getStyleClass().add("date-agregar");
                 .ifPresent(combo::setValue);
 
         TextField txtNombre = new TextField(original.getProducto());
-        String cantidadLimpia = original.getCantidad()
+        String cantidadLimpia = original.getCantComprada()
                 .stripTrailingZeros()
                 .toPlainString();
 
@@ -223,9 +223,9 @@ fecha.getStyleClass().add("date-agregar");
 
                 if (matcher.matches()) {
                     try {
-                        req.setCantidad(new java.math.BigDecimal(matcher.group(1)));
+                        req.setCantComprada(new java.math.BigDecimal(matcher.group(1)));
                     } catch (Exception e) {
-                        req.setCantidad(java.math.BigDecimal.ZERO);
+                        req.setCantComprada(java.math.BigDecimal.ZERO);
                     }
 
                     req.setMedida(matcher.group(2).trim());

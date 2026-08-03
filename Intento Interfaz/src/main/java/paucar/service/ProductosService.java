@@ -20,12 +20,8 @@ public class ProductosService {
     private final VentaRequest venta;
 
     // --- DTOs internos ---
-    public record ProductoItem(Long id, String nombre) {/*Un record (Java 16+) es una forma corta de declarar
-                                                       una clase pensada para transportar datos (lo que antes
-                                                       llamábamos “DTO”) 
-                                                       la idea de un record es evitar escribir todo el codigo
-                                                       repetitivo del constructor, getters, equals/hashCode, 
-                                                       toString.*/
+    public record ProductoItem(Long id, String nombre, double precio) {
+
     }
 
     public ProductosService(String BASE_URL, VentaRequest venta) {
@@ -71,13 +67,21 @@ public class ProductosService {
                         String nombre = n.hasNonNull("nombre")
                                 ? n.get("nombre").asText()
                                 : null;
-
+                        double precio = n.hasNonNull("precio")
+                                ? n.get("precio").asDouble()
+                                : 0;
                         if (id != null && nombre != null && !nombre.isBlank()) {
                             // Excluir productos ya presentes en la venta
                             if (idsSeleccionados.contains(id)) {
                                 continue;
                             }
-                            out.add(new ProductoItem(id, nombre.trim()));
+                            out.add(
+                                    new ProductoItem(
+                                            id,
+                                            nombre.trim(),
+                                            precio
+                                    )
+                            );
                         }
                     }
                 }
