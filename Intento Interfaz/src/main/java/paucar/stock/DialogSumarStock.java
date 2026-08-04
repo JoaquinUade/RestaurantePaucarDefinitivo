@@ -21,6 +21,8 @@ import javafx.scene.layout.VBox;
 
 public class DialogSumarStock {
 
+    private static GastosVariables ultimoGastoSeleccionado;
+
     public static BigDecimal mostrar(
             List<CategoriaGastoVariable> categorias,
             List<GastosVariables> gastos) {
@@ -76,6 +78,8 @@ public class DialogSumarStock {
 
         TableView<GastosVariables> tabla
                 = new TableView<>();
+        final GastosVariables[] gastoSeleccionado
+                = new GastosVariables[1];
 
         TextField txtCantidad = new TextField();
         txtCantidad.setText("0");
@@ -109,7 +113,11 @@ public class DialogSumarStock {
                 colProducto,
                 colCantidad,
                 colMedida);
-
+        tabla.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldValue, newValue) -> {
+                    gastoSeleccionado[0] = newValue;
+                });
         comboCategoria.setOnAction(e -> {
 
             CategoriaGastoVariable categoria
@@ -119,15 +127,16 @@ public class DialogSumarStock {
                 return;
             }
 
-            List<GastosVariables> filtrados
-                    = gastos.stream()
-                            .filter(g
-                                    -> g.getCategoria() != null
-                            && g.getCategoria()
-                                    .getIdCategoria()
-                                    .equals(
-                                            categoria.getIdCategoria()))
-                            .toList();
+            List<GastosVariables> filtrados = gastos.stream()
+                    .filter(g
+                            -> g.getCategoria() != null
+                    && g.getCategoria()
+                            .getIdCategoria()
+                            .equals(
+                                    categoria.getIdCategoria())
+                    && !Boolean.TRUE.equals(
+                            g.getCargadoEnStock()))
+                    .toList();
 
             tabla.setItems(
                     FXCollections.observableArrayList(
@@ -145,7 +154,12 @@ public class DialogSumarStock {
         dialog.setResultConverter(btn -> {
 
             if (btn == btnGuardar) {
+                if (gastoSeleccionado[0] == null) {
+                    return null;
+                }
 
+                ultimoGastoSeleccionado
+                        = gastoSeleccionado[0];
                 try {
 
                     return new BigDecimal(
@@ -163,5 +177,9 @@ public class DialogSumarStock {
 
         return dialog.showAndWait()
                 .orElse(null);
+    }
+
+    public static GastosVariables getUltimoGastoSeleccionado() {
+        return ultimoGastoSeleccionado;
     }
 }

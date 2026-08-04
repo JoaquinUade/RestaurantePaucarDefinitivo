@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
+import com.uade.tpo.demo.entity.GastoVariableRequest;
 import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 
@@ -103,26 +104,50 @@ public class TablaCategoriaStock extends VBox {
                             = DialogSumarStock.mostrar(
                                     categorias,
                                     gastos);
-
+                    GastosVariables gastoUtilizado
+                            = DialogSumarStock.getUltimoGastoSeleccionado();
                     if (cantidadIngresada != null) {
-
-                        System.out.println(
-                                "STOCK: "
-                                + stock.getNombreProducto()
-                        );
 
                         BigDecimal nuevaCantidad
                                 = stock.getCantidad()
                                         .add(cantidadIngresada);
 
-                        System.out.println(
-                                "NUEVA CANTIDAD: "
-                                + nuevaCantidad);
                         stockService.ajustarStockDisponible(
                                 stock.getIdStock(),
                                 nuevaCantidad,
                                 fechaSeleccionada);
                         stock.setCantidad(nuevaCantidad);
+                        if (gastoUtilizado != null) {
+
+                            GastoVariableRequest request
+                                    = new GastoVariableRequest();
+
+                            request.setFecha(
+                                    gastoUtilizado.getFecha());
+
+                            request.setProducto(
+                                    gastoUtilizado.getProducto());
+
+                            request.setCantComprada(
+                                    gastoUtilizado.getCantComprada());
+
+                            request.setMedida(
+                                    gastoUtilizado.getMedida());
+
+                            request.setMonto(
+                                    gastoUtilizado.getMonto());
+
+                            request.setCategoriaId(
+                                    gastoUtilizado.getCategoria() != null
+                                    ? gastoUtilizado.getCategoria().getIdCategoria()
+                                    : null);
+
+                            request.setCargadoEnStock(true);
+                            request.setStockId(stock.getIdStock());
+                            gastosVariablesService.editar(
+                                    gastoUtilizado.getIdGastoVariable(),
+                                    request);
+                        }
                         tabla.refresh();
                     }
                 });
@@ -142,6 +167,61 @@ public class TablaCategoriaStock extends VBox {
                 }
             }
         });
+        TableColumn<Stock, Void> colBajar
+        = new TableColumn<>("-");
+
+colBajar.setCellFactory(param -> new TableCell<>() {
+
+    private final Button btn = new Button("-");
+
+    {
+        btn.setOnAction(event -> {
+
+    Stock stock = getTableView()
+            .getItems()
+            .get(getIndex());
+
+    BigDecimal cantidadARestar =
+            DialogRestarStock.mostrar(
+                    stock.getNombreProducto(),
+                    stock.getCantidad());
+
+    if (cantidadARestar != null) {
+
+        BigDecimal nuevaCantidad =
+                stock.getCantidad()
+                        .subtract(cantidadARestar);
+
+        if (nuevaCantidad.compareTo(BigDecimal.ZERO) < 0) {
+            nuevaCantidad = BigDecimal.ZERO;
+        }
+
+        stockService.ajustarStockDisponible(
+                stock.getIdStock(),
+                nuevaCantidad,
+                fechaSeleccionada);
+
+        stock.setCantidad(nuevaCantidad);
+
+        tabla.refresh();
+    }
+});
+    }
+
+    @Override
+    protected void updateItem(
+            Void item,
+            boolean empty) {
+
+        super.updateItem(item, empty);
+
+        if (empty) {
+            setGraphic(null);
+        } else {
+            setGraphic(btn);
+        }
+    }
+});
         tabla.getColumns().add(colProducto);
 
         if (modoDiario) {
@@ -178,11 +258,13 @@ public class TablaCategoriaStock extends VBox {
             tabla.getColumns().add(colCantidadStock);
             tabla.getColumns().add(colMinimo);
             tabla.getColumns().add(colSubir);
+            tabla.getColumns().add(colBajar);
         } else {
 
             tabla.getColumns().add(colCantidadStock);
             tabla.getColumns().add(colMinimo);
             tabla.getColumns().add(colSubir);
+            tabla.getColumns().add(colBajar);
         }
 
         tabla.setItems(

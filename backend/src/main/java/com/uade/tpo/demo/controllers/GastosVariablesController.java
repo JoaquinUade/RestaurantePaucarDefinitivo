@@ -24,8 +24,9 @@ public class GastosVariablesController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<GastosVariables> modificar(@PathVariable Long id, @RequestBody GastosVariables gasto) {
-        GastosVariables mod = gastosVariablesService.modificarGastoVariable(id, gasto);
+    public ResponseEntity<GastosVariables> modificar(@PathVariable Long id,
+            @RequestBody GastoVariableRequest request) {
+        GastosVariables mod = gastosVariablesService.modificarGastoVariable(id, request);
         return ResponseEntity.ok(mod);
     }
 
@@ -58,5 +59,10 @@ public class GastosVariablesController {
     @GetMapping("/anio/{anio}/mes/{mes}/no-cargados")
     public ResponseEntity<List<GastosVariables>> obtenerNoCargadosPorAnioYMes(@PathVariable int anio, @PathVariable int mes) {
         return ResponseEntity.ok(gastosVariablesService.obtenerGastosVariablesNoCargadosPorAnioYMes(anio, mes));
+    }
+
+    @GetMapping("/stock/{idStock}")
+    public ResponseEntity<List<GastosVariables>> obtenerPorStock(@PathVariable Long idStock) {
+        return ResponseEntity.ok(gastosVariablesService.obtenerPorStock(idStock));
     }
 }

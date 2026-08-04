@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class GastoVariableRequest {
+
     private LocalDate fecha;
     private String producto;
     private BigDecimal cantComprada;
@@ -11,6 +12,7 @@ public class GastoVariableRequest {
     private BigDecimal monto;
     private Boolean cargadoEnStock;
     private Long categoriaId;
+    private Long stockId;
 
     public GastoVariableRequest() {
     }
@@ -77,5 +79,13 @@ public class GastoVariableRequest {
 
     public void setMonto(BigDecimal monto) {
         this.monto = monto;
+    }
+
+    public Long getStockId() {
+        return stockId;
+    }
+
+    public void setStockId(Long stockId) {
+        this.stockId = stockId;
     }
 }

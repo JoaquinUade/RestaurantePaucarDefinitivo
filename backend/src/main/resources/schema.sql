@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS stock (
   id_stock BIGINT NOT NULL AUTO_INCREMENT,
 
   id_categoria BIGINT NOT NULL,
-  id_gasto_variable BIGINT NOT NULL,
+  id_gasto_variable BIGINT NULL,
 
   nombre_producto VARCHAR(255) NOT NULL,
 

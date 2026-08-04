@@ -1,6 +1,7 @@
 package paucar.stock;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
@@ -8,17 +9,23 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import paucar.service.GastosVariablesService;
 
 public class DialogStock {
 
@@ -75,11 +82,16 @@ public class DialogStock {
         TextField txtProducto = new TextField();
         TextField txtStockMinimo = new TextField();
         TextField txtUnidad = new TextField();
+
         txtUnidad.setPromptText(
                 "kg, unidad, caja, cajón..."
         );
+        DatePicker dateFecha
+                = new DatePicker(LocalDate.now());
         VBox form = new VBox(
                 10,
+                new Label("Fecha"),
+                dateFecha,
                 new Label("Categoría"),
                 comboCategoria,
                 new Label("Producto"),
@@ -133,6 +145,8 @@ public class DialogStock {
                 request.setCantidad(BigDecimal.ZERO);
 
                 request.setUnidadCantidad(txtUnidad.getText().trim());
+                request.setFecha(
+                        dateFecha.getValue());
                 try {
 
                     request.setStockMinimo(
@@ -147,6 +161,9 @@ public class DialogStock {
                             BigDecimal.ZERO
                     );
                 }
+                System.out.println(
+                        "FECHA: "
+                        + request.getFecha());
                 System.out.println("SE CREO EL REQUEST");
                 System.out.println(request.getNombreProducto());
                 System.out.println(request.getCantidad());
@@ -159,9 +176,8 @@ public class DialogStock {
         return dialog.showAndWait().orElse(null);
     }
 
-    public static StockRequest mostrarEditar(
-            List<CategoriaGastoVariable> categorias,
-            Stock original) {
+    public static StockRequest mostrarEditar(List<CategoriaGastoVariable> categorias,
+            Stock original, GastosVariablesService gastosService) {
 
         Dialog<StockRequest> dialog = new Dialog<>();
 
@@ -230,17 +246,66 @@ public class DialogStock {
         TextField txtUnidad
                 = new TextField(
                         original.getUnidadCantidad());
-        VBox form = new VBox(
-                10,
-                new Label("Categoría"),
-                comboCategoria,
-                new Label("Producto"),
-                txtProducto,
-                new Label("Stock mínimo"),
-                txtStockMinimo,
-                new Label("Unidad"),
-                txtUnidad);
+        List<GastosVariables> historial
+                = gastosService.obtenerPorStock(
+                        original.getIdStock());
+        TableView<GastosVariables> tablaHistorial
+                = new TableView<>();
 
+        tablaHistorial.setPrefHeight(200);
+        TableColumn<GastosVariables, String> colFecha
+                = new TableColumn<>("Fecha");
+
+        colFecha.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue().getFecha() != null
+                        ? c.getValue().getFecha().toString()
+                        : ""));
+        TableColumn<GastosVariables, String> colProductoHist
+                = new TableColumn<>("Producto");
+
+        colProductoHist.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue().getProducto()));
+        TableColumn<GastosVariables, String> colCantidadHist
+                = new TableColumn<>("Cantidad");
+
+        colCantidadHist.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue().getCantComprada()
+                                .stripTrailingZeros()
+                                .toPlainString()
+                        + " "
+                        + c.getValue().getMedida()));
+        tablaHistorial.getItems().addAll(historial);
+        tablaHistorial.getColumns().add(colFecha);
+        tablaHistorial.getColumns().add(colProductoHist);
+        tablaHistorial.getColumns().add(colCantidadHist);
+       VBox datosBox = new VBox(
+        10,
+        new Label("Categoría"),
+        comboCategoria,
+        new Label("Producto"),
+        txtProducto,
+        new Label("Stock mínimo"),
+        txtStockMinimo,
+        new Label("Unidad"),
+        txtUnidad
+);
+
+VBox historialBox = new VBox(
+        10,
+        new Label("Historial de cargas"),
+        tablaHistorial
+);
+
+tablaHistorial.setPrefWidth(450);
+
+HBox form = new HBox(
+        20,
+        datosBox,
+        historialBox
+);
         form.setPadding(new Insets(15));
 
         dialog.getDialogPane().setContent(form);

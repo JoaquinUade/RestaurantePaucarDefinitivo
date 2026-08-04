@@ -298,7 +298,6 @@ tfCant0.textProperty().addListener((obs, oldValue, newValue) ->
             VBox contPagadores,
             Label lblTotal,
             Label lblRestante) {
-        System.out.println("ACTUALIZANDO");
         double total
                 = CalculadoraVenta.calcularTotal(contLineas);
 int cantidadPagadores =

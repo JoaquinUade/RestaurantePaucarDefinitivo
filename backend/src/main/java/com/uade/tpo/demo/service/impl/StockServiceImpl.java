@@ -53,8 +53,8 @@ public class StockServiceImpl implements StockService {
         BigDecimal stockMinimo = request.getStockMinimo() != null
                 ? request.getStockMinimo()
                 : BigDecimal.ZERO;
-        
-        System.out.println("UNIDAD CANTIDAD = "+ request.getUnidadCantidad());
+
+        System.out.println("UNIDAD CANTIDAD = " + request.getUnidadCantidad());
         if (cantidad.signum() < 0) {
             throw new IllegalArgumentException("No se puede crear stock con una cantidad negativa");
         }
@@ -68,8 +68,12 @@ public class StockServiceImpl implements StockService {
                 request.getUnidadCantComprada(),
                 request.getUnidadCantidad()
         );
-        System.out.println("STOCK UNIDAD = "+ stock.getUnidadCantidad());
-        stock.setFecha(LocalDate.now());
+        System.out.println("STOCK UNIDAD = " + stock.getUnidadCantidad());
+        stock.setFecha(
+                request.getFecha() != null
+                ? request.getFecha()
+                : LocalDate.now()
+        );
 
         Stock stockGuardado = stockRepository.save(stock);
 
@@ -109,13 +113,32 @@ public class StockServiceImpl implements StockService {
 
         stock.setCantidad(stockDisponible);
 
-        HistorialStock historial = new HistorialStock();
-        historial.setStock(stock);
-        historial.setCantidad(stockDisponible);
-        historial.setFecha(fecha);
+        Optional<HistorialStock> historialExistente
+                = historialStockRepository
+                        .findByStock_IdStockAndFecha(
+                                stock.getIdStock(),
+                                fecha);
 
-        historialStockRepository.save(historial);
+        if (historialExistente.isPresent()) {
 
+            HistorialStock historial
+                    = historialExistente.get();
+
+            historial.setCantidad(stockDisponible);
+
+            historialStockRepository.save(historial);
+
+        } else {
+
+            HistorialStock historial
+                    = new HistorialStock();
+
+            historial.setStock(stock);
+            historial.setCantidad(stockDisponible);
+            historial.setFecha(fecha);
+
+            historialStockRepository.save(historial);
+        }
         return stockRepository.save(stock);
     }
 

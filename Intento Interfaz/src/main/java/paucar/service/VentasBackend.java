@@ -95,16 +95,6 @@ public class VentasBackend {
                     }
                 }
             }
-
-            System.out.println("DEBUG idProductos=" + venta.getIdProductos());
-            System.out.println("DEBUG cantidades=" + venta.getCantidades());
-            System.out.println("DEBUG idCliente=" + venta.getIdCliente());
-            System.out.println("DEBUG estado=" + venta.getEstado());
-            System.out.println("DEBUG observaciones=" + venta.getObservaciones());
-            System.out.println("DEBUG fecha=" + venta.getFecha());
-
-            // Serializar el MISMO VentaRequest compartido
-            System.out.println("Fecha enviada = " + venta.getFecha());
             String body = TraductorJSON.writeValueAsString(venta);
 
             var solicitud = HttpRequest.newBuilder()

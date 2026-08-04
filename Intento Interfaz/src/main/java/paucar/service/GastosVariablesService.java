@@ -79,7 +79,9 @@ public class GastosVariablesService {
     public void editar(Long id, GastoVariableRequest gasto) {
         try {
             String json = mapper.writeValueAsString(gasto);
+            System.out.println("PATCH JSON:");
 
+            System.out.println(json);
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/" + id))
                     .header("Content-Type", "application/json")
@@ -110,4 +112,39 @@ public class GastosVariablesService {
             System.err.println("Error eliminando gasto: " + e.getMessage());
         }
     }
+
+    public List<GastosVariables> obtenerPorStock(Long idStock) {
+        try {
+
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(
+                            BASE_URL + "/stock/" + idStock))
+                    .GET()
+                    .build();
+
+            var response = http.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 200
+                    && response.statusCode() < 300) {
+
+                return mapper.readValue(
+                        response.body(),
+                        mapper.getTypeFactory()
+                                .constructCollectionType(
+                                        List.class,
+                                        GastosVariables.class));
+            }
+
+        } catch (IOException | InterruptedException e) {
+
+            System.err.println(
+                    "Error obteniendo gastos por stock: "
+                    + e.getMessage());
+        }
+
+        return List.of();
+    }
+
 }

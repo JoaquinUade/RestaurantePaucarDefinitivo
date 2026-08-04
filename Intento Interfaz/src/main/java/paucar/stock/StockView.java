@@ -1,6 +1,5 @@
 package paucar.stock;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ public class StockView extends BorderPane {
     private final StockService service;
     private final CategoriasGastosService categoriasService;
     private Stock stockSeleccionado;
-    private StockRequest stockPendiente;
     private final GastosVariablesService gastosVariablesService;
     private boolean modoDiario = false;
     private final HBox contenedorCategorias = new HBox(20);
@@ -91,8 +89,8 @@ public class StockView extends BorderPane {
             StockRequest editado
                     = DialogStock.mostrarEditar(
                             categorias,
-                            stockSeleccionado
-                    );
+                            stockSeleccionado,
+                            gastosVariablesService);
 
             if (editado != null) {
 
@@ -189,79 +187,56 @@ public class StockView extends BorderPane {
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
         if (modoDiario) {
-
             stocks = stocks.stream()
                     .filter(stock -> {
 
                         List<HistorialStock> historial
                                 = service.obtenerHistorialPorStock(
                                         stock.getIdStock());
+                        System.out.println("========");
+                        System.out.println(stock.getNombreProducto());
 
+                        historial.forEach(h -> System.out.println(
+                                h.getFecha() + " -> " + h.getCantidad()
+                        )
+                        );
                         if (historial.isEmpty()) {
                             return false;
                         }
 
-                        // Fecha de nacimiento
                         LocalDate fechaNacimiento = historial.stream()
-                                .map(h -> h.getFecha())
+                                .map(HistorialStock::getFecha)
                                 .filter(java.util.Objects::nonNull)
                                 .min(java.util.Comparator.naturalOrder())
                                 .orElse(null);
 
-                        if (fechaSeleccionada.isBefore(fechaNacimiento)) {
+                        if (fechaNacimiento == null) {
                             return false;
-                        }
-
-                        // Fecha de muerte (cantidad = 0)
-                        HistorialStock muerte = historial.stream()
-                                .filter(h
-                                        -> h.getCantidad()
-                                        .compareTo(BigDecimal.ZERO) == 0)
-                                .max(java.util.Comparator.comparing(h -> h.getFecha()))
-                                .orElse(null);
-
-// DEBUG
-                        System.out.println("\n==== " + stock.getNombreProducto() + " ====");
-
-                        System.out.println("Fecha seleccionada: "
-                                + fechaSeleccionada);
-
-                        System.out.println("Fecha nacimiento: "
-                                + fechaNacimiento);
-
-                        if (muerte != null) {
-                            System.out.println("Fecha muerte: "
-                                    + muerte.getFecha());
-                        } else {
-                            System.out.println("Fecha muerte: NINGUNA");
                         }
 
                         if (fechaSeleccionada.isBefore(fechaNacimiento)) {
                             return false;
                         }
 
-                        if (muerte != null
-                                && fechaSeleccionada.isAfter(
-                                        muerte.getFecha())) {
-
-                            return false;
-                        }
-
-                        // Último valor válido para la fecha seleccionada
                         HistorialStock ultimoRegistro
                                 = historial.stream()
                                         .filter(h
-                                                -> !h.getFecha()
-                                                .isAfter(fechaSeleccionada))
-                                        .filter(h -> h.getFecha() != null)
-                                        .max(java.util.Comparator.comparing(h -> h.getFecha()))
+                                                -> h.getFecha() != null
+                                        && !h.getFecha().isAfter(fechaSeleccionada))
+                                        .max(java.util.Comparator.comparing(
+                                                HistorialStock::getFecha))
                                         .orElse(null);
 
                         if (ultimoRegistro == null) {
                             return false;
                         }
-
-                        stock.setCantComprada(
+System.out.println(
+    "ULTIMO: "
+    + ultimoRegistro.getFecha()
+    + " -> "
+    + ultimoRegistro.getCantidad()
+);
+                        stock.setCantidad(
                                 ultimoRegistro.getCantidad());
 
                         return true;

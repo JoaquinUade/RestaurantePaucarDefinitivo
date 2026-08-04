@@ -3,7 +3,6 @@ package com.uade.tpo.demo.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.math.BigDecimal;
-import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 
 @Entity
 @Table(name = "gastos_variables")
@@ -34,6 +33,9 @@ public class GastosVariables {
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = true)
     private CategoriaGastoVariable categoria;
+    @ManyToOne
+    @JoinColumn(name = "id_stock")
+    private Stock stock;
 
     public GastosVariables() {
     }
@@ -53,6 +55,7 @@ public class GastosVariables {
     public void setCargadoEnStock(Boolean cargadoEnStock) {
         this.cargadoEnStock = cargadoEnStock;
     }
+
     public Long getIdGastoVariable() {
         return idGastoVariable;
     }
@@ -107,5 +110,13 @@ public class GastosVariables {
 
     public void setCategoria(CategoriaGastoVariable categoria) {
         this.categoria = categoria;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 }
