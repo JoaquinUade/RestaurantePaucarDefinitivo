@@ -146,5 +146,41 @@ public class GastosVariablesService {
 
         return List.of();
     }
+public List<GastosVariables> obtenerPorCategoria(
+        Long idCategoria) {
 
+    return obtenerTodos()
+            .stream()
+            .filter(g ->
+                    g.getCategoria() != null
+                    && g.getCategoria()
+                            .getIdCategoria()
+                            .equals(idCategoria))
+            .toList();
+}
+public void desvincularStock(Long idGastoVariable) {
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(
+                        BASE_URL + "/"
+                        + idGastoVariable
+                        + "/desvincular"))
+                .method(
+                        "PATCH",
+                        HttpRequest.BodyPublishers.noBody()
+                )
+                .build();
+
+        http.send(
+                request,
+                HttpResponse.BodyHandlers.ofString());
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error desvinculando gasto: "
+                + e.getMessage());
+    }
+}
 }

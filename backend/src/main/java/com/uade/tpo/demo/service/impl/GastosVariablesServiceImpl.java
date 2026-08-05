@@ -7,14 +7,12 @@ import com.uade.tpo.demo.repository.StockRepository;
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.repository.CategoriaGastoVariableRepository;
 import com.uade.tpo.demo.service.GastosVariablesService;
-import com.uade.tpo.demo.repository.StockRepository;
 import com.uade.tpo.demo.entity.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -170,5 +168,34 @@ public List<GastosVariables> obtenerPorStock(
 
     return gastosVariablesRepository
             .findByStock_IdStock(idStock);
+}
+@Override
+public List<GastosVariables> obtenerPorCategoria(
+        Long idCategoria) {
+
+    return gastosVariablesRepository
+            .findAll()
+            .stream()
+            .filter(g ->
+                    g.getCategoria() != null
+                    && g.getCategoria()
+                            .getIdCategoria()
+                            .equals(idCategoria))
+            .toList();
+}
+@Override
+public void desvincularStock(Long idGastoVariable) {
+
+    GastosVariables gasto =
+            gastosVariablesRepository
+                    .findById(idGastoVariable)
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    "Gasto variable no encontrado"));
+
+    gasto.setStock(null);
+    gasto.setCargadoEnStock(false);
+
+    gastosVariablesRepository.save(gasto);
 }
 }

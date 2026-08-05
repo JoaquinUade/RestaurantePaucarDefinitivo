@@ -65,4 +65,9 @@ public class GastosVariablesController {
     public ResponseEntity<List<GastosVariables>> obtenerPorStock(@PathVariable Long idStock) {
         return ResponseEntity.ok(gastosVariablesService.obtenerPorStock(idStock));
     }
+
+    @PatchMapping("/{id}/desvincular")
+    public void desvincularStock(@PathVariable Long id) {
+        gastosVariablesService.desvincularStock(id);
+    }
 }

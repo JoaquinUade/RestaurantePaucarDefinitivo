@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.entity.GastoVariableRequest;
 import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
@@ -97,13 +96,11 @@ public class TablaCategoriaStock extends VBox {
                     List<GastosVariables> gastos
                             = gastosVariablesService.obtenerTodos();
 
-                    List<CategoriaGastoVariable> categorias
-                            = categoriasService.obtenerCategorias();
-
                     BigDecimal cantidadIngresada
-                            = DialogSumarStock.mostrar(
-                                    categorias,
-                                    gastos);
+        = DialogSumarStock.mostrar(
+                stock.getCategoriaGastoVariable()
+                     .getIdCategoria(),
+                gastos);
                     GastosVariables gastoUtilizado
                             = DialogSumarStock.getUltimoGastoSeleccionado();
                     if (cantidadIngresada != null) {

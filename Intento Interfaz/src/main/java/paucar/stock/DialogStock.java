@@ -20,6 +20,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -251,25 +252,89 @@ public class DialogStock {
                         original.getIdStock());
         TableView<GastosVariables> tablaHistorial
                 = new TableView<>();
-
+tablaHistorial.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         tablaHistorial.setPrefHeight(200);
+        TableColumn<GastosVariables, Void> colQuitar =
+        new TableColumn<>("Quitar");
+
+colQuitar.setPrefWidth(120);
+
+colQuitar.setCellFactory(param ->
+        new TableCell<>() {
+
+            private final javafx.scene.control.Button btn =
+                    new javafx.scene.control.Button("Quitar");
+
+            {
+                btn.setOnAction(event -> {
+
+                    GastosVariables gasto =
+                            getTableView()
+                                    .getItems()
+                                    .get(getIndex());
+
+                    Alert alert = new Alert(
+                            Alert.AlertType.CONFIRMATION,
+                            "¿Desea quitar ese gasto de el stock?"
+                    );
+
+                    alert.showAndWait().ifPresent(r -> {
+
+    if (r == ButtonType.OK) {
+
+        gastosService.desvincularStock(
+                gasto.getIdGastoVariable()
+        );
+
+        getTableView()
+                .getItems()
+                .remove(gasto);
+    }
+});
+                });
+            }
+
+            @Override
+            protected void updateItem(
+                    Void item,
+                    boolean empty) {
+
+                super.updateItem(item, empty);
+
+                setGraphic(empty ? null : btn);
+            }
+        });
         TableColumn<GastosVariables, String> colFecha
                 = new TableColumn<>("Fecha");
-
+colFecha.setPrefWidth(100);
         colFecha.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getFecha() != null
                         ? c.getValue().getFecha().toString()
                         : ""));
+                        TableColumn<GastosVariables, String> colCategoria
+        = new TableColumn<>("Categoría");
+
+colCategoria.setPrefWidth(120);
+
+colCategoria.setCellValueFactory(c ->
+        new SimpleStringProperty(
+                c.getValue().getCategoria() != null
+                ? c.getValue()
+                        .getCategoria()
+                        .getNombre()
+                : ""
+        ));
         TableColumn<GastosVariables, String> colProductoHist
                 = new TableColumn<>("Producto");
-
+colProductoHist.setPrefWidth(100);
         colProductoHist.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getProducto()));
         TableColumn<GastosVariables, String> colCantidadHist
                 = new TableColumn<>("Cantidad");
-
+colCantidadHist.setPrefWidth(100);
         colCantidadHist.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getCantComprada()
@@ -278,7 +343,9 @@ public class DialogStock {
                         + " "
                         + c.getValue().getMedida()));
         tablaHistorial.getItems().addAll(historial);
+        tablaHistorial.getColumns().add(colQuitar);
         tablaHistorial.getColumns().add(colFecha);
+        tablaHistorial.getColumns().add(colCategoria);
         tablaHistorial.getColumns().add(colProductoHist);
         tablaHistorial.getColumns().add(colCantidadHist);
        VBox datosBox = new VBox(

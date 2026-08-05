@@ -15,4 +15,6 @@ public interface GastosVariablesService {
     List<GastosVariables> obtenerTodosLosGastosVariables();
     GastosVariables obtenerGastoVariablePorId(Long id);
     List<GastosVariables> obtenerPorStock(Long idStock);
+    List<GastosVariables> obtenerPorCategoria(Long idCategoria);
+    void desvincularStock(Long idGastoVariable);
 }
