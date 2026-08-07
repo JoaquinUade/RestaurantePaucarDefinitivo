@@ -1,6 +1,7 @@
 package paucar.stock;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.GastosVariables;
@@ -9,6 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -28,7 +30,8 @@ public class DialogSumarStock {
         Dialog<BigDecimal> dialog = new Dialog<>();
 
         dialog.setTitle("Seleccionar compra");
-
+        DatePicker dpFecha = new DatePicker();
+        dpFecha.setValue(LocalDate.now());
         ButtonType btnGuardar
                 = new ButtonType(
                         "Aceptar",
@@ -118,7 +121,7 @@ public class DialogSumarStock {
         colMedida.setPrefWidth(120);
         colProducto.setSortable(false);
         colCantidad.setSortable(false);
-        colMedida.setSortable(false); 
+        colMedida.setSortable(false);
         tabla.getColumns().add(colProducto);
         tabla.getColumns().add(colCantidad);
         tabla.getColumns().add(colMedida);
@@ -131,10 +134,13 @@ public class DialogSumarStock {
         dialog.getDialogPane().setContent(
                 new VBox(
                         10,
-                        new Label("Compras disponibles"),
+                        new Label("Fecha de ingreso"),
+                        dpFecha,
+                         new Label("Compras disponibles"),
                         tabla,
-                        new Label("Cantidad a ingresar"),
-                        txtCantidad));
+                         new Label("Cantidad a ingresar"),
+                        txtCantidad
+                ));
 
         dialog.setResultConverter(btn -> {
 

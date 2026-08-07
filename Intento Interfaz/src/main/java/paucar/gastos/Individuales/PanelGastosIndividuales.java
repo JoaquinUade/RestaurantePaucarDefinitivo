@@ -30,9 +30,5 @@ public class PanelGastosIndividuales extends VBox {
                 }));
 
         getChildren().add(titulo);
-
-        porSemana.values().forEach(lista -> {
-            getChildren().add(new TablaSemanalIndividual(lista, onSelect));
-        });
     }
 }

@@ -208,4 +208,15 @@ public class StockServiceImpl implements StockService {
         return historialStockRepository
                 .findByStock_IdStockOrderByFechaAsc(idStock);
     }
+
+    @Override
+    public List<HistorialStock> obtenerHistorialMes(
+            LocalDate desde,
+            LocalDate hasta) {
+
+        return historialStockRepository
+                .findByFechaBetweenOrderByFechaAsc(
+                        desde,
+                        hasta);
+    }
 }

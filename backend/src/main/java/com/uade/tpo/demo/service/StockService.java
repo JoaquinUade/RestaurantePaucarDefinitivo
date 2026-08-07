@@ -26,4 +26,6 @@ public interface StockService {
     List<Stock> obtenerProductosEnFaltaDeStock();
 
     List<HistorialStock> obtenerHistorialPorStock(Long idStock);
+
+    List<HistorialStock> obtenerHistorialMes(LocalDate desde, LocalDate hasta);
 }

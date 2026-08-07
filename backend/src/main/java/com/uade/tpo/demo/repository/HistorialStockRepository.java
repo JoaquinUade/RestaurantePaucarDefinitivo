@@ -16,4 +16,8 @@ public interface HistorialStockRepository
     Optional<HistorialStock> findByStock_IdStockAndFecha(
             Long idStock,
             LocalDate fecha);
+
+    List<HistorialStock> findByFechaBetweenOrderByFechaAsc(
+            LocalDate desde,
+            LocalDate hasta);
 }

@@ -369,4 +369,52 @@ public class StockService {
 
         return List.of();
     }
+    public List<HistorialStock> obtenerHistorialMes(
+        LocalDate desde,
+        LocalDate hasta) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/historial?desde="
+                                + desde
+                                + "&hasta="
+                                + hasta
+                        )
+                )
+                .GET()
+                .build();
+
+        var response
+                = http.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+        if (response.statusCode() >= 200
+                && response.statusCode() < 300) {
+
+            return mapper.readValue(
+                    response.body(),
+                    mapper.getTypeFactory()
+                            .constructCollectionType(
+                                    List.class,
+                                    HistorialStock.class
+                            )
+            );
+        }
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error obteniendo historial mensual: "
+                + e.getMessage()
+        );
+    }
+
+    return List.of();
+}
 }

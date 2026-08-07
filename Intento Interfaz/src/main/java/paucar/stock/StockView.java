@@ -161,14 +161,15 @@ public class StockView extends BorderPane {
             modoDiario = !modoDiario;
 
             if (modoDiario) {
-                btnCambiarVista.setText("Modo Stock");
-                topBar.getChildren().remove(btnAgregar);
-            } else {
                 btnCambiarVista.setText("Modo Diario");
 
                 if (!topBar.getChildren().contains(btnAgregar)) {
                     topBar.getChildren().add(btnAgregar);
                 }
+
+            } else {
+                btnCambiarVista.setText("Modo Stock");
+                topBar.getChildren().remove(btnAgregar);
             }
 
             recargar();
@@ -230,12 +231,12 @@ public class StockView extends BorderPane {
                         if (ultimoRegistro == null) {
                             return false;
                         }
-System.out.println(
-    "ULTIMO: "
-    + ultimoRegistro.getFecha()
-    + " -> "
-    + ultimoRegistro.getCantidad()
-);
+                        System.out.println(
+                                "ULTIMO: "
+                                + ultimoRegistro.getFecha()
+                                + " -> "
+                                + ultimoRegistro.getCantidad()
+                        );
                         stock.setCantidad(
                                 ultimoRegistro.getCantidad());
 
@@ -243,10 +244,10 @@ System.out.println(
                     })
                     .toList();
         } else {
-
             stocks = stocks.stream()
                     .filter(s -> s.getFecha() != null
-                    && s.getFecha().equals(fechaSeleccionada))
+                    && s.getFecha().getMonth() == fechaSeleccionada.getMonth()
+                    && s.getFecha().getYear() == fechaSeleccionada.getYear())
                     .toList();
         }
         for (Stock s : stocks) {
@@ -261,23 +262,40 @@ System.out.println(
                                 s -> s.getCategoriaGastoVariable()
                                         .getNombre()));
 
-        System.out.println("Categorias: " + porCategoria.size());
+        if (modoDiario) {
 
-        porCategoria.forEach((categoria, lista) -> {
+            porCategoria.forEach((categoria, lista) -> {
 
-            System.out.println("Categoria: " + categoria);
+                contenedorCategorias.getChildren().add(
+                        new PanelCategoriaStock(
+                                categoria,
+                                lista,
+                                stock -> stockSeleccionado = stock,
+                                modoDiario,
+                                service,
+                                gastosVariablesService,
+                                categoriasService,
+                                fechaSeleccionada));
+            });
 
-            contenedorCategorias.getChildren().add(
-                    new PanelCategoriaStock(
-                            categoria,
-                            lista,
-                            stock -> stockSeleccionado = stock,
-                            modoDiario,
-                            service,
-                            gastosVariablesService,
-                            categoriasService,
-                            fechaSeleccionada));
-        });
+        } else {
+
+            for (Stock stock : stocks) {
+
+                List<HistorialStock> historial
+                        = service.obtenerHistorialPorStock(
+                                stock.getIdStock());
+
+                contenedorCategorias.getChildren().add(
+                        new PanelHistorialStock(
+                                historial,
+                                modoDiario,
+                                service,
+                                gastosVariablesService,
+                                categoriasService,
+                                fechaSeleccionada));
+            }
+        }
     }
 
     private void actualizarFecha() {

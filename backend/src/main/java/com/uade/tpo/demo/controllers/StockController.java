@@ -70,4 +70,16 @@ public class StockController {
                 stockService.obtenerHistorialPorStock(id)
         );
     }
+
+    @GetMapping("/historial")
+    public ResponseEntity<List<HistorialStock>>
+            obtenerHistorialMes(
+                    @RequestParam LocalDate desde,
+                    @RequestParam LocalDate hasta) {
+
+        return ResponseEntity.ok(
+                stockService.obtenerHistorialMes(
+                        desde,
+                        hasta));
+    }
 }
