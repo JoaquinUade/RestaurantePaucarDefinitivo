@@ -417,4 +417,50 @@ public class StockService {
 
     return List.of();
 }
+public void sumarStock(
+        Long id,
+        BigDecimal cantidad,
+        LocalDate fecha) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/"
+                                + id
+                                + "/sumar?cantidad="
+                                + cantidad
+                                + "&fecha="
+                                + fecha
+                        )
+                )
+                .method(
+                        "PATCH",
+                        HttpRequest.BodyPublishers.noBody()
+                )
+                .build();
+
+        var response = http.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+        );
+
+        System.out.println(
+                "PATCH SUMAR STATUS: "
+                + response.statusCode());
+
+        System.out.println(
+                "PATCH SUMAR BODY: "
+                + response.body());
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error sumando stock: "
+                + e.getMessage()
+        );
+    }
+}
 }

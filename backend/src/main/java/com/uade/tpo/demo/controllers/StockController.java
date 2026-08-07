@@ -82,4 +82,16 @@ public class StockController {
                         desde,
                         hasta));
     }
+    @PatchMapping("/{id}/sumar")
+public ResponseEntity<Stock> sumarStock(
+        @PathVariable Long id,
+        @RequestParam BigDecimal cantidad,
+        @RequestParam LocalDate fecha) {
+
+    return ResponseEntity.ok(
+            stockService.sumarStock(
+                    id,
+                    cantidad,
+                    fecha));
+}
 }

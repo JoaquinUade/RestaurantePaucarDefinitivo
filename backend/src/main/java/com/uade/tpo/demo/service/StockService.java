@@ -28,4 +28,6 @@ public interface StockService {
     List<HistorialStock> obtenerHistorialPorStock(Long idStock);
 
     List<HistorialStock> obtenerHistorialMes(LocalDate desde, LocalDate hasta);
+
+    Stock sumarStock(Long idStock, BigDecimal cantidad, LocalDate fecha);
 }

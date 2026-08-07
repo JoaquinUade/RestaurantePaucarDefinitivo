@@ -113,20 +113,15 @@ public class TablaHistorialStock extends VBox {
                                             .getCategoriaGastoVariable()
                                             .getIdCategoria(),
                                     gastos);
+                    LocalDate fechaIngreso
+                            = DialogSumarStock.getUltimaFechaSeleccionada();
+                    if (cantidadIngresada != null && fechaIngreso != null) {
 
-                    if (cantidadIngresada != null) {
-
-                        BigDecimal nuevaCantidad
-                                = historialActual.getCantidad()
-                                        .add(cantidadIngresada);
-
-                        stockService.ajustarStockDisponible(
+                        stockService.sumarStock(
                                 historialActual.getStock()
                                         .getIdStock(),
-                                nuevaCantidad,
-                                historialActual.getFecha());
-
-                        historialActual.setCantidad(nuevaCantidad);
+                                cantidadIngresada,
+                                fechaIngreso);
 
                         tabla.refresh();
                     }

@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox;
 public class DialogSumarStock {
 
     private static GastosVariables ultimoGastoSeleccionado;
+    private static LocalDate ultimaFechaSeleccionada;
 
     public static BigDecimal mostrar(
             Long idCategoria,
@@ -136,9 +137,9 @@ public class DialogSumarStock {
                         10,
                         new Label("Fecha de ingreso"),
                         dpFecha,
-                         new Label("Compras disponibles"),
+                        new Label("Compras disponibles"),
                         tabla,
-                         new Label("Cantidad a ingresar"),
+                        new Label("Cantidad a ingresar"),
                         txtCantidad
                 ));
 
@@ -151,6 +152,7 @@ public class DialogSumarStock {
 
                 ultimoGastoSeleccionado
                         = gastoSeleccionado[0];
+                ultimaFechaSeleccionada = dpFecha.getValue();
                 try {
 
                     return new BigDecimal(
@@ -173,4 +175,7 @@ public class DialogSumarStock {
     public static GastosVariables getUltimoGastoSeleccionado() {
         return ultimoGastoSeleccionado;
     }
+    public static LocalDate getUltimaFechaSeleccionada() {
+    return ultimaFechaSeleccionada;
+}
 }

@@ -219,4 +219,68 @@ public class StockServiceImpl implements StockService {
                         desde,
                         hasta);
     }
+@Override
+public Stock sumarStock(
+        Long idStock,
+        BigDecimal cantidadASumar,
+        LocalDate fecha) {
+
+    Stock stock = stockRepository.findById(idStock)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
+                            "Stock no encontrado"));
+
+    List<HistorialStock> historiales =
+            historialStockRepository
+                    .findByStock_IdStockOrderByFechaAsc(
+                            idStock);
+
+    boolean existeFecha = false;
+    BigDecimal ultimaCantidad = BigDecimal.ZERO;
+
+    for (HistorialStock h : historiales) {
+
+        if (h.getFecha().equals(fecha)) {
+            existeFecha = true;
+        }
+
+        if (!h.getFecha().isAfter(fecha)) {
+            ultimaCantidad = h.getCantidad();
+        }
+    }
+
+    if (!existeFecha) {
+
+        HistorialStock nuevo = new HistorialStock();
+        nuevo.setStock(stock);
+        nuevo.setFecha(fecha);
+        nuevo.setCantidad(
+                ultimaCantidad.add(cantidadASumar));
+
+        historialStockRepository.save(nuevo);
+    }
+
+    historiales = historialStockRepository
+            .findByStock_IdStockOrderByFechaAsc(
+                    idStock);
+
+    for (HistorialStock h : historiales) {
+
+        if (!h.getFecha().isBefore(fecha)) {
+
+            h.setCantidad(
+                    h.getCantidad()
+                            .add(cantidadASumar));
+
+            historialStockRepository.save(h);
+        }
+    }
+
+    HistorialStock ultimo = historiales.get(
+            historiales.size() - 1);
+
+    stock.setCantidad(ultimo.getCantidad());
+
+    return stockRepository.save(stock);
+}
 }
