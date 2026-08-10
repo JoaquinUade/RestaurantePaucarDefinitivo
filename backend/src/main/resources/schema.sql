@@ -28,7 +28,36 @@ CREATE TABLE IF NOT EXISTS productos (
   categoria VARCHAR(50) NOT NULL,
   PRIMARY KEY (id_producto)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS gastos_variables (
+    id_gasto_variable BIGINT NOT NULL AUTO_INCREMENT,
 
+    fecha DATE NOT NULL,
+
+    producto VARCHAR(255) NOT NULL,
+
+    cant_comprada DECIMAL(19,4) NOT NULL,
+
+    medida VARCHAR(255),
+
+    monto DECIMAL(19,2) NOT NULL,
+
+    cargado_en_stock BOOLEAN,
+
+    id_categoria BIGINT,
+
+    id_stock BIGINT,
+
+    PRIMARY KEY (id_gasto_variable),
+
+    CONSTRAINT fk_gastos_variables_categoria
+        FOREIGN KEY (id_categoria)
+        REFERENCES categoria_gasto_variable(id_categoria),
+
+    CONSTRAINT fk_gastos_variables_stock
+        FOREIGN KEY (id_stock)
+        REFERENCES stock(id_stock)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE IF NOT EXISTS stock (
   id_stock BIGINT NOT NULL AUTO_INCREMENT,
 

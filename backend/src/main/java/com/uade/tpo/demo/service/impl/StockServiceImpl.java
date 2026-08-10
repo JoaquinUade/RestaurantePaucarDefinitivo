@@ -246,12 +246,24 @@ public class StockServiceImpl implements StockService {
 
         if (idGastoVariable != null) {
 
-            gastoVariable = gastosVariablesRepository
-                    .findById(idGastoVariable)
-                    .orElseThrow(()
-                            -> new IllegalArgumentException(
+    gastoVariable = gastosVariablesRepository
+            .findById(idGastoVariable)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
                             "Gasto variable no encontrado"));
-        }
+
+    if (Boolean.TRUE.equals(
+            gastoVariable.getCargadoEnStock())) {
+
+        throw new IllegalArgumentException(
+                "El gasto ya fue cargado al stock");
+    }
+
+    gastoVariable.setCargadoEnStock(true);
+    gastoVariable.setStock(stock);
+
+    gastosVariablesRepository.save(gastoVariable);
+}
         for (HistorialStock h : historiales) {
 
             if (!h.getFecha().isAfter(fecha)) {

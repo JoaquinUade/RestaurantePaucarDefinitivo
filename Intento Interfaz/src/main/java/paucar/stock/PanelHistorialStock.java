@@ -15,7 +15,6 @@ public class PanelHistorialStock extends VBox {
     public PanelHistorialStock(
         String categoria,
         List<Stock> stocks,
-        boolean modoDiario,
         StockService stockService,
         GastosVariablesService gastosVariablesService,
         CategoriasGastosService categoriasService,
@@ -29,7 +28,6 @@ public class PanelHistorialStock extends VBox {
     getChildren().add(
             new TablaHistorialStock(
                     stocks,
-                    modoDiario,
                     stockService,
                     gastosVariablesService,
                     categoriasService,

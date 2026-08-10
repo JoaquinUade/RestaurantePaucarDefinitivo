@@ -38,164 +38,164 @@ public class DialogHistorialStock {
                 "Historial - "
                 + stock.getNombreProducto());
 
-        Map<LocalDate, List<HistorialStock>> historialPorSemana =
-        historial.stream()
-                .collect(Collectors.groupingBy(
-                        h -> h.getFecha().with(DayOfWeek.MONDAY),
-                        TreeMap::new,
-                        Collectors.toList()));
+        Map<LocalDate, List<HistorialStock>> historialPorSemana
+                = historial.stream()
+                        .collect(Collectors.groupingBy(
+                                h -> h.getFecha().with(DayOfWeek.MONDAY),
+                                TreeMap::new,
+                                Collectors.toList()));
 
-VBox root = new VBox(15);
-root.setPadding(
-        new Insets(20));
-int semana = 1;
+        VBox root = new VBox(15);
+        root.setPadding(
+                new Insets(20));
+        int semana = 1;
 
-for (Map.Entry<LocalDate, List<HistorialStock>> entry
-        : historialPorSemana.entrySet()) {
+        for (Map.Entry<LocalDate, List<HistorialStock>> entry
+                : historialPorSemana.entrySet()) {
 
-    Label titulo = new Label(
-            "SEMANA " + semana);
+            Label titulo = new Label(
+                    "SEMANA " + semana);
 
-    titulo.setStyle(
-            "-fx-font-size: 18px;"
-            + "-fx-font-weight: bold;");
+            titulo.setStyle(
+                    "-fx-font-size: 18px;"
+                    + "-fx-font-weight: bold;");
 
-    TableView<HistorialStock> tabla =
-            crearTabla(entry.getValue());
+            TableView<HistorialStock> tabla
+                    = crearTabla(entry.getValue());
 
-    root.getChildren().addAll(
-            titulo,
-            tabla);
+            root.getChildren().addAll(
+                    titulo,
+                    tabla);
 
-    semana++;
-}
+            semana++;
+        }
 
         ScrollPane scrollPane = new ScrollPane(root);
-scrollPane.setFitToWidth(true);
+        scrollPane.setFitToWidth(true);
 
-Scene scene =
-        new Scene(scrollPane, 1200, 600);
+        Scene scene
+                = new Scene(scrollPane, 1200, 600);
 
         ventana.setScene(scene);
         ventana.showAndWait();
     }
+
     private static TableView<HistorialStock> crearTabla(
-        List<HistorialStock> historial) {
+            List<HistorialStock> historial) {
 
-    TableView<HistorialStock> tabla =
-            new TableView<>();
+        TableView<HistorialStock> tabla
+                = new TableView<>();
 
-    TableColumn<HistorialStock, String> colFecha =
-            new TableColumn<>("Fecha");
+        TableColumn<HistorialStock, String> colFecha
+                = new TableColumn<>("Fecha");
 
-    colFecha.setCellValueFactory(c ->
-            new SimpleStringProperty(
-                    c.getValue()
-                            .getFecha()
-                            .toString()));
+        colFecha.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue()
+                                .getFecha()
+                                .toString()));
 
-    TableColumn<HistorialStock, String> colMovimiento =
-            new TableColumn<>("Movimiento");
+        TableColumn<HistorialStock, String> colMovimiento
+                = new TableColumn<>("Movimiento");
 
-    colMovimiento.setCellFactory(col ->
-            new TableCell<>() {
+        colMovimiento.setCellFactory(col
+                -> new TableCell<>() {
 
-                @Override
-                protected void updateItem(
-                        String item,
-                        boolean empty) {
+            @Override
+            protected void updateItem(
+                    String item,
+                    boolean empty) {
 
-                    super.updateItem(item, empty);
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                        return;
-                    }
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                    return;
+                }
 
-                    setText(item);
+                setText(item);
 
-                    HistorialStock historial =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
+                HistorialStock historial
+                        = getTableView()
+                                .getItems()
+                                .get(getIndex());
 
-                    if (historial.getMovimiento() != null) {
+                if (historial.getMovimiento() != null) {
 
-                        if (historial.getMovimiento()
-                                .compareTo(java.math.BigDecimal.ZERO)
-                                > 0) {
+                    if (historial.getMovimiento()
+                            .compareTo(java.math.BigDecimal.ZERO)
+                            > 0) {
 
-                            setStyle(
-                                    "-fx-text-fill: green;"
-                                    + "-fx-font-weight: bold;");
+                        setStyle(
+                                "-fx-text-fill: green;"
+                                + "-fx-font-weight: bold;");
 
-                        } else if (historial.getMovimiento()
-                                .compareTo(java.math.BigDecimal.ZERO)
-                                < 0) {
+                    } else if (historial.getMovimiento()
+                            .compareTo(java.math.BigDecimal.ZERO)
+                            < 0) {
 
-                            setStyle(
-                                    "-fx-text-fill: red;"
-                                    + "-fx-font-weight: bold;");
-                        }
+                        setStyle(
+                                "-fx-text-fill: red;"
+                                + "-fx-font-weight: bold;");
                     }
                 }
-            });
+            }
+        });
 
-    colMovimiento.setCellValueFactory(c -> {
+        colMovimiento.setCellValueFactory(c -> {
 
-        if (c.getValue().getMovimiento() == null) {
-            return new SimpleStringProperty("-");
-        }
+            if (c.getValue().getMovimiento() == null) {
+                return new SimpleStringProperty("-");
+            }
 
-        var mov = c.getValue().getMovimiento();
+            var mov = c.getValue().getMovimiento();
 
-        String texto =
-                mov.compareTo(java.math.BigDecimal.ZERO) > 0
-                        ? "+" + mov.stripTrailingZeros().toPlainString()
-                        : mov.stripTrailingZeros().toPlainString();
+            String texto
+                    = mov.compareTo(java.math.BigDecimal.ZERO) > 0
+                    ? "+" + mov.stripTrailingZeros().toPlainString()
+                    : mov.stripTrailingZeros().toPlainString();
 
-        return new SimpleStringProperty(texto);
-    });
+            return new SimpleStringProperty(texto);
+        });
 
-    TableColumn<HistorialStock, String> colStock =
-            new TableColumn<>("Stock");
+        TableColumn<HistorialStock, String> colStock
+                = new TableColumn<>("Stock");
 
-    colStock.setCellValueFactory(c ->
-            new SimpleStringProperty(
+        colStock.setCellValueFactory(c
+                -> new SimpleStringProperty(
+                        c.getValue()
+                                .getCantidad()
+                                .stripTrailingZeros()
+                                .toPlainString()));
+
+        TableColumn<HistorialStock, String> colGasto
+                = new TableColumn<>("Gasto");
+
+        colGasto.setCellValueFactory(c -> {
+
+            if (c.getValue().getGastoVariable() == null) {
+                return new SimpleStringProperty("-");
+            }
+
+            return new SimpleStringProperty(
                     c.getValue()
-                            .getCantidad()
-                            .stripTrailingZeros()
-                            .toPlainString()));
+                            .getGastoVariable()
+                            .getProducto());
+        });
 
-    TableColumn<HistorialStock, String> colGasto =
-            new TableColumn<>("Gasto");
+        tabla.getColumns().addAll(colFecha);
+        tabla.getColumns().add(colMovimiento);
+        tabla.getColumns().add(colStock);
+        tabla.getColumns().add(colGasto);
 
-    colGasto.setCellValueFactory(c -> {
+        tabla.setItems(
+                FXCollections.observableArrayList(
+                        historial));
 
-        if (c.getValue().getGastoVariable() == null) {
-            return new SimpleStringProperty("-");
-        }
+        tabla.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        return new SimpleStringProperty(
-                c.getValue()
-                        .getGastoVariable()
-                        .getProducto());
-    });
-
-    tabla.getColumns().addAll(
-            colFecha,
-            colMovimiento,
-            colStock,
-            colGasto);
-
-    tabla.setItems(
-            FXCollections.observableArrayList(
-                    historial));
-
-    tabla.setColumnResizePolicy(
-            TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-    return tabla;
-}
+        return tabla;
+    }
 }

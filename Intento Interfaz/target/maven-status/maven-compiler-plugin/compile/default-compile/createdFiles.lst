@@ -28,6 +28,7 @@ paucar\resumen\clientes\semanal\VentanaPagoDeudasCliente.class
 paucar\gastos\Individuales\DialogGastosIndividuales$3.class
 paucar\service\VentasBackend.class
 paucar\admin\categoriasgastos\TablaCategoriasGastos$1.class
+paucar\stock\TablaHistorialStock$3.class
 paucar\resumen\empresas\MensualEmpresas.class
 paucar\service\ClientesService.class
 paucar\gastos\Fijos\TablaMensualFijos$2.class
@@ -38,6 +39,7 @@ paucar\gastos\Variables\DialogGastosV$2.class
 paucar\resumen\general\MensualGeneral$2.class
 paucar\gastos\Individuales\DialogGastosIndividuales.class
 paucar\stock\DialogStock$5.class
+paucar\stock\TablaHistorialStock$1.class
 paucar\admin\Admin.class
 paucar\service\VentasBackend$1.class
 paucar\gastos\Individuales\TablaSemanalIndividual.class
@@ -56,6 +58,7 @@ paucar\ventas\ui\ClienteTipoManager.class
 paucar\gastos\Fijos\TablaMensualFijos.class
 paucar\ventas\ui\ProductoAutoCompletar$1.class
 paucar\stock\PanelHistorialStock.class
+paucar\stock\TablaHistorialStock$2.class
 paucar\resumen\general\SemanalGeneral$4.class
 paucar\admin\platos\TablaProductosCategoria.class
 paucar\gastos\Individuales\DialogGastosIndividuales$1.class
@@ -85,6 +88,7 @@ paucar\admin\empresasClientes\TablaEmpresasClientes$1.class
 paucar\resumen\general\SemanalGeneral$3.class
 paucar\service\GastosIndividualesService.class
 paucar\resumen\clientes\MensualClientes$6.class
+paucar\stock\DialogHistorialStock.class
 paucar\ventas\ui\FormularioPedidoBuilder.class
 paucar\stock\DialogRestarStock.class
 paucar\admin\empresasClientes\EmpresasClientes.class
@@ -102,6 +106,7 @@ paucar\shared\LocaleUtils.class
 paucar\ventas\util\VentaBuilder.class
 paucar\ventas\Agregar.class
 paucar\service\CategoriasGastosService.class
+paucar\stock\DialogHistorialStock$1.class
 paucar\gastos\Individuales\PanelGastosIndividuales.class
 paucar\stock\DialogSumarStock.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas$1.class

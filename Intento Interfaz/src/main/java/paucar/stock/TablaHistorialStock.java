@@ -23,7 +23,6 @@ public class TablaHistorialStock extends VBox {
 
     public TablaHistorialStock(
             List<Stock> stocks,
-            boolean modoDiario,
             StockService stockService,
             GastosVariablesService gastosVariablesService,
             CategoriasGastosService categoriasService,
