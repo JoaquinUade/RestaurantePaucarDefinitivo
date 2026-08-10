@@ -1,6 +1,8 @@
 package com.uade.tpo.demo.repository;
 
 import com.uade.tpo.demo.entity.GastosVariables;
+import com.uade.tpo.demo.entity.Stock;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +24,5 @@ public interface GastosVariablesRepository
             @Param("mes") int mes);
 
     List<GastosVariables> findByStock_IdStock(Long idStock);
+    List<GastosVariables> findByStock(Stock stock);
 }

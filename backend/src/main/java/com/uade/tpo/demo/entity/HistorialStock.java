@@ -3,6 +3,7 @@ package com.uade.tpo.demo.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "historial_stock")
@@ -21,6 +22,13 @@ public class HistorialStock {
 
     @Column(nullable = false)
     private LocalDate fecha;
+
+    @ManyToOne
+    @JoinColumn(name = "id_gasto_variable")
+    private GastosVariables gastoVariable;
+
+    @Column(nullable = false)
+    private BigDecimal movimiento;
 
     public HistorialStock() {
     }
@@ -51,5 +59,23 @@ public class HistorialStock {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public GastosVariables getGastoVariable() {
+        return gastoVariable;
+    }
+
+    public void setGastoVariable(
+            GastosVariables gastoVariable) {
+        this.gastoVariable = gastoVariable;
+    }
+
+    public BigDecimal getMovimiento() {
+        return movimiento;
+    }
+
+    public void setMovimiento(
+            BigDecimal movimiento) {
+        this.movimiento = movimiento;
     }
 }

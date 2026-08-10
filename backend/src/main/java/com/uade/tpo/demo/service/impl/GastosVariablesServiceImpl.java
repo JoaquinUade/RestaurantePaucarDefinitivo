@@ -162,13 +162,7 @@ public class GastosVariablesServiceImpl implements GastosVariablesService {
         return gastosVariablesRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Gasto variable no encontrado con id: " + id));
     }
-    @Override
-public List<GastosVariables> obtenerPorStock(
-        Long idStock) {
 
-    return gastosVariablesRepository
-            .findByStock_IdStock(idStock);
-}
 @Override
 public List<GastosVariables> obtenerPorCategoria(
         Long idCategoria) {
@@ -197,5 +191,12 @@ public void desvincularStock(Long idGastoVariable) {
     gasto.setCargadoEnStock(false);
 
     gastosVariablesRepository.save(gasto);
+}
+@Override
+public List<GastosVariables> obtenerPorStock(
+        Long idStock) {
+
+    return gastosVariablesRepository
+            .findByStock_IdStock(idStock);
 }
 }

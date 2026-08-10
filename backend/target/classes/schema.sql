@@ -60,9 +60,14 @@ CREATE TABLE IF NOT EXISTS stock (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS historial_stock (
+
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
     id_stock BIGINT NOT NULL,
+
+    id_gasto_variable BIGINT NULL,
+
+    movimiento DECIMAL(19,4) NOT NULL,
 
     cantidad DECIMAL(19,4) NOT NULL,
 
@@ -70,5 +75,10 @@ CREATE TABLE IF NOT EXISTS historial_stock (
 
     CONSTRAINT fk_historial_stock
         FOREIGN KEY (id_stock)
-        REFERENCES stock(id_stock)
+        REFERENCES stock(id_stock),
+
+    CONSTRAINT fk_historial_gasto_variable
+        FOREIGN KEY (id_gasto_variable)
+        REFERENCES gastos_variables(id_gasto_variable)
+
 );

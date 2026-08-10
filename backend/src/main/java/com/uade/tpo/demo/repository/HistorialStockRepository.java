@@ -10,8 +10,8 @@ import java.util.Optional;
 public interface HistorialStockRepository
         extends JpaRepository<HistorialStock, Long> {
 
-    List<HistorialStock> findByStock_IdStockOrderByFechaAsc(
-            Long idStock);
+    List<HistorialStock> findByStock_IdStockOrderByFechaAscIdAsc(
+        Long idStock);
 
     Optional<HistorialStock> findByStock_IdStockAndFecha(
             Long idStock,

@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
@@ -97,23 +96,21 @@ public class TablaCategoriaStock extends VBox {
                             = gastosVariablesService.obtenerTodos();
 
                     BigDecimal cantidadIngresada
-        = DialogSumarStock.mostrar(
-                stock.getCategoriaGastoVariable()
-                     .getIdCategoria(),
-                gastos);
+                            = DialogSumarStock.mostrar(
+                                    stock.getCategoriaGastoVariable()
+                                            .getIdCategoria(),
+                                    gastos);
                     GastosVariables gastoUtilizado
                             = DialogSumarStock.getUltimoGastoSeleccionado();
                     if (cantidadIngresada != null) {
 
-                        BigDecimal nuevaCantidad
-                                = stock.getCantidad()
-                                        .add(cantidadIngresada);
-
-                        stockService.ajustarStockDisponible(
+                        stockService.sumarStock(
                                 stock.getIdStock(),
-                                nuevaCantidad,
-                                fechaSeleccionada);
-                        stock.setCantidad(nuevaCantidad);
+                                cantidadIngresada,
+                                fechaSeleccionada,
+                                gastoUtilizado != null
+                                        ? gastoUtilizado.getIdGastoVariable()
+                                        : null);
                         if (gastoUtilizado != null) {
 
                             GastoVariableRequest request
@@ -165,104 +162,66 @@ public class TablaCategoriaStock extends VBox {
             }
         });
         TableColumn<Stock, Void> colBajar
-        = new TableColumn<>("-");
+                = new TableColumn<>("-");
 
-colBajar.setCellFactory(param -> new TableCell<>() {
+        colBajar.setCellFactory(param -> new TableCell<>() {
 
-    private final Button btn = new Button("-");
+            private final Button btn = new Button("-");
 
-    {
-        btn.setOnAction(event -> {
+            {
+                btn.setOnAction(event -> {
 
-    Stock stock = getTableView()
-            .getItems()
-            .get(getIndex());
+                    Stock stock = getTableView()
+                            .getItems()
+                            .get(getIndex());
 
-    BigDecimal cantidadARestar =
-            DialogRestarStock.mostrar(
-                    stock.getNombreProducto(),
-                    stock.getCantidad());
+                    BigDecimal cantidadARestar
+                            = DialogRestarStock.mostrar(
+                                    stock.getNombreProducto(),
+                                    stock.getCantidad());
 
-    if (cantidadARestar != null) {
+                    if (cantidadARestar != null) {
 
-        BigDecimal nuevaCantidad =
-                stock.getCantidad()
-                        .subtract(cantidadARestar);
+                        BigDecimal nuevaCantidad
+                                = stock.getCantidad()
+                                        .subtract(cantidadARestar);
 
-        if (nuevaCantidad.compareTo(BigDecimal.ZERO) < 0) {
-            nuevaCantidad = BigDecimal.ZERO;
-        }
+                        if (nuevaCantidad.compareTo(BigDecimal.ZERO) < 0) {
+                            nuevaCantidad = BigDecimal.ZERO;
+                        }
 
-        stockService.ajustarStockDisponible(
-                stock.getIdStock(),
-                nuevaCantidad,
-                fechaSeleccionada);
+                        stockService.ajustarStockDisponible(
+                                stock.getIdStock(),
+                                nuevaCantidad,
+                                fechaSeleccionada);
 
-        stock.setCantidad(nuevaCantidad);
+                        stock.setCantidad(nuevaCantidad);
 
-        tabla.refresh();
-    }
-});
-    }
+                        tabla.refresh();
+                    }
+                });
+            }
 
-    @Override
-    protected void updateItem(
-            Void item,
-            boolean empty) {
+            @Override
+            protected void updateItem(
+                    Void item,
+                    boolean empty) {
 
-        super.updateItem(item, empty);
+                super.updateItem(item, empty);
 
-        if (empty) {
-            setGraphic(null);
-        } else {
-            setGraphic(btn);
-        }
-    }
-});
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
         tabla.getColumns().add(colProducto);
 
-        if (modoDiario) {
-            colMinimo.setCellFactory(
-                    TextFieldTableCell.forTableColumn());
-            colMinimo.setOnEditCommit(event -> {
-
-                Stock stock = event.getRowValue();
-
-                try {
-
-                    BigDecimal nuevoMinimo
-                            = new BigDecimal(
-                                    event.getNewValue());
-
-                    stock.setCantidad(nuevoMinimo);
-
-                    stock.setFecha(fechaSeleccionada);
-
-                    stockService.ajustarStockDisponible(
-                            stock.getIdStock(),
-                            nuevoMinimo,
-                            LocalDate.now());
-
-                    tabla.refresh();
-
-                } catch (Exception e) {
-
-                    System.err.println(
-                            "Error al editar stock mínimo: "
-                            + e.getMessage());
-                }
-            });
-            tabla.getColumns().add(colCantidadStock);
-            tabla.getColumns().add(colMinimo);
-            tabla.getColumns().add(colSubir);
-            tabla.getColumns().add(colBajar);
-        } else {
-
-            tabla.getColumns().add(colCantidadStock);
-            tabla.getColumns().add(colMinimo);
-            tabla.getColumns().add(colSubir);
-            tabla.getColumns().add(colBajar);
-        }
+        tabla.getColumns().add(colCantidadStock);
+        tabla.getColumns().add(colMinimo);
+        tabla.getColumns().add(colSubir);
+        tabla.getColumns().add(colBajar);
 
         tabla.setItems(
                 FXCollections.observableArrayList(stocks));

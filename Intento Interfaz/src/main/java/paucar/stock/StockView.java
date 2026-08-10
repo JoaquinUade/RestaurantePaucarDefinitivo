@@ -67,7 +67,7 @@ public class StockView extends BorderPane {
             List<GastosVariables> gastos
                     = this.gastosVariablesService.obtenerTodos();
             List<Stock> stocks = service.obtenerTodos();
-
+            System.out.println("TOTAL STOCKS: " + stocks.size());
             StockRequest request = DialogStock.mostrar(categorias, gastos, stocks);
 
             if (request != null) {
@@ -194,6 +194,11 @@ public class StockView extends BorderPane {
                         List<HistorialStock> historial
                                 = service.obtenerHistorialPorStock(
                                         stock.getIdStock());
+
+                        System.out.println(
+                                stock.getNombreProducto()
+                                + " historial="
+                                + historial.size());
                         System.out.println("========");
                         System.out.println(stock.getNombreProducto());
 
@@ -202,7 +207,12 @@ public class StockView extends BorderPane {
                         )
                         );
                         if (historial.isEmpty()) {
-                            return false;
+
+                            System.out.println(
+                                    "SIN HISTORIAL: "
+                                    + stock.getNombreProducto());
+
+                            return true;
                         }
 
                         LocalDate fechaNacimiento = historial.stream()
@@ -260,7 +270,8 @@ public class StockView extends BorderPane {
                 = stocks.stream()
                         .collect(Collectors.groupingBy(
                                 s -> s.getCategoriaGastoVariable()
-                                        .getNombre()));
+                                        .getNombre()
+                        ));
 
         if (modoDiario) {
 
@@ -279,22 +290,20 @@ public class StockView extends BorderPane {
             });
 
         } else {
-
-            for (Stock stock : stocks) {
-
-                List<HistorialStock> historial
-                        = service.obtenerHistorialPorStock(
-                                stock.getIdStock());
+            porCategoria.forEach((categoria, listaStocks) -> {
 
                 contenedorCategorias.getChildren().add(
                         new PanelHistorialStock(
-                                historial,
+                                categoria,
+                                listaStocks,
                                 modoDiario,
                                 service,
                                 gastosVariablesService,
                                 categoriasService,
-                                fechaSeleccionada));
-            }
+                                fechaSeleccionada
+                        )
+                );
+            });
         }
     }
 

@@ -3,7 +3,8 @@ package com.uade.tpo.demo.entity;
 import java.time.LocalDate;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "stock")
 public class Stock {
@@ -17,9 +18,13 @@ public class Stock {
     @JoinColumn(name = "id_categoria", nullable = false)
     private CategoriaGastoVariable categoriaGastoVariable;
 
-    @OneToOne
-    @JoinColumn(name = "id_gasto_variable", unique = true)
-    private GastosVariables gastoVariable;
+    @OneToMany(
+            mappedBy = "stock",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<HistorialStock> historiales;
 
     @Column(name = "nombre_producto", nullable = false)
     private String nombreProducto;
@@ -118,14 +123,6 @@ public class Stock {
         this.unidadCantidad = unidadCantidad;
     }
 
-    public GastosVariables getGastoVariable() {
-        return gastoVariable;
-    }
-
-    public void setGastoVariable(GastosVariables gastoVariable) {
-        this.gastoVariable = gastoVariable;
-    }
-
     public BigDecimal getStockMinimo() {
         return stockMinimo;
     }
@@ -140,5 +137,13 @@ public class Stock {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public List<HistorialStock> getHistoriales() {
+        return historiales;
+    }
+
+    public void setHistoriales(List<HistorialStock> historiales) {
+        this.historiales = historiales;
     }
 }

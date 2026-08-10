@@ -76,22 +76,24 @@ public class StockController {
             obtenerHistorialMes(
                     @RequestParam LocalDate desde,
                     @RequestParam LocalDate hasta) {
-
         return ResponseEntity.ok(
                 stockService.obtenerHistorialMes(
                         desde,
                         hasta));
     }
-    @PatchMapping("/{id}/sumar")
-public ResponseEntity<Stock> sumarStock(
-        @PathVariable Long id,
-        @RequestParam BigDecimal cantidad,
-        @RequestParam LocalDate fecha) {
 
-    return ResponseEntity.ok(
-            stockService.sumarStock(
-                    id,
-                    cantidad,
-                    fecha));
-}
+    @PatchMapping("/{id}/sumar")
+    public ResponseEntity<Stock> sumarStock(
+            @PathVariable Long id,
+            @RequestParam BigDecimal cantidad,
+            @RequestParam LocalDate fecha,
+            @RequestParam Long idGastoVariable) {
+
+        return ResponseEntity.ok(
+                stockService.sumarStock(
+                        id,
+                        cantidad,
+                        fecha,
+                        idGastoVariable));
+    }
 }

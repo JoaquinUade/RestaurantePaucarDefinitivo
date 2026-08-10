@@ -15,7 +15,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
-
 public class StockService {
 
     private final String BASE_URL;
@@ -420,22 +419,25 @@ public class StockService {
 public void sumarStock(
         Long id,
         BigDecimal cantidad,
-        LocalDate fecha) {
+        LocalDate fecha,
+        Long idGastoVariable) {
 
     try {
 
         var request = HttpRequest.newBuilder()
                 .uri(
-                        URI.create(
-                                BASE_URL
-                                + "/"
-                                + id
-                                + "/sumar?cantidad="
-                                + cantidad
-                                + "&fecha="
-                                + fecha
-                        )
-                )
+        URI.create(
+                BASE_URL
+                + "/"
+                + id
+                + "/sumar?cantidad="
+                + cantidad
+                + "&fecha="
+                + fecha
+                + "&idGastoVariable="
+                + idGastoVariable
+        )
+)
                 .method(
                         "PATCH",
                         HttpRequest.BodyPublishers.noBody()

@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
+
+import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 
 public interface StockService {
@@ -29,5 +31,5 @@ public interface StockService {
 
     List<HistorialStock> obtenerHistorialMes(LocalDate desde, LocalDate hasta);
 
-    Stock sumarStock(Long idStock, BigDecimal cantidad, LocalDate fecha);
+    Stock sumarStock(Long idStock, BigDecimal cantidad, LocalDate fecha, Long idGastoVariable);
 }

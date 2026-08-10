@@ -1,6 +1,7 @@
 package com.uade.tpo.demo.service.impl;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
+import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
@@ -78,8 +79,12 @@ public class StockServiceImpl implements StockService {
         Stock stockGuardado = stockRepository.save(stock);
 
         HistorialStock historial = new HistorialStock();
+
         historial.setStock(stockGuardado);
-        historial.setCantidad(stock.getCantComprada());
+
+        historial.setMovimiento(BigDecimal.ZERO);
+
+        historial.setCantidad(stock.getCantidad());
 
         historial.setFecha(stockGuardado.getFecha());
 
@@ -89,58 +94,41 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public Stock ajustarStockDisponible(Long id, BigDecimal stockDisponible, LocalDate fecha) {
-        System.out.println(
-                "AJUSTANDO STOCK: "
-                + id
-                + " -> "
-                + stockDisponible);
-        Stock stock = stockRepository.findById(id)
-                .orElseThrow(()
-                        -> new IllegalArgumentException(
-                        "Stock no encontrado con id: "
-                        + id));
+public Stock ajustarStockDisponible(
+        Long id,
+        BigDecimal stockDisponible,
+        LocalDate fecha) {
 
-        if (stockDisponible == null) {
-            throw new IllegalArgumentException(
-                    "La cantidad no puede ser nula");
-        }
+    Stock stock = stockRepository.findById(id)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
+                            "Stock no encontrado"));
 
-        if (stockDisponible.signum() < 0) {
-            throw new IllegalArgumentException(
-                    "La cantidad no puede ser negativa");
-        }
+    BigDecimal stockActual =
+            stock.getCantidad();
 
-        stock.setCantidad(stockDisponible);
+    BigDecimal movimiento =
+            stockDisponible.subtract(
+                    stockActual
+            );
 
-        Optional<HistorialStock> historialExistente
-                = historialStockRepository
-                        .findByStock_IdStockAndFecha(
-                                stock.getIdStock(),
-                                fecha);
+    HistorialStock historial =
+            new HistorialStock();
 
-        if (historialExistente.isPresent()) {
+    historial.setStock(stock);
 
-            HistorialStock historial
-                    = historialExistente.get();
+    historial.setFecha(fecha);
 
-            historial.setCantidad(stockDisponible);
+    historial.setMovimiento(movimiento);
 
-            historialStockRepository.save(historial);
+    historialStockRepository.save(historial);
 
-        } else {
+    recalcularHistorial(id);
 
-            HistorialStock historial
-                    = new HistorialStock();
-
-            historial.setStock(stock);
-            historial.setCantidad(stockDisponible);
-            historial.setFecha(fecha);
-
-            historialStockRepository.save(historial);
-        }
-        return stockRepository.save(stock);
-    }
+    return stockRepository
+            .findById(id)
+            .orElseThrow();
+}
 
     @Override
     public Stock modificarStock(Long id, Stock stockActualizado) {
@@ -180,10 +168,21 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public void eliminarStock(Long id) {
-        if (!stockRepository.existsById(id)) {
-            throw new IllegalArgumentException("Stock no encontrado con id: " + id);
+        Stock stock = stockRepository.findById(id)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado con id: " + id));
+        List<GastosVariables> gastos
+                = gastosVariablesRepository.findByStock(stock);
+
+        for (GastosVariables gasto : gastos) {
+
+            gasto.setStock(null);
+
+            gastosVariablesRepository.save(gasto);
+
         }
-        stockRepository.deleteById(id);
+        stockRepository.delete(stock);
     }
 
     @Override
@@ -206,81 +205,107 @@ public class StockServiceImpl implements StockService {
             Long idStock) {
 
         return historialStockRepository
-                .findByStock_IdStockOrderByFechaAsc(idStock);
+                .findByStock_IdStockOrderByFechaAscIdAsc(
+                        idStock);
     }
 
     @Override
     public List<HistorialStock> obtenerHistorialMes(
             LocalDate desde,
             LocalDate hasta) {
-
+        System.out.println(
+                "OBTENIENDO HISTORIAL MES: "
+                + desde
+                + " - "
+                + hasta);
         return historialStockRepository
                 .findByFechaBetweenOrderByFechaAsc(
                         desde,
                         hasta);
     }
-@Override
-public Stock sumarStock(
-        Long idStock,
-        BigDecimal cantidadASumar,
-        LocalDate fecha) {
 
-    Stock stock = stockRepository.findById(idStock)
-            .orElseThrow(() ->
-                    new IllegalArgumentException(
-                            "Stock no encontrado"));
+    @Override
+    public Stock sumarStock(
+            Long idStock,
+            BigDecimal cantidadASumar,
+            LocalDate fecha,
+            Long idGastoVariable) {
 
-    List<HistorialStock> historiales =
-            historialStockRepository
-                    .findByStock_IdStockOrderByFechaAsc(
-                            idStock);
+        Stock stock = stockRepository.findById(idStock)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado"));
 
-    boolean existeFecha = false;
-    BigDecimal ultimaCantidad = BigDecimal.ZERO;
+        List<HistorialStock> historiales
+        = historialStockRepository
+                .findByStock_IdStockOrderByFechaAscIdAsc(
+                        idStock);
 
-    for (HistorialStock h : historiales) {
+        BigDecimal ultimaCantidad = BigDecimal.ZERO;
+        GastosVariables gastoVariable = null;
 
-        if (h.getFecha().equals(fecha)) {
-            existeFecha = true;
+        if (idGastoVariable != null) {
+
+            gastoVariable = gastosVariablesRepository
+                    .findById(idGastoVariable)
+                    .orElseThrow(()
+                            -> new IllegalArgumentException(
+                            "Gasto variable no encontrado"));
         }
+        for (HistorialStock h : historiales) {
 
-        if (!h.getFecha().isAfter(fecha)) {
-            ultimaCantidad = h.getCantidad();
+            if (!h.getFecha().isAfter(fecha)) {
+                ultimaCantidad = h.getCantidad();
+            }
         }
-    }
-
-    if (!existeFecha) {
-
         HistorialStock nuevo = new HistorialStock();
+
         nuevo.setStock(stock);
         nuevo.setFecha(fecha);
+        nuevo.setMovimiento(cantidadASumar);
         nuevo.setCantidad(
                 ultimaCantidad.add(cantidadASumar));
 
+        nuevo.setGastoVariable(gastoVariable);
+
         historialStockRepository.save(nuevo);
+        recalcularHistorial(idStock);
+        stock.setCantidad(
+                ultimaCantidad.add(cantidadASumar)
+        );
+
+        return stockRepository.save(stock);
     }
 
-    historiales = historialStockRepository
-            .findByStock_IdStockOrderByFechaAsc(
-                    idStock);
+    private void recalcularHistorial(
+            Long idStock) {
 
-    for (HistorialStock h : historiales) {
+        List<HistorialStock> historiales
+                = historialStockRepository
+                        .findByStock_IdStockOrderByFechaAscIdAsc(
+                                idStock);
 
-        if (!h.getFecha().isBefore(fecha)) {
+        BigDecimal acumulado
+                = BigDecimal.ZERO;
 
-            h.setCantidad(
-                    h.getCantidad()
-                            .add(cantidadASumar));
+        for (HistorialStock h : historiales) {
+
+            acumulado
+                    = acumulado.add(
+                            h.getMovimiento()
+                    );
+
+            h.setCantidad(acumulado);
 
             historialStockRepository.save(h);
         }
+
+        Stock stock
+                = stockRepository.findById(idStock)
+                        .orElseThrow();
+
+        stock.setCantidad(acumulado);
+
+        stockRepository.save(stock);
     }
-
-    HistorialStock ultimo = historiales.get(
-            historiales.size() - 1);
-
-    stock.setCantidad(ultimo.getCantidad());
-
-    return stockRepository.save(stock);
-}
 }
