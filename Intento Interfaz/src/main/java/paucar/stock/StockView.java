@@ -273,23 +273,6 @@ public class StockView extends BorderPane {
                                         .getNombre()
                         ));
 
-        if (modoDiario) {
-
-            porCategoria.forEach((categoria, lista) -> {
-
-                contenedorCategorias.getChildren().add(
-                        new PanelCategoriaStock(
-                                categoria,
-                                lista,
-                                stock -> stockSeleccionado = stock,
-                                modoDiario,
-                                service,
-                                gastosVariablesService,
-                                categoriasService,
-                                fechaSeleccionada));
-            });
-
-        } else {
             porCategoria.forEach((categoria, listaStocks) -> {
 
                 contenedorCategorias.getChildren().add(
@@ -304,7 +287,7 @@ public class StockView extends BorderPane {
                         )
                 );
             });
-        }
+        
     }
 
     private void actualizarFecha() {

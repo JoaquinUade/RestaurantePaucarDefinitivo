@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.uade.tpo.demo.entity.Stock;
 
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
@@ -22,23 +21,20 @@ public class PanelHistorialStock extends VBox {
         CategoriasGastosService categoriasService,
         LocalDate fechaSeleccionada) {
 
-       Label titulo = new Label(categoria);
+    TituloPanel titulo =
+            new TituloPanel(categoria);
 
-titulo.getStyleClass().add(
-        "titulo-xl-blanco"
-);
+    getChildren().add(titulo);
 
-getChildren().add(titulo);
-
-getChildren().add(
-        new TablaHistorialStock(
-                stocks,
-                modoDiario,
-                stockService,
-                gastosVariablesService,
-                categoriasService,
-                fechaSeleccionada
-        )
-);
-    }
+    getChildren().add(
+            new TablaHistorialStock(
+                    stocks,
+                    modoDiario,
+                    stockService,
+                    gastosVariablesService,
+                    categoriasService,
+                    fechaSeleccionada
+            )
+    );
+}
 }

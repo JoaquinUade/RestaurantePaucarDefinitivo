@@ -81,7 +81,7 @@ colSubirStock.setCellFactory(param ->
         new TableCell<>() {
 
             private final Button btn =
-                    new Button("Sumar");
+                    new Button("+");
 
             {
                 btn.setOnAction(event -> {
@@ -132,7 +132,7 @@ colSubirStock.setCellFactory(param ->
         new TableCell<>() {
 
             private final Button btn =
-                    new Button("Restar");
+                    new Button("-");
 
             {
                 btn.setOnAction(event -> {

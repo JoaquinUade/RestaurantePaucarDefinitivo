@@ -5,7 +5,6 @@ paucar\resumen\clientes\semanal\TablaSemanalDebeCliente$1.class
 paucar\resumen\empresas\MensualEmpresas$4.class
 paucar\admin\empleados\TablaEmpleados$1.class
 paucar\admin\platos\DialogBotones.class
-paucar\stock\TablaCategoriaStock$1.class
 paucar\gastos\Gastos.class
 paucar\resumen\empresas\MensualEmpresas$7.class
 paucar\resumen\clientes\semanal\TablaSemanalDebeCliente.class
@@ -42,7 +41,6 @@ paucar\stock\DialogStock$5.class
 paucar\admin\Admin.class
 paucar\service\VentasBackend$1.class
 paucar\gastos\Individuales\TablaSemanalIndividual.class
-paucar\stock\PanelCategoriaStock.class
 paucar\shared\FechaUtils.class
 paucar\admin\platos\Platos.class
 paucar\admin\categoriasgastos\TablaCategoriasGastos.class
@@ -113,7 +111,6 @@ paucar\stock\StockView.class
 paucar\stock\TablaItemsComprados$1.class
 paucar\ventas\ui\ClienteAutoCompletar$2.class
 paucar\resumen\empresas\semanal\VentanaPagoDeudas.class
-paucar\stock\TablaCategoriaStock$2.class
 paucar\gastos\Fijos\DialogGastosFijos.class
 paucar\resumen\empresas\semanal\SemanalEmpresas.class
 paucar\shared\MonedaUtils.class
@@ -147,7 +144,6 @@ paucar\admin\empleados\EmpleadosView.class
 paucar\resumen\clientes\MensualClientes$5.class
 paucar\resumen\general\SemanalGeneral$1.class
 paucar\ventas\ui\EstadoPagoCombo.class
-paucar\stock\TablaCategoriaStock.class
 paucar\ventas\util\ValidadorVenta.class
 paucar\stock\DialogSumarStock$1.class
 paucar\service\ResumenBackend$1.class
