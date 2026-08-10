@@ -465,4 +465,47 @@ public void sumarStock(
         );
     }
 }
+public void restarStock(
+        Long id,
+        BigDecimal cantidad) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/"
+                                + id
+                                + "/restar?cantidad="
+                                + cantidad
+                        )
+                )
+                .method(
+                        "PATCH",
+                        HttpRequest.BodyPublishers.noBody()
+                )
+                .build();
+
+        var response = http.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+        );
+
+        System.out.println(
+                "PATCH RESTAR STATUS: "
+                + response.statusCode());
+
+        System.out.println(
+                "PATCH RESTAR BODY: "
+                + response.body());
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error restando stock: "
+                + e.getMessage()
+        );
+    }
+}
 }

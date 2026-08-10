@@ -40,7 +40,6 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Inter
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\TablaHistorialStock.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\ClientesService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\resumen\general\SemanalGeneral.java
-C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\FilaStockExpandible.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\Ventas.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\GastosVariablesView.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\empresasClientes\EmpresasClientes.java
@@ -52,6 +51,7 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Inter
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\service\GastosIndividualesService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\gastos\Variables\TablaSemanalGastosV.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\admin\platos\DialogBotones.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\DialogHistorialStock.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\stock\DialogRestarStock.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\ui\ClienteAutoCompletar.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\Intento Interfaz\src\main\java\paucar\ventas\ui\PanelProductos.java

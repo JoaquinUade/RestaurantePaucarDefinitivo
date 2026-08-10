@@ -99,7 +99,6 @@ paucar\gastos\Fijos\TablaMensualFijos$1.class
 paucar\resumen\general\SemanalGeneral.class
 paucar\stock\DialogStock.class
 paucar\gastos\Variables\TablaSemanalGastosV.class
-paucar\stock\FilaStockExpandible.class
 paucar\ventas\Tabla$2.class
 paucar\shared\LocaleUtils.class
 paucar\ventas\util\VentaBuilder.class

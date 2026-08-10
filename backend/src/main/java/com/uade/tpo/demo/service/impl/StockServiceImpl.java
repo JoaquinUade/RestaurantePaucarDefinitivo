@@ -94,41 +94,41 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-public Stock ajustarStockDisponible(
-        Long id,
-        BigDecimal stockDisponible,
-        LocalDate fecha) {
+    public Stock ajustarStockDisponible(
+            Long id,
+            BigDecimal stockDisponible,
+            LocalDate fecha) {
 
-    Stock stock = stockRepository.findById(id)
-            .orElseThrow(() ->
-                    new IllegalArgumentException(
-                            "Stock no encontrado"));
+        Stock stock = stockRepository.findById(id)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado"));
 
-    BigDecimal stockActual =
-            stock.getCantidad();
+        BigDecimal stockActual
+                = stock.getCantidad();
 
-    BigDecimal movimiento =
-            stockDisponible.subtract(
-                    stockActual
-            );
+        BigDecimal movimiento
+                = stockDisponible.subtract(
+                        stockActual
+                );
 
-    HistorialStock historial =
-            new HistorialStock();
+        HistorialStock historial
+                = new HistorialStock();
 
-    historial.setStock(stock);
+        historial.setStock(stock);
 
-    historial.setFecha(fecha);
+        historial.setFecha(fecha);
 
-    historial.setMovimiento(movimiento);
+        historial.setMovimiento(movimiento);
 
-    historialStockRepository.save(historial);
+        historialStockRepository.save(historial);
 
-    recalcularHistorial(id);
+        recalcularHistorial(id);
 
-    return stockRepository
-            .findById(id)
-            .orElseThrow();
-}
+        return stockRepository
+                .findById(id)
+                .orElseThrow();
+    }
 
     @Override
     public Stock modificarStock(Long id, Stock stockActualizado) {
@@ -237,9 +237,9 @@ public Stock ajustarStockDisponible(
                         "Stock no encontrado"));
 
         List<HistorialStock> historiales
-        = historialStockRepository
-                .findByStock_IdStockOrderByFechaAscIdAsc(
-                        idStock);
+                = historialStockRepository
+                        .findByStock_IdStockOrderByFechaAscIdAsc(
+                                idStock);
 
         BigDecimal ultimaCantidad = BigDecimal.ZERO;
         GastosVariables gastoVariable = null;
@@ -307,5 +307,51 @@ public Stock ajustarStockDisponible(
         stock.setCantidad(acumulado);
 
         stockRepository.save(stock);
+    }
+
+    @Override
+    public Stock restarStock(
+            Long idStock,
+            BigDecimal cantidadARestar) {
+
+        Stock stock = stockRepository.findById(idStock)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "Stock no encontrado"));
+
+        if (cantidadARestar == null
+                || cantidadARestar.compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new IllegalArgumentException(
+                    "La cantidad a restar debe ser mayor a cero");
+        }
+
+        if (cantidadARestar.compareTo(stock.getCantidad()) > 0) {
+
+            throw new IllegalArgumentException(
+                    "No hay stock suficiente");
+        }
+
+        HistorialStock historial
+                = new HistorialStock();
+
+        historial.setStock(stock);
+
+        historial.setFecha(LocalDate.now());
+
+        historial.setMovimiento(
+                cantidadARestar.negate()
+        );
+        historial.setCantidad(
+                stock.getCantidad()
+                        .subtract(cantidadARestar)
+        );
+        historialStockRepository.save(historial);
+
+        recalcularHistorial(idStock);
+
+        return stockRepository
+                .findById(idStock)
+                .orElseThrow();
     }
 }

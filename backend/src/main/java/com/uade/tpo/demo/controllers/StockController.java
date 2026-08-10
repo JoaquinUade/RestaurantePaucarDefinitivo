@@ -96,4 +96,17 @@ public class StockController {
                         fecha,
                         idGastoVariable));
     }
+    
+    @PatchMapping("/{id}/restar")
+public ResponseEntity<Stock> restarStock(
+        @PathVariable Long id,
+        @RequestParam BigDecimal cantidad) {
+
+    return ResponseEntity.ok(
+            stockService.restarStock(
+                    id,
+                    cantidad
+            )
+    );
+}
 }
