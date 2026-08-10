@@ -366,4 +366,34 @@ public class StockServiceImpl implements StockService {
                 .findById(idStock)
                 .orElseThrow();
     }
+    @Override
+public void eliminarMovimientoHistorial(
+        Long idHistorial) {
+
+    HistorialStock historial =
+            historialStockRepository
+                    .findById(idHistorial)
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    "Movimiento no encontrado"));
+
+    Long idStock =
+            historial.getStock()
+                    .getIdStock();
+
+    if (historial.getGastoVariable() != null) {
+
+        GastosVariables gasto =
+                historial.getGastoVariable();
+
+        gasto.setStock(null);
+        gasto.setCargadoEnStock(false);
+
+        gastosVariablesRepository.save(gasto);
+    }
+
+    historialStockRepository.delete(historial);
+
+    recalcularHistorial(idStock);
+}
 }

@@ -99,15 +99,24 @@ colSubirStock.setCellFactory(param ->
 
     if (cantidad != null) {
 
-        stockService.sumarStock(
-                stock.getIdStock(),
-                cantidad,
-                DialogSumarStock.getUltimaFechaSeleccionada(),
-                DialogSumarStock
-                        .getUltimoGastoSeleccionado()
-                        .getIdGastoVariable()
-        );
-    }
+    stockService.sumarStock(
+            stock.getIdStock(),
+            cantidad,
+            DialogSumarStock.getUltimaFechaSeleccionada(),
+            DialogSumarStock.getUltimoGastoSeleccionado()
+                    .getIdGastoVariable()
+    );
+
+    Stock actualizado =
+            stockService.obtenerPorId(
+                    stock.getIdStock());
+
+    getTableView()
+            .getItems()
+            .set(getIndex(), actualizado);
+
+    getTableView().refresh();
+}
 });
             }
 
@@ -153,6 +162,16 @@ colSubirStock.setCellFactory(param ->
             stock.getIdStock(),
             cantidad
     );
+
+    Stock actualizado =
+            stockService.obtenerPorId(
+                    stock.getIdStock());
+
+    getTableView()
+            .getItems()
+            .set(getIndex(), actualizado);
+
+    getTableView().refresh();
 }
                 });
             }
@@ -196,8 +215,7 @@ colSubirStock.setCellFactory(param ->
 
                             DialogHistorialStock.mostrar(
                                     stock,
-                                    historial
-                            );
+                                    historial, gastosVariablesService.obtenerTodos(), stockService);
                         });
                     }
 

@@ -34,4 +34,5 @@ public interface StockService {
     Stock sumarStock(Long idStock, BigDecimal cantidad, LocalDate fecha, Long idGastoVariable);
 
     Stock restarStock(Long idStock, BigDecimal cantidad);
+    void eliminarMovimientoHistorial(Long idHistorial);
 }

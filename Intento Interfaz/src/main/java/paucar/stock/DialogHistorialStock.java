@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
 
@@ -14,20 +15,23 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import paucar.service.StockService;
 
 public class DialogHistorialStock {
 
     public static void mostrar(
             Stock stock,
-            List<HistorialStock> historial) {
+            List<HistorialStock> historial, List<GastosVariables> gastos, StockService stockService) {
 
         Stage ventana = new Stage();
 
@@ -61,7 +65,9 @@ public class DialogHistorialStock {
                     + "-fx-font-weight: bold;");
 
             TableView<HistorialStock> tabla
-                    = crearTabla(entry.getValue());
+                    = crearTabla(
+                            entry.getValue(),
+                            gastos, stockService);
 
             root.getChildren().addAll(
                     titulo,
@@ -81,7 +87,7 @@ public class DialogHistorialStock {
     }
 
     private static TableView<HistorialStock> crearTabla(
-            List<HistorialStock> historial) {
+            List<HistorialStock> historial, List<GastosVariables> gastos, StockService stockService) {
 
         TableView<HistorialStock> tabla
                 = new TableView<>();
@@ -183,11 +189,91 @@ public class DialogHistorialStock {
                             .getGastoVariable()
                             .getProducto());
         });
+        TableColumn<HistorialStock, Void> colAcciones
+                = new TableColumn<>("Acciones");
 
-        tabla.getColumns().addAll(colFecha);
+        colAcciones.setCellFactory(param
+                -> new TableCell<>() {
+
+            private final Button btnEditar
+                    = new Button("Editar");
+
+            private final Button btnEliminar
+                    = new Button("Eliminar");
+
+            {
+                btnEditar.setOnAction(event -> {
+
+                    HistorialStock registro
+                            = getTableView()
+                                    .getItems()
+                                    .get(getIndex());
+
+                    HistorialStock editado
+                            = DialogHistorialEditar
+                                    .mostrarEditar(registro, gastos);
+
+                    if (editado != null) {
+
+                        getTableView().refresh();
+
+                        System.out.println(
+                                "Registro editado");
+                    }
+                });
+
+                btnEliminar.setOnAction(event -> {
+
+                    HistorialStock registro
+                            = getTableView()
+                                    .getItems()
+                                    .get(getIndex());
+
+                    if (DialogStock.confirmarEliminacion()) {
+
+                        stockService.eliminarHistorial(
+                                registro.getId());
+
+                        getTableView()
+                                .getItems()
+                                .remove(registro);
+
+                        getTableView().refresh();
+
+                        System.out.println(
+                                "Registro eliminado");
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(
+                    Void item,
+                    boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty) {
+
+                    setGraphic(null);
+
+                } else {
+
+                    HBox botones
+                            = new HBox(
+                                    5,
+                                    btnEditar,
+                                    btnEliminar);
+
+                    setGraphic(botones);
+                }
+            }
+        });
+        tabla.getColumns().add(colFecha);
         tabla.getColumns().add(colMovimiento);
         tabla.getColumns().add(colStock);
         tabla.getColumns().add(colGasto);
+        tabla.getColumns().add(colAcciones);
 
         tabla.setItems(
                 FXCollections.observableArrayList(

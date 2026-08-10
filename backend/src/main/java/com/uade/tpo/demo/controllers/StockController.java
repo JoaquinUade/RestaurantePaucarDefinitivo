@@ -109,4 +109,12 @@ public ResponseEntity<Stock> restarStock(
             )
     );
 }
+@DeleteMapping("/historial/{id}")
+public ResponseEntity<Void> eliminarHistorial(
+        @PathVariable Long id) {
+
+    stockService.eliminarMovimientoHistorial(id);
+
+    return ResponseEntity.ok().build();
+}
 }

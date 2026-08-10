@@ -508,4 +508,33 @@ public void restarStock(
         );
     }
 }
+public void eliminarHistorial(
+        Long idHistorial) {
+
+    try {
+
+        var request = HttpRequest.newBuilder()
+                .uri(
+                        URI.create(
+                                BASE_URL
+                                + "/historial/"
+                                + idHistorial
+                        )
+                )
+                .DELETE()
+                .build();
+
+        http.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+        );
+
+    } catch (IOException | InterruptedException e) {
+
+        System.err.println(
+                "Error eliminando historial: "
+                + e.getMessage()
+        );
+    }
+}
 }
