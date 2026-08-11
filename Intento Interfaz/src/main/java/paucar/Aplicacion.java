@@ -1,5 +1,8 @@
 package paucar;
 
+import java.util.List;
+
+import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 import javafx.application.Application;
@@ -31,6 +34,7 @@ import paucar.service.StockService;
 import paucar.service.VentasBackend;
 import paucar.stock.StockView;
 import paucar.ventas.Ventas;
+
 public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
@@ -80,22 +84,6 @@ public class Aplicacion extends Application {
         menu.setPadding(new Insets(20));
         menu.setPrefWidth(200);
 
-        // ===== Logo decorativo como primer "ítem" del menú =====
-        Image logoImg = new Image(getClass().getResourceAsStream("/img/logo paucar.png"));
-        ImageView logoView = new ImageView(logoImg);
-        logoView.setFitWidth(110); // ajustá a gusto
-        logoView.setPreserveRatio(true);
-        logoView.setSmooth(true);
-        logoView.setCache(true);
-        logoView.setMouseTransparent(true); // no capta clics, es decorativo
-
-        StackPane logoItem = new StackPane(logoView);
-        logoItem.getStyleClass().add("menu-logo"); // clase CSS para espaciar/centrar
-        StackPane.setAlignment(logoView, Pos.CENTER);
-
-        // Insertar el logo antes que los botones
-        menu.getChildren().add(logoItem);
-
         Button btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png");
         Button btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png");
         Button btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png");
@@ -111,14 +99,32 @@ public class Aplicacion extends Application {
             b.setMaxWidth(Double.MAX_VALUE);
         }
         /* Esto hace que los botones tomen la medida de la navtab izquierda */
-
-        menu.getChildren().addAll(btnVentas, btnResumen, btnGastos, btnStock,
-                btnCalcula, btnAdmin);
-
-        // ===== Contenido central =====
+        // ===== Logo decorativo como primer "ítem" del menú =====
+        Image logoImg = new Image(getClass().getResourceAsStream("/img/logo paucar.png"));
+        ImageView logoView = new ImageView(logoImg);
+        logoView.setFitWidth(110); // ajustá a gusto
+        logoView.setPreserveRatio(true);
+        logoView.setSmooth(true);
+        logoView.setCache(true);
+// ===== Contenido central =====
         VBox contenido = new VBox(30);
         contenido.getStyleClass().add("content");
         contenido.setAlignment(Pos.TOP_CENTER);
+        StackPane logoItem = new StackPane(logoView);
+        logoItem.getStyleClass().add("menu-logo"); // clase CSS para espaciar/centrar
+        StackPane.setAlignment(logoView, Pos.CENTER);
+        logoItem.setOnMouseClicked(e -> {
+
+            for (Button b : botones) {
+                b.getStyleClass().remove("active");
+            }
+
+            root.setCenter(contenido);
+        });
+        // Insertar el logo antes que los botones
+        menu.getChildren().add(logoItem);
+        menu.getChildren().addAll(btnVentas, btnResumen, btnGastos, btnStock,
+                btnCalcula, btnAdmin);
 
         Label titulo = new Label("Bienvenido UwU");
         titulo.getStyleClass().add("titulo-welcome");
@@ -146,7 +152,7 @@ public class Aplicacion extends Application {
 
         root.setLeft(menuScroll);
         root.setCenter(contenido);
-        
+
         vistaResumen = new Resumen(backend);
         vistaVentas = new Ventas(vistaResumen);// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
         // escrita en ventas
@@ -157,6 +163,27 @@ public class Aplicacion extends Application {
         GastosIndividualesService gastosIService = new GastosIndividualesService(API_BASE);
         GastosFijosService gastosFService = new GastosFijosService(API_BASE);
         StockService stockService = new StockService(API_BASE);
+
+List<Stock> alertas = stockService.obtenerFaltantes();
+
+System.out.println("Alertas: " + alertas.size());
+
+for (Stock stock : alertas) {
+
+    AlertaStockCard card =
+            new AlertaStockCard(
+                    stock.getNombreProducto(),
+                    stock.getCantidad().toString()
+                    + " "
+                    + stock.getUnidadCantidad(),
+                    stock.getStockMinimo().toString()
+                    + " "
+                    + stock.getUnidadCantidad()
+            );
+
+    contenido.getChildren().add(card);
+}
+
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -175,7 +202,8 @@ public class Aplicacion extends Application {
         btnStock.setOnAction(e -> {
 
             marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin);
-            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService, stock -> {}));
+            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService, stock -> {
+            }));
         });
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
 
