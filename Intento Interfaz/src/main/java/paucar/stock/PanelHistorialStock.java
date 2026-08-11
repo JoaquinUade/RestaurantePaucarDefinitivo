@@ -2,6 +2,7 @@ package paucar.stock;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.uade.tpo.demo.entity.Stock;
 
@@ -18,7 +19,7 @@ public class PanelHistorialStock extends VBox {
         StockService stockService,
         GastosVariablesService gastosVariablesService,
         CategoriasGastosService categoriasService,
-        LocalDate fechaSeleccionada) {
+        LocalDate fechaSeleccionada, Consumer<Stock> onSelect) {
 
     TituloPanel titulo =
             new TituloPanel(categoria);
@@ -31,7 +32,8 @@ public class PanelHistorialStock extends VBox {
                     stockService,
                     gastosVariablesService,
                     categoriasService,
-                    fechaSeleccionada
+                    fechaSeleccionada,
+                    onSelect
             )
     );
 }

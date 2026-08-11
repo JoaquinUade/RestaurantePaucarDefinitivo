@@ -9,7 +9,6 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -20,11 +19,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import paucar.service.GastosVariablesService;
 
@@ -177,246 +172,131 @@ public class DialogStock {
         return dialog.showAndWait().orElse(null);
     }
 
-    public static StockRequest mostrarEditar(List<CategoriaGastoVariable> categorias,
-            Stock original, GastosVariablesService gastosService) {
+    public static Stock mostrarEditar(
+        List<CategoriaGastoVariable> categorias,
+        Stock original,
+        GastosVariablesService gastosService) {
 
-        Dialog<StockRequest> dialog = new Dialog<>();
+    Dialog<Stock> dialog = new Dialog<>();
 
-        dialog.setTitle("Editar Stock");
+    dialog.setTitle("Editar Stock");
 
-        ButtonType btnGuardar
-                = new ButtonType(
-                        "Guardar",
-                        ButtonBar.ButtonData.OK_DONE);
+    ButtonType btnGuardar =
+            new ButtonType(
+                    "Guardar",
+                    ButtonBar.ButtonData.OK_DONE);
 
-        dialog.getDialogPane()
-                .getButtonTypes()
-                .addAll(btnGuardar, ButtonType.CANCEL);
+    dialog.getDialogPane()
+            .getButtonTypes()
+            .addAll(btnGuardar, ButtonType.CANCEL);
 
-        ComboBox<CategoriaGastoVariable> comboCategoria
-                = new ComboBox<>();
+    ComboBox<CategoriaGastoVariable> comboCategoria =
+            new ComboBox<>();
 
-        comboCategoria.getItems().addAll(categorias);
+    comboCategoria.getItems().addAll(categorias);
 
-        comboCategoria.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(
-                    CategoriaGastoVariable item,
-                    boolean empty) {
+    comboCategoria.setCellFactory(lv -> new ListCell<>() {
+        @Override
+        protected void updateItem(
+                CategoriaGastoVariable item,
+                boolean empty) {
 
-                super.updateItem(item, empty);
+            super.updateItem(item, empty);
 
-                setText(
-                        empty || item == null
-                                ? null
-                                : item.getNombre());
-            }
-        });
-        comboCategoria.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(
-                    CategoriaGastoVariable item,
-                    boolean empty) {
+            setText(
+                    empty || item == null
+                    ? null
+                    : item.getNombre());
+        }
+    });
 
-                super.updateItem(item, empty);
+    comboCategoria.setButtonCell(new ListCell<>() {
+        @Override
+        protected void updateItem(
+                CategoriaGastoVariable item,
+                boolean empty) {
 
-                setText(
-                        empty || item == null
-                                ? null
-                                : item.getNombre());
-            }
-        });
+            super.updateItem(item, empty);
 
-        categorias.stream()
-                .filter(c
-                        -> c.getIdCategoria().equals(
-                        original.getCategoriaGastoVariable()
-                                .getIdCategoria()))
-                .findFirst()
-                .ifPresent(comboCategoria::setValue);
+            setText(
+                    empty || item == null
+                    ? null
+                    : item.getNombre());
+        }
+    });
 
-        TextField txtProducto
-                = new TextField(
-                        original.getNombreProducto());
+    categorias.stream()
+            .filter(c ->
+                    c.getIdCategoria().equals(
+                            original.getCategoriaGastoVariable()
+                                    .getIdCategoria()))
+            .findFirst()
+            .ifPresent(comboCategoria::setValue);
 
-        TextField txtStockMinimo
-                = new TextField(
-                        original.getStockMinimo()
-                                .stripTrailingZeros()
-                                .toPlainString());
-        TextField txtUnidad
-                = new TextField(
-                        original.getUnidadCantidad());
-        List<GastosVariables> historial
-                = gastosService.obtenerPorStock(
-                        original.getIdStock());
-        TableView<GastosVariables> tablaHistorial
-                = new TableView<>();
-tablaHistorial.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        tablaHistorial.setPrefHeight(200);
-        TableColumn<GastosVariables, Void> colQuitar =
-        new TableColumn<>("Quitar");
+    TextField txtProducto =
+            new TextField(
+                    original.getNombreProducto());
 
-colQuitar.setPrefWidth(120);
+    TextField txtStockMinimo =
+            new TextField(
+                    original.getStockMinimo()
+                            .stripTrailingZeros()
+                            .toPlainString());
 
-colQuitar.setCellFactory(param ->
-        new TableCell<>() {
+    TextField txtUnidad =
+            new TextField(
+                    original.getUnidadCantidad());
 
-            private final javafx.scene.control.Button btn =
-                    new javafx.scene.control.Button("Quitar");
+    VBox form = new VBox(
+            10,
+            new Label("Categoría"),
+            comboCategoria,
 
-            {
-                btn.setOnAction(event -> {
+            new Label("Producto"),
+            txtProducto,
 
-                    GastosVariables gasto =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
+            new Label("Stock mínimo"),
+            txtStockMinimo,
 
-                    Alert alert = new Alert(
-                            Alert.AlertType.CONFIRMATION,
-                            "¿Desea quitar ese gasto de el stock?"
-                    );
+            new Label("Unidad"),
+            txtUnidad
+    );
 
-                    alert.showAndWait().ifPresent(r -> {
+    form.setPadding(new Insets(15));
 
-    if (r == ButtonType.OK) {
+    dialog.getDialogPane()
+            .setContent(form);
 
-        gastosService.desvincularStock(
-                gasto.getIdGastoVariable()
-        );
+    dialog.setResultConverter(btn -> {
 
-        getTableView()
-                .getItems()
-                .remove(gasto);
-    }
-});
-                });
-            }
+        if (btn == btnGuardar) {
 
-            @Override
-            protected void updateItem(
-                    Void item,
-                    boolean empty) {
+            Stock stock = new Stock();
 
-                super.updateItem(item, empty);
+            stock.setNombreProducto(
+                    txtProducto.getText().trim());
 
-                setGraphic(empty ? null : btn);
-            }
-        });
-        TableColumn<GastosVariables, String> colFecha
-                = new TableColumn<>("Fecha");
-colFecha.setPrefWidth(100);
-        colFecha.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue().getFecha() != null
-                        ? c.getValue().getFecha().toString()
-                        : ""));
-                        TableColumn<GastosVariables, String> colCategoria
-        = new TableColumn<>("Categoría");
+            stock.setCantidad(
+                    original.getCantidad());
 
-colCategoria.setPrefWidth(120);
+            stock.setStockMinimo(
+                    new BigDecimal(
+                            txtStockMinimo.getText()));
 
-colCategoria.setCellValueFactory(c ->
-        new SimpleStringProperty(
-                c.getValue().getCategoria() != null
-                ? c.getValue()
-                        .getCategoria()
-                        .getNombre()
-                : ""
-        ));
-        TableColumn<GastosVariables, String> colProductoHist
-                = new TableColumn<>("Producto");
-colProductoHist.setPrefWidth(100);
-        colProductoHist.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue().getProducto()));
-        TableColumn<GastosVariables, String> colCantidadHist
-                = new TableColumn<>("Cantidad");
-colCantidadHist.setPrefWidth(100);
-        colCantidadHist.setCellValueFactory(c
-                -> new SimpleStringProperty(
-                        c.getValue().getCantComprada()
-                                .stripTrailingZeros()
-                                .toPlainString()
-                        + " "
-                        + c.getValue().getMedida()));
-        tablaHistorial.getItems().addAll(historial);
-        tablaHistorial.getColumns().add(colQuitar);
-        tablaHistorial.getColumns().add(colFecha);
-        tablaHistorial.getColumns().add(colCategoria);
-        tablaHistorial.getColumns().add(colProductoHist);
-        tablaHistorial.getColumns().add(colCantidadHist);
-       VBox datosBox = new VBox(
-        10,
-        new Label("Categoría"),
-        comboCategoria,
-        new Label("Producto"),
-        txtProducto,
-        new Label("Stock mínimo"),
-        txtStockMinimo,
-        new Label("Unidad"),
-        txtUnidad
-);
+            stock.setUnidadCantidad(
+                    txtUnidad.getText().trim());
 
-VBox historialBox = new VBox(
-        10,
-        new Label("Historial de cargas"),
-        tablaHistorial
-);
+            stock.setCategoriaGastoVariable(
+                    comboCategoria.getValue());
 
-tablaHistorial.setPrefWidth(450);
+            return stock;
+        }
 
-HBox form = new HBox(
-        20,
-        datosBox,
-        historialBox
-);
-        form.setPadding(new Insets(15));
+        return null;
+    });
 
-        dialog.getDialogPane().setContent(form);
-
-        dialog.setResultConverter(btn -> {
-
-            if (btn == btnGuardar) {
-
-                StockRequest req
-                        = new StockRequest();
-
-                req.setCategoriaId(
-                        comboCategoria.getValue()
-                                .getIdCategoria());
-
-                req.setNombreProducto(
-                        txtProducto.getText());
-
-                req.setCantidad(original.getCantidad());
-
-                req.setUnidadCantidad(
-                        txtUnidad.getText().trim()
-                );
-
-                try {
-
-                    req.setStockMinimo(
-                            new BigDecimal(
-                                    txtStockMinimo.getText()));
-
-                } catch (Exception e) {
-
-                    req.setStockMinimo(
-                            BigDecimal.ZERO);
-                }
-
-                return req;
-            }
-
-            return null;
-        });
-
-        return dialog.showAndWait().orElse(null);
-    }
+    return dialog.showAndWait().orElse(null);
+}
     private static final String PASSWORD = "1234";
 
     public static boolean confirmarEliminacion() {

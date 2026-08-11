@@ -229,7 +229,7 @@ public class DialogHistorialStock {
                                     .getItems()
                                     .get(getIndex());
 
-                    if (DialogStock.confirmarEliminacion()) {
+                    if (DialogHistorialEditar.confirmarEliminacion()) {
 
                         stockService.eliminarHistorial(
                                 registro.getId());

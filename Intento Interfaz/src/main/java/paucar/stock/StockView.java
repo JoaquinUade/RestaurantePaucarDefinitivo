@@ -3,6 +3,7 @@ package paucar.stock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
@@ -34,13 +35,24 @@ public class StockView extends BorderPane {
     private final HBox contenedorCategorias = new HBox(20);
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
+    private final Consumer<Stock> onSelect;
 
     public StockView(StockService service, CategoriasGastosService categoriasService,
-            GastosVariablesService gastosVariablesService) {
+            GastosVariablesService gastosVariablesService, Consumer<Stock> onSelect) {
 
         this.service = service;
         this.categoriasService = categoriasService;
         this.gastosVariablesService = gastosVariablesService;
+        this.onSelect = stock -> {
+            this.stockSeleccionado = stock;
+
+            if (onSelect != null) {
+                onSelect.accept(stock);
+            }
+
+            System.out.println("Seleccionado: "
+                    + stock.getNombreProducto());
+        };
 
         Button btnAgregar = new Button("Crear Stock");
         btnAgregar.getStyleClass().add("btn-agregar");
@@ -75,38 +87,22 @@ public class StockView extends BorderPane {
         });
         btnEditar.setOnAction(e -> {
 
-            if (stockSeleccionado == null) {
-                return;
-            }
+    System.out.println("CLICK EDITAR");
+    System.out.println(stockSeleccionado);
 
-            List<CategoriaGastoVariable> categorias
-                    = categoriasService.obtenerCategorias();
+    if (stockSeleccionado == null) {
+        System.out.println("NO HAY STOCK SELECCIONADO");
+        return;
+    }
 
-            StockRequest editado
-                    = DialogStock.mostrarEditar(
-                            categorias,
-                            stockSeleccionado,
-                            gastosVariablesService);
+    System.out.println("ABRIENDO DIALOG");
 
-            if (editado != null) {
-
-                stockSeleccionado.setNombreProducto(
-                        editado.getNombreProducto());
-
-                stockSeleccionado.setCantidad(
-                        editado.getCantidad());
-
-                stockSeleccionado.setUnidadCantidad(
-                        editado.getUnidadCantidad());
-
-                service.editar(
-                        stockSeleccionado.getIdStock(),
-                        stockSeleccionado
-                );
-
-                recargar();
-            }
-        });
+    DialogStock.mostrarEditar(
+            categoriasService.obtenerCategorias(),
+            stockSeleccionado,
+            gastosVariablesService
+    );
+});
         btnEliminar.setOnAction(e -> {
 
             if (stockSeleccionado == null) {
@@ -165,12 +161,12 @@ public class StockView extends BorderPane {
         List<Stock> stocks = service.obtenerTodos();
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
-            stocks = stocks.stream()
-                    .filter(s -> s.getFecha() != null
-                    && s.getFecha().getMonth() == fechaSeleccionada.getMonth()
-                    && s.getFecha().getYear() == fechaSeleccionada.getYear())
-                    .toList();
-        
+        stocks = stocks.stream()
+                .filter(s -> s.getFecha() != null
+                && s.getFecha().getMonth() == fechaSeleccionada.getMonth()
+                && s.getFecha().getYear() == fechaSeleccionada.getYear())
+                .toList();
+
         for (Stock s : stocks) {
             System.out.println(
                     s.getNombreProducto() + " - "
@@ -184,20 +180,21 @@ public class StockView extends BorderPane {
                                         .getNombre()
                         ));
 
-            porCategoria.forEach((categoria, listaStocks) -> {
+        porCategoria.forEach((categoria, listaStocks) -> {
 
-                contenedorCategorias.getChildren().add(
-                        new PanelHistorialStock(
-                                categoria,
-                                listaStocks,
-                                service,
-                                gastosVariablesService,
-                                categoriasService,
-                                fechaSeleccionada
-                        )
-                );
-            });
-        
+            contenedorCategorias.getChildren().add(
+                    new PanelHistorialStock(
+                            categoria,
+                            listaStocks,
+                            service,
+                            gastosVariablesService,
+                            categoriasService,
+                            fechaSeleccionada,
+                            onSelect
+                    )
+            );
+        });
+
     }
 
     private void actualizarFecha() {

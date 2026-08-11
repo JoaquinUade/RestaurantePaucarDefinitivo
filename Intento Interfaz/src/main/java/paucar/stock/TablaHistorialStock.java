@@ -3,6 +3,7 @@ package paucar.stock;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.uade.tpo.demo.entity.HistorialStock;
 import com.uade.tpo.demo.entity.Stock;
@@ -18,7 +19,6 @@ import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
-
 public class TablaHistorialStock extends VBox {
 
     public TablaHistorialStock(
@@ -26,7 +26,7 @@ public class TablaHistorialStock extends VBox {
             StockService stockService,
             GastosVariablesService gastosVariablesService,
             CategoriasGastosService categoriasService,
-            LocalDate fechaSeleccionada) {
+            LocalDate fechaSeleccionada, Consumer<Stock> onSelect) {
 
         TableView<Stock> tabla = new TableView<>();
 
@@ -244,7 +244,14 @@ tabla.getColumns().add(colHistorial);
         tabla.setItems(
                 FXCollections.observableArrayList(
                         stocks));
+tabla.getSelectionModel()
+        .selectedItemProperty()
+        .addListener((obs, viejo, nuevo) -> {
 
+            if (nuevo != null) {
+                onSelect.accept(nuevo);
+            }
+        });
         tabla.setPrefHeight(
                 (stocks.size() * 30) + 60);
 

@@ -31,7 +31,6 @@ import paucar.service.StockService;
 import paucar.service.VentasBackend;
 import paucar.stock.StockView;
 import paucar.ventas.Ventas;
-
 public class Aplicacion extends Application {
 
     private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
@@ -158,7 +157,6 @@ public class Aplicacion extends Application {
         GastosIndividualesService gastosIService = new GastosIndividualesService(API_BASE);
         GastosFijosService gastosFService = new GastosFijosService(API_BASE);
         StockService stockService = new StockService(API_BASE);
-
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -177,7 +175,7 @@ public class Aplicacion extends Application {
         btnStock.setOnAction(e -> {
 
             marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin);
-            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService));
+            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService, stock -> {}));
         });
         btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
 
