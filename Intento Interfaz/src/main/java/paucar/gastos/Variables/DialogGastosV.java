@@ -19,26 +19,26 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.gastos.Fijos.DialogGastosFijos;
+import paucar.security.PasswordManager;
 
 public class DialogGastosV {
-    private static final String PASSWORD = "1234";
 
     public static GastoVariableRequest mostrar(List<CategoriaGastoVariable> categorias) {
 
         Dialog<GastoVariableRequest> dialog = new Dialog<>();
         dialog.setTitle("Agregar Gasto");
-dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
 
         DatePicker fecha = new DatePicker(LocalDate.now());
-fecha.getStyleClass().add("date-agregar");
+        fecha.getStyleClass().add("date-agregar");
         ComboBox<CategoriaGastoVariable> combo = new ComboBox<>();
         combo.getItems().addAll(categorias);
         combo.setCellFactory(lv -> new ListCell<>() {
@@ -74,7 +74,7 @@ fecha.getStyleClass().add("date-agregar");
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -136,18 +136,18 @@ fecha.getStyleClass().add("date-agregar");
 
         Dialog<GastoVariableRequest> dialog = new Dialog<>();
         dialog.setTitle("Editar Gasto");
-dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
 
         DatePicker fecha = new DatePicker(original.getFecha());
-fecha.getStyleClass().add("date-agregar");
+        fecha.getStyleClass().add("date-agregar");
         ComboBox<CategoriaGastoVariable> combo = new ComboBox<>();
         combo.getItems().addAll(categorias);
 
@@ -180,8 +180,8 @@ fecha.getStyleClass().add("date-agregar");
 
         TextField txtCantidad = new TextField(
                 original.getMedida().isEmpty()
-                        ? cantidadLimpia
-                        : cantidadLimpia + " " + original.getMedida());
+                ? cantidadLimpia
+                : cantidadLimpia + " " + original.getMedida());
         java.text.NumberFormat formato = java.text.NumberFormat
                 .getNumberInstance(java.util.Locale.forLanguageTag("es-AR"));
 
@@ -203,7 +203,7 @@ fecha.getStyleClass().add("date-agregar");
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -253,11 +253,11 @@ fecha.getStyleClass().add("date-agregar");
 
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Gasto");
-dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
 
         dialog.getDialogPane().getButtonTypes()
@@ -271,14 +271,13 @@ dialog.getDialogPane().getStylesheets().add(
         form.setPadding(new Insets(10));
         dialog.getDialogPane().setContent(form);
 
-        final boolean[] confirmado = { false };
+        final boolean[] confirmado = {false};
 
         dialog.setResultConverter(btn -> {
-            if (btn == btnEliminar &&
-                    txtPass.getText().equals(PASSWORD)) {
+            if (btn == btnEliminar
+                    && PasswordManager.verificar(txtPass.getText())) {
 
                 confirmado[0] = true;
-
             } else if (btn == btnEliminar) {
 
                 new Alert(Alert.AlertType.ERROR,

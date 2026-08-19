@@ -5,7 +5,6 @@ import java.util.List;
 import com.uade.tpo.demo.entity.Stock;
 
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import paucar.service.StockService;
@@ -15,39 +14,39 @@ public class AlertasStockView extends ScrollPane {
     private final VBox contenedor;
 
     public AlertasStockView(StockService stockService) {
-System.out.println("ENTRE A ALERTAS");
+        System.out.println("ENTRE A ALERTAS");
         contenedor = new VBox(15);
         contenedor.setPadding(new Insets(20));
+        contenedor.setStyle("""
+            -fx-background-color: transparent;
+        """);
 
-        Label titulo = new Label("⚠ Alertas de Stock");
-        titulo.getStyleClass().add("titulo-alertas");
-
-        contenedor.getChildren().add(titulo);
-
+        setStyle("""
+            -fx-background-color: transparent;
+        """);
         cargarAlertas(stockService);
-
         setContent(contenedor);
         setFitToWidth(true);
+        contenedor.setStyle("""
+    -fx-background-color: #0f172a; 
+""");
     }
-private void cargarAlertas(StockService stockService) {
 
-    List<Stock> alertas =
-            stockService.obtenerFaltantes();
+    private void cargarAlertas(StockService stockService) {
 
-    System.out.println(
-            "Cantidad de alertas: "
-            + alertas.size()
-    );
+        List<Stock> alertas
+                = stockService.obtenerFaltantes();
 
-    for (Stock stock : alertas) {
+        for (Stock stock : alertas) {
 
-        System.out.println(
-                stock.getNombreProducto()
-                + " | "
-                + stock.getCantidad()
-                + " | "
-                + stock.getStockMinimo()
-        );
+            AlertaStockCard card
+                    = new AlertaStockCard(
+                            stock.getNombreProducto(),
+                            stock.getCantidad() + " " + stock.getUnidadCantidad(),
+                            stock.getStockMinimo() + " " + stock.getUnidadCantidad()
+                    );
+
+            contenedor.getChildren().add(card);
+        }
     }
-}
 }

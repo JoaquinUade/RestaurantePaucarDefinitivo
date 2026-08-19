@@ -19,10 +19,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.gastos.Fijos.DialogGastosFijos;
+import paucar.security.PasswordManager;
 
 public class DialogGastosIndividuales {
-
-    private static final String PASSWORD = "1234";
 
     public static GastoIndividualRequest mostrar(List<Empleado> empleados) {
 
@@ -74,7 +73,7 @@ public class DialogGastosIndividuales {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -162,7 +161,7 @@ public class DialogGastosIndividuales {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -213,10 +212,9 @@ public class DialogGastosIndividuales {
 
         dialog.setResultConverter(btn -> {
             if (btn == btnEliminar
-                    && txtPass.getText().equals(PASSWORD)) {
+                    && PasswordManager.verificar(txtPass.getText())) {
 
                 confirmado[0] = true;
-
             } else if (btn == btnEliminar) {
 
                 new Alert(Alert.AlertType.ERROR,

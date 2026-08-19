@@ -21,10 +21,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
 
 public class DialogGastosFijos {
-
-    private static final String PASSWORD = "1234";
 
     // ✅ AGREGAR
     public static GastoFijoRequest mostrar(List<Empleado> empleados) {
@@ -45,12 +44,12 @@ public class DialogGastosFijos {
     public static Boolean preguntarSiEsPersonal() {
 
         Dialog<Boolean> dialog = new Dialog<>();
-         dialog.setTitle("Tipo de gasto");
-    dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.setTitle("Tipo de gasto");
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
 
         Button btnPersonal = new Button("Personal");
         Button btnGeneral = new Button("General");
@@ -96,11 +95,11 @@ public class DialogGastosFijos {
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Editar Gasto Fijo");
 
-    dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
 
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
@@ -126,7 +125,7 @@ public class DialogGastosFijos {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -158,18 +157,18 @@ public class DialogGastosFijos {
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Pago a personal");
 
-    dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
 
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         PasswordField txtPass = new PasswordField();
         DatePicker fecha = new DatePicker(LocalDate.now());
-        
+
         fecha.getStyleClass().add("date-agregar");
         ComboBox<Empleado> comboEmpleado = new ComboBox<>();
         comboEmpleado.getItems().addAll(empleados);
@@ -205,7 +204,7 @@ public class DialogGastosFijos {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -241,11 +240,11 @@ public class DialogGastosFijos {
         Dialog<GastoFijoRequest> dialog = new Dialog<>();
         dialog.setTitle("Gasto fijo");
 
-    dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
 
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
@@ -271,7 +270,7 @@ public class DialogGastosFijos {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -308,11 +307,11 @@ public class DialogGastosFijos {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Gasto");
 
-    dialog.getDialogPane().getStylesheets().add(
-        DialogGastosFijos.class
-            .getResource("/gastos.css")
-            .toExternalForm()
-    );
+        dialog.getDialogPane().getStylesheets().add(
+                DialogGastosFijos.class
+                        .getResource("/gastos.css")
+                        .toExternalForm()
+        );
 
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnEliminar, ButtonType.CANCEL);
@@ -329,7 +328,7 @@ public class DialogGastosFijos {
         final boolean[] confirmado = {false};
 
         dialog.setResultConverter(btn -> {
-            if (btn == btnEliminar && txtPass.getText().equals(PASSWORD)) {
+            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnEliminar) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();

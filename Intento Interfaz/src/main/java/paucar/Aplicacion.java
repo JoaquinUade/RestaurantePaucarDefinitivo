@@ -1,247 +1,243 @@
 package paucar;
 
-import java.util.List;
-
-import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import paucar.admin.Admin;
+import paucar.componentes.MenuLateral;
+import paucar.config.CssLoader;
+import paucar.config.ServiceContainer;
 import paucar.gastos.Gastos;
 import paucar.resumen.Resumen;
-import paucar.service.AdminService;
-import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
-import paucar.service.EmpleadoService;
-import paucar.service.GastosFijosService;
-import paucar.service.GastosIndividualesService;
-import paucar.service.GastosVariablesService;
-import paucar.service.StockService;
 import paucar.service.VentasBackend;
 import paucar.stock.StockView;
 import paucar.ventas.Ventas;
 
 public class Aplicacion extends Application {
 
-    private Ventas vistaVentas;// ← guardamos UNA instancia reutilizable
+    private Ventas vistaVentas;
     private Resumen vistaResumen;
+    private Gastos vistaGastos;
+    private StockView vistaStock;
 
-    private static final String API_BASE = "http://localhost:4002/api";
+    private static final String API_BASE
+            = "http://localhost:4002/api";
+
     private VentasBackend backend;
 
     @Override
     public void start(Stage stage) {
 
-        // Layout principal
         BorderPane root = new BorderPane();
 
         Scene scene = new Scene(root, 1000, 700);
 
+        CssLoader.cargar(scene);
+
         VentaRequest venta = new VentaRequest();
-        ClientesService clientesService = new ClientesService(API_BASE, venta);
-        backend = new VentasBackend(API_BASE, clientesService, venta);
 
-        // Cargar CSS (asegurate que app.css esté en resources)
-        scene.getStylesheets().add(
-                getClass().getResource("/app.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/stylemensual.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/stylesemanal.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/styletabla.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/platos.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/empresasclientes.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/agregar.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/resumen.css").toExternalForm());
-        scene.getStylesheets().add(
-                getClass().getResource("/gastos.css").toExternalForm());
-        // =====================
-        // BARRA LATERAL IZQUIERDA
-        // =====================
+        ClientesService clientesService
+                = new ClientesService(API_BASE, venta);
 
-        // ===== Menú lateral =====
-        VBox menu = new VBox(12);
-        menu.getStyleClass().add("menu"); // estilo del panel izquierdo
-        menu.setPadding(new Insets(20));
-        menu.setPrefWidth(200);
+        backend = new VentasBackend(
+                API_BASE,
+                clientesService,
+                venta);
 
-        Button btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png");
-        Button btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png");
-        Button btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png");
-        Button btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
-        Button btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
-        Button btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
+        ServiceContainer services
+                = new ServiceContainer(API_BASE);
 
-        // Marcar “activo” (estado visual)
-        btnVentas.getStyleClass().add("active");
+        MenuLateral menu
+                = new MenuLateral();
 
-        Button[] botones = new Button[]{btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin};
-        for (Button b : botones) {
-            b.setMaxWidth(Double.MAX_VALUE);
-        }
-        /* Esto hace que los botones tomen la medida de la navtab izquierda */
-        // ===== Logo decorativo como primer "ítem" del menú =====
-        Image logoImg = new Image(getClass().getResourceAsStream("/img/logo paucar.png"));
-        ImageView logoView = new ImageView(logoImg);
-        logoView.setFitWidth(110); // ajustá a gusto
-        logoView.setPreserveRatio(true);
-        logoView.setSmooth(true);
-        logoView.setCache(true);
-// ===== Contenido central =====
         VBox contenido = new VBox(30);
         contenido.getStyleClass().add("content");
         contenido.setAlignment(Pos.TOP_CENTER);
-        StackPane logoItem = new StackPane(logoView);
-        logoItem.getStyleClass().add("menu-logo"); // clase CSS para espaciar/centrar
-        StackPane.setAlignment(logoView, Pos.CENTER);
-        logoItem.setOnMouseClicked(e -> {
 
-            for (Button b : botones) {
-                b.getStyleClass().remove("active");
-            }
-
-            root.setCenter(contenido);
-        });
-        // Insertar el logo antes que los botones
-        menu.getChildren().add(logoItem);
-        menu.getChildren().addAll(btnVentas, btnResumen, btnGastos, btnStock,
-                btnCalcula, btnAdmin);
-
-        Label titulo = new Label("Bienvenido UwU");
+        Label titulo = new Label("Alertas de Stock");
         titulo.getStyleClass().add("titulo-welcome");
 
         VBox lineas = new VBox(20);
+
         for (int i = 0; i < 4; i++) {
+
             Region linea = new Region();
+
             linea.getStyleClass().add("line");
-            linea.setPrefHeight(50);// grosor de linea
-            linea.setMaxWidth(600);// ancho maximo de la linea
+            linea.setPrefHeight(50);
+            linea.setMaxWidth(600);
+
             // lineas.getChildren().add(linea);
         }
 
-        contenido.getChildren().addAll(titulo, lineas);
+        contenido.getChildren().addAll(
+                titulo,
+                lineas
+        );
 
-        // Armado final (con scroll en la navtab)
+        AlertasStockView alertasView
+                = new AlertasStockView(services.stock);
+
+        contenido.getChildren().add(alertasView);
+
         ScrollPane menuScroll = new ScrollPane(menu);
-        menuScroll.setFitToWidth(true); // el VBox ocupa el ancho del scroll
-        menuScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // sin barra horizontal
-        menuScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // barra vertical solo si hace falta
-
-        // (opcional pero recomendado) sin borde del ScrollPane
-        menuScroll.setPannable(true); // permite “arrastrar” con el mouse (agradable)
-        menuScroll.setFocusTraversable(false); // no roba el foco al iniciar
+        menuScroll.setFitToWidth(true);
+        menuScroll.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER);
+        menuScroll.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        menuScroll.setPannable(true);
+        menuScroll.setFocusTraversable(false);
 
         root.setLeft(menuScroll);
         root.setCenter(contenido);
 
-        vistaResumen = new Resumen(backend);
-        vistaVentas = new Ventas(vistaResumen);// así no se pierde el estado al navegar, asi no se eliminara la tabla ya
-        // escrita en ventas
-        AdminService adminService = new AdminService(API_BASE);
-        GastosVariablesService gastosVService = new GastosVariablesService(API_BASE);
-        CategoriasGastosService categoriaGastos = new CategoriasGastosService(API_BASE);
-        EmpleadoService empleadoService = new EmpleadoService(API_BASE);
-        GastosIndividualesService gastosIService = new GastosIndividualesService(API_BASE);
-        GastosFijosService gastosFService = new GastosFijosService(API_BASE);
-        StockService stockService = new StockService(API_BASE);
+        vistaResumen
+                = new Resumen(backend);
 
-List<Stock> alertas = stockService.obtenerFaltantes();
+        vistaVentas
+                = new Ventas(vistaResumen);
 
-System.out.println("Alertas: " + alertas.size());
+        vistaGastos
+                = new Gastos(
+                        services.gastosVariables,
+                        services.categorias,
+                        services.gastosIndividuales,
+                        services.empleados,
+                        services.gastosFijos);
 
-for (Stock stock : alertas) {
+        vistaStock
+                = new StockView(
+                        services.stock,
+                        services.categorias,
+                        services.gastosVariables,
+                        stock -> {
+                        });
 
-    AlertaStockCard card =
-            new AlertaStockCard(
-                    stock.getNombreProducto(),
-                    stock.getCantidad().toString()
-                    + " "
-                    + stock.getUnidadCantidad(),
-                    stock.getStockMinimo().toString()
-                    + " "
-                    + stock.getUnidadCantidad()
-            );
+        menu.getLogoItem().setOnMouseClicked(e -> {
 
-    contenido.getChildren().add(card);
-}
+            limpiarActivos(menu);
+
+            root.setCenter(contenido);
+        });
+
+        menu.getBtnVentas().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnGastos(),
+                    menu.getBtnStock(),
+                    menu.getBtnCalcula(),
+                    menu.getBtnAdmin());
+
+            root.setCenter(vistaVentas);
+
+            vistaVentas.recargarDelBackend();
+        });
+
+        menu.getBtnResumen().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnResumen(),
+                    menu.getBtnVentas(),
+                    menu.getBtnGastos(),
+                    menu.getBtnStock(),
+                    menu.getBtnCalcula(),
+                    menu.getBtnAdmin());
+
+            root.setCenter(vistaResumen);
+        });
+
+        menu.getBtnGastos().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnGastos(),
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnStock(),
+                    menu.getBtnCalcula(),
+                    menu.getBtnAdmin());
+
+            root.setCenter(vistaGastos);
+        });
+
+        menu.getBtnStock().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnStock(),
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnGastos(),
+                    menu.getBtnCalcula(),
+                    menu.getBtnAdmin());
+
+            root.setCenter(vistaStock);
+        });
+
+        menu.getBtnCalcula().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnCalcula(),
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnGastos(),
+                    menu.getBtnStock(),
+                    menu.getBtnAdmin());
+        });
+
+        menu.getBtnAdmin().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnAdmin(),
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnGastos(),
+                    menu.getBtnStock(),
+                    menu.getBtnCalcula());
+
+            root.setCenter(
+                    new Admin(
+                            services.adminService,
+                            clientesService,
+                            services.categorias,
+                            services.empleados
+                    ));
+        });
 
         stage.setTitle("Interfaz");
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
-
-        // ===== Demo: al hacer clic cambiamos el “activo” =====
-        btnResumen.setOnAction(e -> {
-            marcarActivo(btnResumen, btnVentas, btnGastos, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(vistaResumen);
-        });
-
-        btnGastos.setOnAction(e -> {
-            marcarActivo(btnGastos, btnVentas, btnResumen, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(new Gastos(gastosVService, categoriaGastos, gastosIService, empleadoService, gastosFService));
-        });
-        btnStock.setOnAction(e -> {
-
-            marcarActivo(btnStock, btnVentas, btnResumen, btnGastos, btnCalcula, btnAdmin);
-            root.setCenter(new StockView(stockService, categoriaGastos, gastosVService, stock -> {
-            }));
-        });
-        btnCalcula.setOnAction(e -> marcarActivo(btnCalcula, btnVentas, btnResumen, btnGastos, btnStock, btnAdmin));
-
-        btnAdmin.setOnAction(e -> {
-            marcarActivo(btnAdmin, btnVentas, btnResumen, btnGastos, btnStock, btnCalcula);
-            root.setCenter(new Admin(adminService, clientesService, categoriaGastos, empleadoService)); // ← NUEVA instancia cada vez
-        });
-        btnVentas.setOnAction(e -> {
-            marcarActivo(btnVentas, btnResumen, btnGastos, btnStock, btnCalcula, btnAdmin);
-            root.setCenter(vistaVentas); // reutilizamos la misma instancia
-            vistaVentas.recargarDelBackend(); // refrescamos por si hubo cambios
-        });
-
     }
 
-    private Button crearBotonConIcono(String texto, String rutaIcono) {
-        Image img = new Image(getClass().getResourceAsStream(rutaIcono));
-        ImageView icono = new ImageView(img);
+    private void limpiarActivos(MenuLateral menu) {
 
-        icono.setFitWidth(55);
-        icono.setFitHeight(55);
-        icono.setPreserveRatio(true);
-
-        Button btn = new Button(texto);
-        btn.setGraphic(icono);
-        btn.setContentDisplay(ContentDisplay.TOP); // Imagen arriba del texto
-        btn.setGraphicTextGap(8);
-
-        return btn;
+        menu.getBtnVentas().getStyleClass().remove("active");
+        menu.getBtnResumen().getStyleClass().remove("active");
+        menu.getBtnGastos().getStyleClass().remove("active");
+        menu.getBtnStock().getStyleClass().remove("active");
+        menu.getBtnCalcula().getStyleClass().remove("active");
+        menu.getBtnAdmin().getStyleClass().remove("active");
     }
 
-    /**
-     * Marca un botón como activo y limpia el resto.
-     */
-    private void marcarActivo(Button activo, Button... otros) {
+    private void marcarActivo(Button activo,
+            Button... otros) {
+
         if (!activo.getStyleClass().contains("active")) {
             activo.getStyleClass().add("active");
         }
+
         for (Button b : otros) {
             b.getStyleClass().remove("active");
         }

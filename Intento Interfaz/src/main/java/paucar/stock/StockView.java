@@ -87,22 +87,27 @@ public class StockView extends BorderPane {
         });
         btnEditar.setOnAction(e -> {
 
-    System.out.println("CLICK EDITAR");
-    System.out.println(stockSeleccionado);
-
     if (stockSeleccionado == null) {
-        System.out.println("NO HAY STOCK SELECCIONADO");
         return;
     }
 
-    System.out.println("ABRIENDO DIALOG");
-
-    DialogStock.mostrarEditar(
+    Stock editado = DialogStock.mostrarEditar(
             categoriasService.obtenerCategorias(),
             stockSeleccionado,
             gastosVariablesService
     );
+
+    if (editado != null) {
+
+        service.editar(
+                stockSeleccionado.getIdStock(),
+                editado
+        );
+
+        recargar();
+    }
 });
+
         btnEliminar.setOnAction(e -> {
 
             if (stockSeleccionado == null) {

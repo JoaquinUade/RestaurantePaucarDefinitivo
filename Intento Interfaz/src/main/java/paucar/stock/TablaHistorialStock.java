@@ -19,6 +19,9 @@ import javafx.scene.layout.VBox;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
+import paucar.stock.aumentoydisminucion.DialogRestarStock;
+import paucar.stock.aumentoydisminucion.DialogSumarStock;
+
 public class TablaHistorialStock extends VBox {
 
     public TablaHistorialStock(
@@ -34,23 +37,23 @@ public class TablaHistorialStock extends VBox {
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // PRODUCTO
-        TableColumn<Stock, String> colProducto =
-                new TableColumn<>("Producto");
+        TableColumn<Stock, String> colProducto
+                = new TableColumn<>("Producto");
 
-        colProducto.setCellValueFactory(c ->
-                new SimpleStringProperty(
+        colProducto.setCellValueFactory(c
+                -> new SimpleStringProperty(
                         c.getValue().getNombreProducto()));
 
         // STOCK ACTUAL
-        TableColumn<Stock, String> colCantidad =
-                new TableColumn<>("Stock actual");
+        TableColumn<Stock, String> colCantidad
+                = new TableColumn<>("Stock actual");
 
         colCantidad.setCellValueFactory(c -> {
 
             Stock stock = c.getValue();
 
-            String texto =
-                    stock.getCantidad()
+            String texto
+                    = stock.getCantidad()
                             .stripTrailingZeros()
                             .toPlainString()
                     + " "
@@ -60,12 +63,11 @@ public class TablaHistorialStock extends VBox {
         });
 
         // STOCK MINIMO
-        TableColumn<Stock, String> colMinimo =
-                new TableColumn<>("Stock mínimo");
+        TableColumn<Stock, String> colMinimo
+                = new TableColumn<>("Stock mínimo");
 
-        colMinimo.setCellValueFactory(c ->
-
-                new SimpleStringProperty(
+        colMinimo.setCellValueFactory(c
+                -> new SimpleStringProperty(
                         c.getValue()
                                 .getStockMinimo()
                                 .stripTrailingZeros()
@@ -73,51 +75,51 @@ public class TablaHistorialStock extends VBox {
                 )
         );
 // SUBIR STOCK
-TableColumn<Stock, Void> colSubirStock =
-        new TableColumn<>("Subir stock");
+        TableColumn<Stock, Void> colSubirStock
+                = new TableColumn<>("Subir stock");
 
-colSubirStock.setCellFactory(param ->
-        new TableCell<>() {
+        colSubirStock.setCellFactory(param
+                -> new TableCell<>() {
 
-            private final Button btn =
-                    new Button("+");
+            private final Button btn
+                    = new Button("+");
 
             {
                 btn.setOnAction(event -> {
 
-    Stock stock =
-            getTableView()
-                    .getItems()
-                    .get(getIndex());
+                    Stock stock
+                            = getTableView()
+                                    .getItems()
+                                    .get(getIndex());
 
-    BigDecimal cantidad =
-            DialogSumarStock.mostrar(
-                    stock.getCategoriaGastoVariable()
-                         .getIdCategoria(),
-                    gastosVariablesService.obtenerTodos()
-            );
+                    BigDecimal cantidad
+                            = DialogSumarStock.mostrar(
+                                    stock.getCategoriaGastoVariable()
+                                            .getIdCategoria(),
+                                    gastosVariablesService.obtenerTodos()
+                            );
 
-    if (cantidad != null) {
+                    if (cantidad != null) {
 
-    stockService.sumarStock(
-            stock.getIdStock(),
-            cantidad,
-            DialogSumarStock.getUltimaFechaSeleccionada(),
-            DialogSumarStock.getUltimoGastoSeleccionado()
-                    .getIdGastoVariable()
-    );
+                        stockService.sumarStock(
+                                stock.getIdStock(),
+                                cantidad,
+                                DialogSumarStock.getUltimaFechaSeleccionada(),
+                                DialogSumarStock.getUltimoGastoSeleccionado()
+                                        .getIdGastoVariable()
+                        );
 
-    Stock actualizado =
-            stockService.obtenerPorId(
-                    stock.getIdStock());
+                        Stock actualizado
+                                = stockService.obtenerPorId(
+                                        stock.getIdStock());
 
-    getTableView()
-            .getItems()
-            .set(getIndex(), actualizado);
+                        getTableView()
+                                .getItems()
+                                .set(getIndex(), actualizado);
 
-    getTableView().refresh();
-}
-});
+                        getTableView().refresh();
+                    }
+                });
             }
 
             @Override
@@ -134,45 +136,45 @@ colSubirStock.setCellFactory(param ->
                 }
             }
         });
-        TableColumn<Stock, Void> colRestarStock =
-        new TableColumn<>("Consumir");
-        colRestarStock.setCellFactory(param ->
-        new TableCell<>() {
+        TableColumn<Stock, Void> colRestarStock
+                = new TableColumn<>("Consumir");
+        colRestarStock.setCellFactory(param
+                -> new TableCell<>() {
 
-            private final Button btn =
-                    new Button("-");
+            private final Button btn
+                    = new Button("-");
 
             {
                 btn.setOnAction(event -> {
 
-                    Stock stock =
-                            getTableView()
+                    Stock stock
+                            = getTableView()
                                     .getItems()
                                     .get(getIndex());
 
-                    BigDecimal cantidad =
-                            DialogRestarStock.mostrar(
+                    BigDecimal cantidad
+                            = DialogRestarStock.mostrar(
                                     stock.getNombreProducto(),
                                     stock.getCantidad()
                             );
 
                     if (cantidad != null) {
 
-    stockService.restarStock(
-            stock.getIdStock(),
-            cantidad
-    );
+                        stockService.restarStock(
+                                stock.getIdStock(),
+                                cantidad
+                        );
 
-    Stock actualizado =
-            stockService.obtenerPorId(
-                    stock.getIdStock());
+                        Stock actualizado
+                                = stockService.obtenerPorId(
+                                        stock.getIdStock());
 
-    getTableView()
-            .getItems()
-            .set(getIndex(), actualizado);
+                        getTableView()
+                                .getItems()
+                                .set(getIndex(), actualizado);
 
-    getTableView().refresh();
-}
+                        getTableView().refresh();
+                    }
                 });
             }
 
@@ -191,81 +193,87 @@ colSubirStock.setCellFactory(param ->
             }
         });
         // HISTORIAL
-        TableColumn<Stock, Void> colHistorial =
-                new TableColumn<>("Historial");
+        TableColumn<Stock, Void> colHistorial
+                = new TableColumn<>("Historial");
 
-        colHistorial.setCellFactory(param ->
-                new TableCell<>() {
+        colHistorial.setCellFactory(param
+                -> new TableCell<>() {
 
-                    private final Button btn =
-                            new Button("Ver");
+            private final Button btn
+                    = new Button("Ver");
 
-                    {
-                        btn.setOnAction(event -> {
+            {
+                btn.setOnAction(event -> {
 
-                            Stock stock =
-                                    getTableView()
-                                            .getItems()
-                                            .get(getIndex());
+                    Stock stock
+                            = getTableView()
+                                    .getItems()
+                                    .get(getIndex());
 
-                            List<HistorialStock> historial =
-                                    stockService
-                                            .obtenerHistorialPorStock(
-                                                    stock.getIdStock());
+                    List<HistorialStock> historial
+                            = stockService
+                                    .obtenerHistorialPorStock(
+                                            stock.getIdStock());
 
-                            DialogHistorialStock.mostrar(
-                                    stock,
-                                    historial, gastosVariablesService.obtenerTodos(), stockService);
-                        });
-                    }
-
-                    @Override
-                    protected void updateItem(
-                            Void item,
-                            boolean empty) {
-
-                        super.updateItem(item, empty);
-
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btn);
-                        }
-                    }
+                    DialogHistorialStock.mostrar(
+                            stock,
+                            historial, gastosVariablesService.obtenerTodos(), stockService);
                 });
+            }
 
-       tabla.getColumns().add(colProducto);
-tabla.getColumns().add(colCantidad);
-tabla.getColumns().add(colMinimo);
-tabla.getColumns().add(colSubirStock);
-tabla.getColumns().add(colRestarStock);
-tabla.getColumns().add(colHistorial);
+            @Override
+            protected void updateItem(
+                    Void item,
+                    boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
+        colProducto.setSortable(false);
+        colCantidad.setSortable(false);
+        colMinimo.setSortable(false);
+        colSubirStock.setSortable(false);
+        colRestarStock.setSortable(false);
+        colHistorial.setSortable(false);
+
+        tabla.getColumns().add(colProducto);
+        tabla.getColumns().add(colCantidad);
+        tabla.getColumns().add(colMinimo);
+        tabla.getColumns().add(colSubirStock);
+        tabla.getColumns().add(colRestarStock);
+        tabla.getColumns().add(colHistorial);
 
         tabla.setItems(
                 FXCollections.observableArrayList(
                         stocks));
-tabla.getSelectionModel()
-        .selectedItemProperty()
-        .addListener((obs, viejo, nuevo) -> {
+        tabla.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, viejo, nuevo) -> {
 
-            if (nuevo != null) {
-                onSelect.accept(nuevo);
-            }
-        });
+                    if (nuevo != null) {
+                        onSelect.accept(nuevo);
+                    }
+                });
         tabla.setPrefHeight(
                 (stocks.size() * 30) + 60);
 
-        long faltantes =
-                stocks.stream()
-                        .filter(s ->
-                                s.getCantidad()
-                                        .compareTo(
-                                                s.getStockMinimo())
-                                        <= 0)
+        long faltantes
+                = stocks.stream()
+                        .filter(s
+                                -> s.getCantidad()
+                                .compareTo(
+                                        s.getStockMinimo())
+                        <= 0)
                         .count();
 
-        Label lblInfo =
-                new Label(
+        Label lblInfo
+                = new Label(
                         "Productos con bajo stock: "
                         + faltantes);
 

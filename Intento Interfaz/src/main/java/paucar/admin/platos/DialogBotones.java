@@ -15,11 +15,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
 import paucar.shared.MonedaUtils;
 
 public class DialogBotones {
-
-    private static final String PASSWORD = "1234";
 
     public static Producto abrirDialogCrear() {
 
@@ -66,7 +65,7 @@ public class DialogBotones {
         dialog.setResultConverter(btn -> {
             /*Según el botón presionado, devuelve el objeto creado o null*/
             if (btn == btnGuardar) {/*si el boton es guardar */
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -78,16 +77,16 @@ public class DialogBotones {
                 BigDecimal precio
                         = MonedaUtils.parseMoneda(
                                 txtPrecio.getText());
-                                
-if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-    new Alert(
-            Alert.AlertType.ERROR,
-            "Precio inválido")
-            .showAndWait();
+                if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-    return null;
-}
+                    new Alert(
+                            Alert.AlertType.ERROR,
+                            "Precio inválido")
+                            .showAndWait();
+
+                    return null;
+                }
 
                 p.setPrecio(precio);/*asigna el precio convertido al producto */
 
@@ -145,7 +144,7 @@ if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
             if (btn == btnGuardar) {/*Si el botón presionado es guardar, se actualizan los datos del
                                     producto con los valores ingresados en el formulario */
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -154,16 +153,16 @@ if (precio.compareTo(BigDecimal.ZERO) <= 0) {
                 BigDecimal precio
                         = MonedaUtils.parseMoneda(
                                 txtPrecio.getText());
-                                
-if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-    new Alert(
-            Alert.AlertType.ERROR,
-            "Precio inválido")
-            .showAndWait();
+                if (precio.compareTo(BigDecimal.ZERO) <= 0) {
 
-    return null;
-}
+                    new Alert(
+                            Alert.AlertType.ERROR,
+                            "Precio inválido")
+                            .showAndWait();
+
+                    return null;
+                }
 
                 producto.setPrecio(precio);/*Asigna el precio del producto */
 
@@ -194,7 +193,7 @@ if (precio.compareTo(BigDecimal.ZERO) <= 0) {
         final boolean[] confirmado = {false};
 
         dialog.setResultConverter(btn -> {
-            if (btn == btnConfirmar && txtPass.getText().equals(PASSWORD)) {
+            if (btn == btnConfirmar && PasswordManager.verificar(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnConfirmar) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();

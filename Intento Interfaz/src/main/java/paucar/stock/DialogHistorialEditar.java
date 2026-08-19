@@ -18,6 +18,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
+import paucar.stock.aumentoydisminucion.TablaItemsComprados;
 
 public class DialogHistorialEditar {
 
@@ -69,33 +71,32 @@ public class DialogHistorialEditar {
         TableView<GastosVariables> tabla
                 = TablaItemsComprados.crear();
         tabla.getItems().addAll(
-        gastos.stream()
-                .filter(g ->
-                        Boolean.FALSE.equals(
+                gastos.stream()
+                        .filter(g
+                                -> Boolean.FALSE.equals(
                                 g.getCargadoEnStock())
-                        ||
-                        (historial.getGastoVariable() != null
+                        || (historial.getGastoVariable() != null
                         && g.getIdGastoVariable().equals(
                                 historial.getGastoVariable()
                                         .getIdGastoVariable())))
-                .toList()
-);
+                        .toList()
+        );
 
-if (historial.getGastoVariable() != null) {
+        if (historial.getGastoVariable() != null) {
 
-    for (GastosVariables gasto : tabla.getItems()) {
+            for (GastosVariables gasto : tabla.getItems()) {
 
-        if (gasto.getIdGastoVariable().equals(
-                historial.getGastoVariable()
-                        .getIdGastoVariable())) {
+                if (gasto.getIdGastoVariable().equals(
+                        historial.getGastoVariable()
+                                .getIdGastoVariable())) {
 
-            tabla.getSelectionModel().select(gasto);
-            tabla.scrollTo(gasto);
+                    tabla.getSelectionModel().select(gasto);
+                    tabla.scrollTo(gasto);
 
-            break;
+                    break;
+                }
+            }
         }
-    }
-}
 
         VBox historialBox = new VBox(
                 10,
@@ -155,7 +156,6 @@ if (historial.getGastoVariable() != null) {
         return dialog.showAndWait()
                 .orElse(null);
     }
-    private static final String PASSWORD = "1234";
 
     public static boolean confirmarEliminacion() {
 
@@ -193,9 +193,7 @@ if (historial.getGastoVariable() != null) {
 
         dialog.setResultConverter(btn -> {
 
-            if (btn == btnEliminar
-                    && txtPass.getText()
-                            .equals(PASSWORD)) {
+            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
 
                 confirmado[0] = true;
 

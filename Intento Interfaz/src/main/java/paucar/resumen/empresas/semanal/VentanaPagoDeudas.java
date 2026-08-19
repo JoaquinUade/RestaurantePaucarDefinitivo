@@ -22,6 +22,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import paucar.security.PasswordManager;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 
@@ -187,10 +188,11 @@ public class VentanaPagoDeudas {
         Button btnConfirmar = new Button("Confirmar Pago");
 
         btnConfirmar.setOnAction(e -> {/*si presiona el boton confirmar */
-            String pass = txtPass.getText();/*obtiene lo que el usuario escribió en el campo de contraseña*/
-
-            if (!"1234".equals(pass)) {/*si la contraseña es incorrecta */
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta");
+            if (!PasswordManager.verificar(txtPass.getText())) {
+                Alert alert = new Alert(
+                        Alert.AlertType.ERROR,
+                        "Contraseña incorrecta"
+                );
                 alert.show();
                 return;
             }
@@ -234,17 +236,19 @@ public class VentanaPagoDeudas {
 
         col.setCellValueFactory(fila -> {
 
-    Venta v = fila.getValue();
+            Venta v = fila.getValue();
 
-    String valor = switch (key) {
-        case "descripcion" -> v.getDescripcion();
-        case "observaciones" -> v.getObservaciones();
-        default -> "";
-    };
+            String valor = switch (key) {
+                case "descripcion" ->
+                    v.getDescripcion();
+                case "observaciones" ->
+                    v.getObservaciones();
+                default ->
+                    "";
+            };
 
-    return new SimpleObjectProperty<>(valor);
-});
-
+            return new SimpleObjectProperty<>(valor);
+        });
 
         col.setCellFactory(columna -> new TableCell<>() {/*Por cada columna, devolveme una nueva celda
                                                          (TableCell) */

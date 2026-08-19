@@ -21,6 +21,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
 import paucar.service.GastosVariablesService;
 
 public class DialogStock {
@@ -173,131 +174,127 @@ public class DialogStock {
     }
 
     public static Stock mostrarEditar(
-        List<CategoriaGastoVariable> categorias,
-        Stock original,
-        GastosVariablesService gastosService) {
+            List<CategoriaGastoVariable> categorias,
+            Stock original,
+            GastosVariablesService gastosService) {
 
-    Dialog<Stock> dialog = new Dialog<>();
+        Dialog<Stock> dialog = new Dialog<>();
 
-    dialog.setTitle("Editar Stock");
+        dialog.setTitle("Editar Stock");
 
-    ButtonType btnGuardar =
-            new ButtonType(
-                    "Guardar",
-                    ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnGuardar
+                = new ButtonType(
+                        "Guardar",
+                        ButtonBar.ButtonData.OK_DONE);
 
-    dialog.getDialogPane()
-            .getButtonTypes()
-            .addAll(btnGuardar, ButtonType.CANCEL);
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(btnGuardar, ButtonType.CANCEL);
 
-    ComboBox<CategoriaGastoVariable> comboCategoria =
-            new ComboBox<>();
+        ComboBox<CategoriaGastoVariable> comboCategoria
+                = new ComboBox<>();
 
-    comboCategoria.getItems().addAll(categorias);
+        comboCategoria.getItems().addAll(categorias);
 
-    comboCategoria.setCellFactory(lv -> new ListCell<>() {
-        @Override
-        protected void updateItem(
-                CategoriaGastoVariable item,
-                boolean empty) {
+        comboCategoria.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(
+                    CategoriaGastoVariable item,
+                    boolean empty) {
 
-            super.updateItem(item, empty);
+                super.updateItem(item, empty);
 
-            setText(
-                    empty || item == null
-                    ? null
-                    : item.getNombre());
-        }
-    });
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre());
+            }
+        });
 
-    comboCategoria.setButtonCell(new ListCell<>() {
-        @Override
-        protected void updateItem(
-                CategoriaGastoVariable item,
-                boolean empty) {
+        comboCategoria.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(
+                    CategoriaGastoVariable item,
+                    boolean empty) {
 
-            super.updateItem(item, empty);
+                super.updateItem(item, empty);
 
-            setText(
-                    empty || item == null
-                    ? null
-                    : item.getNombre());
-        }
-    });
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre());
+            }
+        });
 
-    categorias.stream()
-            .filter(c ->
-                    c.getIdCategoria().equals(
-                            original.getCategoriaGastoVariable()
-                                    .getIdCategoria()))
-            .findFirst()
-            .ifPresent(comboCategoria::setValue);
+        categorias.stream()
+                .filter(c
+                        -> c.getIdCategoria().equals(
+                        original.getCategoriaGastoVariable()
+                                .getIdCategoria()))
+                .findFirst()
+                .ifPresent(comboCategoria::setValue);
 
-    TextField txtProducto =
-            new TextField(
-                    original.getNombreProducto());
+        TextField txtProducto
+                = new TextField(
+                        original.getNombreProducto());
 
-    TextField txtStockMinimo =
-            new TextField(
-                    original.getStockMinimo()
-                            .stripTrailingZeros()
-                            .toPlainString());
+        TextField txtStockMinimo
+                = new TextField(
+                        original.getStockMinimo()
+                                .stripTrailingZeros()
+                                .toPlainString());
 
-    TextField txtUnidad =
-            new TextField(
-                    original.getUnidadCantidad());
+        TextField txtUnidad
+                = new TextField(
+                        original.getUnidadCantidad());
 
-    VBox form = new VBox(
-            10,
-            new Label("Categoría"),
-            comboCategoria,
+        VBox form = new VBox(
+                10,
+                new Label("Categoría"),
+                comboCategoria,
+                new Label("Producto"),
+                txtProducto,
+                new Label("Stock mínimo"),
+                txtStockMinimo,
+                new Label("Unidad"),
+                txtUnidad
+        );
 
-            new Label("Producto"),
-            txtProducto,
+        form.setPadding(new Insets(15));
 
-            new Label("Stock mínimo"),
-            txtStockMinimo,
+        dialog.getDialogPane()
+                .setContent(form);
 
-            new Label("Unidad"),
-            txtUnidad
-    );
+        dialog.setResultConverter(btn -> {
 
-    form.setPadding(new Insets(15));
+            if (btn == btnGuardar) {
 
-    dialog.getDialogPane()
-            .setContent(form);
+                Stock stock = new Stock();
 
-    dialog.setResultConverter(btn -> {
+                stock.setNombreProducto(
+                        txtProducto.getText().trim());
 
-        if (btn == btnGuardar) {
+                stock.setCantidad(
+                        original.getCantidad());
 
-            Stock stock = new Stock();
+                stock.setStockMinimo(
+                        new BigDecimal(
+                                txtStockMinimo.getText()));
 
-            stock.setNombreProducto(
-                    txtProducto.getText().trim());
+                stock.setUnidadCantidad(
+                        txtUnidad.getText().trim());
 
-            stock.setCantidad(
-                    original.getCantidad());
+                stock.setCategoriaGastoVariable(
+                        comboCategoria.getValue());
 
-            stock.setStockMinimo(
-                    new BigDecimal(
-                            txtStockMinimo.getText()));
+                return stock;
+            }
 
-            stock.setUnidadCantidad(
-                    txtUnidad.getText().trim());
+            return null;
+        });
 
-            stock.setCategoriaGastoVariable(
-                    comboCategoria.getValue());
-
-            return stock;
-        }
-
-        return null;
-    });
-
-    return dialog.showAndWait().orElse(null);
-}
-    private static final String PASSWORD = "1234";
+        return dialog.showAndWait().orElse(null);
+    }
 
     public static boolean confirmarEliminacion() {
 
@@ -336,8 +333,7 @@ public class DialogStock {
         dialog.setResultConverter(btn -> {
 
             if (btn == btnEliminar
-                    && txtPass.getText()
-                            .equals(PASSWORD)) {
+                    && PasswordManager.verificar(txtPass.getText())) {
 
                 confirmado[0] = true;
 

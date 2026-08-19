@@ -12,10 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
 
 public class DialogEmpresasClientes {
-
-    private static final String PASSWORD = "1234";
 
     // ✅ CREAR
     public static Object[] abrirDialogCrear() {
@@ -45,7 +44,7 @@ public class DialogEmpresasClientes {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -77,7 +76,7 @@ public class DialogEmpresasClientes {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);/*Campo con dato precargado */
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();
-        
+
         cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA, TipoCliente.MESA);
         cmbTipo.setValue(tipoOriginal);
 
@@ -93,7 +92,7 @@ public class DialogEmpresasClientes {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -119,11 +118,10 @@ public class DialogEmpresasClientes {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Eliminar Cliente / Empresa");
 
-        ButtonType btnEliminar = new ButtonType
-            ("Eliminar", ButtonBar.ButtonData.OK_DONE);/*Crea el botón "Eliminar" como acción de
+        ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);/*Crea el botón "Eliminar" como acción de
                                                        confirmación */
         dialog.getDialogPane().getButtonTypes()
-            .addAll(btnEliminar, ButtonType.CANCEL);/*Agrega los botones eliminar y cancelar al diálogo */
+                .addAll(btnEliminar, ButtonType.CANCEL);/*Agrega los botones eliminar y cancelar al diálogo */
 
         PasswordField txtPass = new PasswordField();/*Campo para ingresar la contraseña de forma oculta */
 
@@ -137,11 +135,8 @@ public class DialogEmpresasClientes {
 
         dialog.setResultConverter(btn -> {/*Define qué hacer según el botón presionado en el diálogo */
 
-            if (btn == btnEliminar && txtPass.getText().equals(PASSWORD)) {/*Si presiona eliminar y la
-                                                                           contraseña es correcta */
-                confirmado[0] = true;/*Marca que el usuario confirmó
-                                     correctamente la eliminación */
-
+            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
+                confirmado[0] = true;
             } else if (btn == btnEliminar) {/*Si presionó eliminar pero la contraseña es incorrecta */
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
             }

@@ -9,9 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.security.PasswordManager;
 
 public class DialogEmpleados {
-    private static final String PASSWORD = "1234";
 
     // ✅ CREAR
     public static String abrirDialogCrear() {
@@ -30,7 +30,7 @@ public class DialogEmpleados {
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -61,7 +61,7 @@ public class DialogEmpleados {
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
-                if (!txtPass.getText().equals(PASSWORD)) {
+                if (!PasswordManager.verificar(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -91,7 +91,7 @@ public class DialogEmpleados {
         dialog.getDialogPane().setContent(form);
         final boolean[] confirmado = {false};
         dialog.setResultConverter(btn -> {
-            if (btn == btnEliminar && txtPass.getText().equals(PASSWORD)) {
+            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnEliminar) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
