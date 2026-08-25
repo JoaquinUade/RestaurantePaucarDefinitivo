@@ -197,7 +197,14 @@ colEstado.setCellFactory(tc -> new TableCell<>() {
                 }
             }
         });
-
+colCuit.setSortable(false);
+colFecha.setSortable(false);
+colNum.setSortable(false);
+colMonto.setSortable(false);
+colMontoIva.setSortable(false);
+colFactura.setSortable(false);
+colEstado.setSortable(false);
+colObs.setSortable(false);
         tabla.getColumns().add(
                 colEmpresa);
         tabla.getColumns().add(colCuit);
@@ -225,6 +232,21 @@ colEstado.setCellFactory(tc -> new TableCell<>() {
 
     public void setPagos(List<PagoEmpresa> pagos) {
 
-        tabla.setItems(FXCollections.observableArrayList(pagos));
-    }
+    tabla.setItems(
+            FXCollections.observableArrayList(pagos));
+
+    ajustarAltura();
+}
+    private void ajustarAltura() {
+
+    int filas = tabla.getItems().size();
+
+    double alturaCabecera = 30;
+    double alturaFila = 28;
+
+    tabla.setPrefHeight(
+            alturaCabecera
+            + (filas * alturaFila)
+            + 55);
+}
 }

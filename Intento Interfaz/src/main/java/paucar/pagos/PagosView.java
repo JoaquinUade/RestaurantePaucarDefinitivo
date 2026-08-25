@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.pagos.pagosView.PagosSemanalesView;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
@@ -30,7 +31,7 @@ public class PagosView extends BorderPane {
     private PagoEmpresa seleccionado;
 
     private PagosPeriodicidadView vistaMensual;
-    private PagosPeriodicidadView vistaSemanal;
+    private PagosSemanalesView vistaSemanal;
     private PagosPeriodicidadView vistaQuincenal;
     private PagosPeriodicidadView vistaConsumo;
 
@@ -92,8 +93,6 @@ public class PagosView extends BorderPane {
         topBar.setPadding(new Insets(10));
         HBox bottomBar = new HBox(10, btnEditar, btnEliminar, spacer);
         bottomBar.setPadding(new Insets(10));
-
-        
 
         VBox fondo = new VBox(
                 15,
@@ -174,10 +173,9 @@ public class PagosView extends BorderPane {
             case "Semanal" -> {
 
                 if (vistaSemanal == null) {
-                    vistaSemanal = new PagosPeriodicidadView(
-                            service,
-                            clientesService,
-                            TipoPeriodicidad.SEMANAL);
+                    
+                    vistaSemanal = new PagosSemanalesView(service);
+                    
                 }
 
                 vistaSemanal.actualizarFecha(filtroFecha.getValue());
@@ -216,6 +214,6 @@ public class PagosView extends BorderPane {
     }
 
     private void recargar() {
-    aplicarFiltro();
-}
+        aplicarFiltro();
+    }
 }

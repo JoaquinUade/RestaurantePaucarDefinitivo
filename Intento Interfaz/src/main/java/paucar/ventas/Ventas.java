@@ -232,7 +232,7 @@ public final class Ventas extends BorderPane {
         var dlg = new Agregar(clientes, productos, clientesService, venta);/*crea un objeto nuevo de la clase Agregar y le
                                                           pasa clientes, productos y venta al constructor */
 
-        var res = dlg.Mostrar(getScene() == null ? null : getScene().getWindow());/*Muestra el diálogo dlg
+        var res = dlg.mostrar(getScene() == null ? null : getScene().getWindow());/*Muestra el diálogo dlg
                                                                              usando como owner la ventana
                                                                              actual (si existe) y guarda en
                                                                           res el Optional con el resultado

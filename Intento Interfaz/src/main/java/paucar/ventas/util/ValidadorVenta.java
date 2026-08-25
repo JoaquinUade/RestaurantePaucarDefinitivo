@@ -17,12 +17,10 @@ public final class ValidadorVenta {
 
         @SuppressWarnings("unchecked")
         ComboBox<ProductosService.ProductoItem> comboProductos
-                = (ComboBox<ProductosService.ProductoItem>)
-                fila.getChildren().get(0);
+                = (ComboBox<ProductosService.ProductoItem>) fila.getChildren().get(0);
 
         TextField cant
-                = (TextField)
-                fila.getChildren().get(1);
+                = (TextField) fila.getChildren().get(1);
 
         if (comboProductos.getValue() == null) {
             return false;
@@ -49,11 +47,13 @@ public final class ValidadorVenta {
             ObservableList<String> clientes,
             VBox contLineas) {
 
-        boolean clienteValido =
-                cbCliente.getValue() != null
+        boolean clienteValido
+                = cbCliente.getValue() != null
                 && clientes.contains(
                         cbCliente.getValue());
-
+        System.out.println("Texto: " + cbCliente.getEditor().getText());
+        System.out.println("Value: " + cbCliente.getValue());
+       
         if (!clienteValido) {
             return true;
         }
