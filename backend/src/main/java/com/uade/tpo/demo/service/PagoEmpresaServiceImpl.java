@@ -30,11 +30,11 @@ public class PagoEmpresaServiceImpl implements PagoEmpresaService {
     @Override
     public PagoEmpresa modificarPagoEmpresa(Long id, PagoEmpresa pagoEmpresa) {
         return pagoEmpresaRepository.findById(id).map(existing -> {
-            
+
             // Si se está cambiando el tipo de periodicidad o la fecha, validar nuevamente
-            if (!existing.getTipoPeriodicidad().equals(pagoEmpresa.getTipoPeriodicidad()) ||
-                !existing.getFecha().equals(pagoEmpresa.getFecha())) {
-                // Remover el pago anterior de la validación temporalmente
+            if ((pagoEmpresa.getTipoPeriodicidad() != null && !existing.getTipoPeriodicidad().equals(pagoEmpresa.getTipoPeriodicidad())) ||
+                (pagoEmpresa.getFecha() != null && !existing.getFecha().equals(pagoEmpresa.getFecha()))) {
+                
                 validarPagoEmpresaParaModificacion(pagoEmpresa, id);
             }
 
@@ -129,7 +129,8 @@ public class PagoEmpresaServiceImpl implements PagoEmpresaService {
 
     @Override
     public Long obtenerCantidadActual(Long empresaId, TipoPeriodicidad tipoPeriodicidad, Integer mes, Integer año) {
-        return pagoEmpresaRepository.contarPagosPorTipoYMes(empresaId, tipoPeriodicidad, mes, año);
+        Long total = pagoEmpresaRepository.contarPagosPorTipoYMes(empresaId, tipoPeriodicidad, mes, año);
+        return total != null ? total : 0L;
     }
 
     /**
@@ -146,27 +147,28 @@ public class PagoEmpresaServiceImpl implements PagoEmpresaService {
             throw new IllegalArgumentException("El tipo de periodicidad es obligatorio");
         }
 
-        Integer mes = pagoEmpresa.getMes();
-        Integer año = pagoEmpresa.getAño();
+        // Se extraen mes y año directamente del objeto LocalDateTime de la fecha
+        Integer mes = pagoEmpresa.getFecha().getMonthValue();
+        Integer año = pagoEmpresa.getFecha().getYear();
 
         // Validar límites según tipo de periodicidad
         if (!puedeCrearPago(pagoEmpresa.getEmpresaId(), pagoEmpresa.getTipoPeriodicidad(), mes, año)) {
-            
-            Long cantidadActual = obtenerCantidadActual(pagoEmpresa.getEmpresaId(), 
-                                                         pagoEmpresa.getTipoPeriodicidad(), 
-                                                         mes, año);
+
+            Long cantidadActual = obtenerCantidadActual(pagoEmpresa.getEmpresaId(),
+                    pagoEmpresa.getTipoPeriodicidad(),
+                    mes, año);
             Integer limite = obtenerLimitePorTipo(pagoEmpresa.getTipoPeriodicidad());
-            
+
             throw new IllegalArgumentException(
-                String.format("La empresa ya tiene %d pago(s) %s en %d/%d. Límite permitido: %d",
-                    cantidadActual, pagoEmpresa.getTipoPeriodicidad(), mes, año, limite)
+                    String.format("La empresa ya tiene %d pago(s) %s en %d/%d. Límite permitido: %d",
+                            cantidadActual, pagoEmpresa.getTipoPeriodicidad(), mes, año, limite)
             );
         }
     }
 
     /**
-     * Valida las reglas de negocio para modificar un pago existente
-     * (excluyendo el pago actual de la validación)
+     * Valida las reglas de negocio para modificar un pago existente (excluyendo
+     * el pago actual de la validación)
      */
     private void validarPagoEmpresaParaModificacion(PagoEmpresa pagoEmpresa, Long pagoActualId) {
         if (pagoEmpresa.getEmpresaId() == null) {
@@ -179,26 +181,24 @@ public class PagoEmpresaServiceImpl implements PagoEmpresaService {
             throw new IllegalArgumentException("El tipo de periodicidad es obligatorio");
         }
 
-        Integer mes = pagoEmpresa.getMes();
-        Integer año = pagoEmpresa.getAño();
+        Integer mes = pagoEmpresa.getFecha().getMonthValue();
+        Integer año = pagoEmpresa.getFecha().getYear();
 
-        // Obtener cantidad actual excluyendo el pago actual
-        Long cantidadActual = pagoEmpresaRepository.contarPagosPorTipoYMes(
-            pagoEmpresa.getEmpresaId(), 
-            pagoEmpresa.getTipoPeriodicidad(), 
-            mes, 
-            año
-        );
+        Long cantidadActual = obtenerCantidadActual(pagoEmpresa.getEmpresaId(), 
+                                                     pagoEmpresa.getTipoPeriodicidad(), 
+                                                     mes, año);
 
-        // Restar 1 porque el pago actual ya está contado
-        cantidadActual = cantidadActual - 1;
+        // Descontar el registro que se está editando en caso de que ya exista
+        if (cantidadActual > 0) {
+            cantidadActual = cantidadActual - 1;
+        }
 
         Integer limite = obtenerLimitePorTipo(pagoEmpresa.getTipoPeriodicidad());
 
         if (cantidadActual >= limite) {
             throw new IllegalArgumentException(
-                String.format("La empresa ya tiene %d pago(s) %s en %d/%d. Límite permitido: %d",
-                    cantidadActual, pagoEmpresa.getTipoPeriodicidad(), mes, año, limite)
+                    String.format("La empresa ya tiene %d pago(s) %s en %d/%d. Límite permitido: %d",
+                            cantidadActual, pagoEmpresa.getTipoPeriodicidad(), mes, año, limite)
             );
         }
     }

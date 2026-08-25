@@ -7,17 +7,25 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class PasswordManager {
 
     private static final Dotenv DOTENV =
-            Dotenv.configure()
-                  .ignoreIfMissing()
-                  .load();
+        Dotenv.configure()
+              .directory("../../")
+              .ignoreIfMissing()
+              .load();
 
-    private static final String PASSWORD_ENV =
-            DOTENV.get("ADMIN_PASSWORD");
+    private static final String PASSWORD_ENV
+            = DOTENV.get("ADMIN_PASSWORD");
 
     private static final String HASH;
 
     static {
+        System.out.println(
+                "Directorio actual: "
+                + System.getProperty("user.dir"));
 
+        System.out.println(
+                "ADMIN_PASSWORD: "
+                + DOTENV.get("ADMIN_PASSWORD")
+        );
         if (PASSWORD_ENV == null || PASSWORD_ENV.isBlank()) {
             throw new IllegalStateException(
                     "ADMIN_PASSWORD no definida en el .env"

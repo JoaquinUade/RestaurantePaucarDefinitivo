@@ -14,6 +14,7 @@ public class MenuLateral extends VBox {
     private final Button btnResumen;
     private final Button btnGastos;
     private final Button btnStock;
+    private final Button btnPagos;
     private final Button btnCalcula;
     private final Button btnAdmin;
 
@@ -34,6 +35,7 @@ public class MenuLateral extends VBox {
         btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png");
         btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png");
         btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
+        btnPagos = crearBotonConIcono("PAGOS", "/img/pagos.png");
         btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
         btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
 
@@ -44,6 +46,7 @@ public class MenuLateral extends VBox {
             btnResumen,
             btnGastos,
             btnStock,
+            btnPagos,
             btnCalcula,
             btnAdmin
         };
@@ -74,6 +77,7 @@ public class MenuLateral extends VBox {
                 btnResumen,
                 btnGastos,
                 btnStock,
+                btnPagos,
                 btnCalcula,
                 btnAdmin
         );
@@ -114,6 +118,10 @@ public class MenuLateral extends VBox {
 
     public Button getBtnStock() {
         return btnStock;
+    }
+
+    public Button getBtnPagos() {
+        return btnPagos;
     }
 
     public Button getBtnCalcula() {

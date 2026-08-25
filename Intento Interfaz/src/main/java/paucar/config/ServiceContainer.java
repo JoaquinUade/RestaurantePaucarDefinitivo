@@ -6,6 +6,7 @@ import paucar.service.EmpleadoService;
 import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
+import paucar.service.PagosService;
 import paucar.service.StockService;
 public class ServiceContainer {
 
@@ -16,6 +17,7 @@ public class ServiceContainer {
     public final GastosIndividualesService gastosIndividuales;
     public final GastosFijosService gastosFijos;
     public final StockService stock;
+    public final PagosService pagos;
 
     public ServiceContainer(String apiBase) {
 
@@ -26,5 +28,6 @@ public class ServiceContainer {
         gastosIndividuales = new GastosIndividualesService(apiBase);
         gastosFijos = new GastosFijosService(apiBase);
         stock = new StockService(apiBase);
+        pagos = new PagosService(apiBase);
     }
 }

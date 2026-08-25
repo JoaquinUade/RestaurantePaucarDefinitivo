@@ -17,6 +17,7 @@ import paucar.componentes.MenuLateral;
 import paucar.config.CssLoader;
 import paucar.config.ServiceContainer;
 import paucar.gastos.Gastos;
+import paucar.pagos.PagosView;
 import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
@@ -29,6 +30,7 @@ public class Aplicacion extends Application {
     private Resumen vistaResumen;
     private Gastos vistaGastos;
     private StockView vistaStock;
+    private PagosView vistaPagos;
 
     private static final String API_BASE
             = "http://localhost:4002/api";
@@ -124,6 +126,11 @@ public class Aplicacion extends Application {
                         stock -> {
                         });
 
+        vistaPagos
+                = new PagosView(
+                        services.pagos,
+                        clientesService);
+
         menu.getLogoItem().setOnMouseClicked(e -> {
 
             limpiarActivos(menu);
@@ -138,6 +145,7 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
+                    menu.getBtnPagos(),
                     menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
@@ -153,6 +161,7 @@ public class Aplicacion extends Application {
                     menu.getBtnVentas(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
+                    menu.getBtnPagos(),
                     menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
@@ -166,6 +175,7 @@ public class Aplicacion extends Application {
                     menu.getBtnVentas(),
                     menu.getBtnResumen(),
                     menu.getBtnStock(),
+                    menu.getBtnPagos(),
                     menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
@@ -179,10 +189,25 @@ public class Aplicacion extends Application {
                     menu.getBtnVentas(),
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
+                    menu.getBtnPagos(),
                     menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaStock);
+        });
+
+        menu.getBtnPagos().setOnAction(e -> {
+
+            marcarActivo(
+                    menu.getBtnPagos(),
+                    menu.getBtnVentas(),
+                    menu.getBtnResumen(),
+                    menu.getBtnGastos(),
+                    menu.getBtnStock(),
+                    menu.getBtnCalcula(),
+                    menu.getBtnAdmin());
+
+            root.setCenter(vistaPagos);
         });
 
         menu.getBtnCalcula().setOnAction(e -> {
@@ -193,6 +218,7 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
+                    menu.getBtnPagos(),
                     menu.getBtnAdmin());
         });
 
@@ -204,6 +230,7 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
+                    menu.getBtnPagos(),
                     menu.getBtnCalcula());
 
             root.setCenter(
@@ -227,6 +254,7 @@ public class Aplicacion extends Application {
         menu.getBtnResumen().getStyleClass().remove("active");
         menu.getBtnGastos().getStyleClass().remove("active");
         menu.getBtnStock().getStyleClass().remove("active");
+        menu.getBtnPagos().getStyleClass().remove("active");
         menu.getBtnCalcula().getStyleClass().remove("active");
         menu.getBtnAdmin().getStyleClass().remove("active");
     }
