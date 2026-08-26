@@ -73,7 +73,7 @@ public class PagoEmpresa {
     @PrePersist
     @PreUpdate
     private void calcularMontoConIvaAutomatico() {
-        if (this.montoConIva == null && this.monto != null) {
+        if (this.monto != null) {
             this.montoConIva = calcularMontoConIva(this.monto);
         }
     }
@@ -163,7 +163,7 @@ public class PagoEmpresa {
     public void setMonto(BigDecimal monto) {
         this.monto = monto;
         // Recalcular montoConIva si es null cuando se establece el monto
-        if (this.montoConIva == null && monto != null) {
+        if (monto != null) {
             this.montoConIva = calcularMontoConIva(monto);
         }
     }

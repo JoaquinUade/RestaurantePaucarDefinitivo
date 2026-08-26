@@ -315,10 +315,11 @@ public class VentaServiceImpl implements VentaService {
             return;
         }
 
-        // Por ahora solo empresas
-        if (cliente.getTipoCliente() != TipoCliente.EMPRESA) {
-            return;
-        }
+        // Ahora si empresas y clientes
+        if (cliente.getTipoCliente() != TipoCliente.EMPRESA
+        && cliente.getTipoCliente() != TipoCliente.CLIENTE) {
+    return;
+}
 
         TipoPeriodicidad periodicidad = cliente.getPeriodicidadPago();
 System.out.println("===========");

@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
-import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
@@ -43,8 +42,7 @@ public class PagosPeriodicidadView extends BorderPane {
                 pago -> {
 
                     List<String> empresas
-                    = clientesService.obtenerNombresPorTipo(
-                            TipoCliente.EMPRESA);
+                    = clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo = DialogPagos.mostrarEditar(
                             empresas,

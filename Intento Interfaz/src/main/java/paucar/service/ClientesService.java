@@ -398,5 +398,73 @@ public class ClientesService {
             System.err.println("Error editar: " + e.getMessage());
         }
     }
+public List<String> obtenerNombresPagables() {
 
+    try {
+
+        String url = BASE_URL + "/clientes";
+
+        var req = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+
+        var res = http.send(
+                req,
+                HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() >= 200 && res.statusCode() < 300) {
+
+            var json = TraductorJSON.readTree(res.body());
+
+            var out = new ArrayList<String>();
+
+            if (json.isArray()) {
+
+                for (var n : json) {
+
+                    String nombre = n.hasNonNull("nombre")
+                            ? n.get("nombre").asText()
+                            : null;
+
+                    String tipo = n.hasNonNull("tipoCliente")
+                            ? n.get("tipoCliente").asText()
+                            : null;
+
+                    if (nombre != null
+                            && !nombre.isBlank()
+                            && tipo != null
+                            && !tipo.equalsIgnoreCase("MESA")) {
+
+                        out.add(nombre.trim());
+                    }
+                }
+            }
+
+            return out.stream()
+                    .distinct()
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .toList();
+        }
+
+    } catch (Exception e) {
+        System.err.println(e.getMessage());
+    }
+
+    return List.of();
+}
+public Long obtenerClienteIdPorNombre(String nombre) {
+
+    Long id = obtenerClienteIdPorNombre(
+            nombre,
+            TipoCliente.CLIENTE);
+
+    if (id != null) {
+        return id;
+    }
+
+    return obtenerClienteIdPorNombre(
+            nombre,
+            TipoCliente.EMPRESA);
+}
 }

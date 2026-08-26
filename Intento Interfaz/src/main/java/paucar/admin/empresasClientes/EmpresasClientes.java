@@ -111,10 +111,13 @@ public class EmpresasClientes extends BorderPane {
     }
 
     private void cargarDatos() {
-        clientesOriginal = clientesService
-                .obtenerNombresPorTipo(TipoCliente.CLIENTE);/*Le pide al clientesService todos los nombres
-                                                        de clientes y los guarda en una lista */
-        empresasOriginal = clientesService.obtenerNombresPorTipo(TipoCliente.EMPRESA);
+        clientesOriginal
+                = clientesService.obtenerNombresPorTipo(
+                        TipoCliente.CLIENTE);
+
+        empresasOriginal
+                = clientesService.obtenerNombresPorTipo(
+                        TipoCliente.EMPRESA);
 
         listaClientes.getItems().setAll(clientesOriginal);/*Carga todos los clientes en la lista visual */
         listaEmpresas.getItems().setAll(empresasOriginal);

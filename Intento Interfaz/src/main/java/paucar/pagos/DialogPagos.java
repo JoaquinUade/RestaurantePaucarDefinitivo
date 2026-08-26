@@ -248,8 +248,7 @@ if (empresa != null && empresa.contains(" - ")) {
                 return null;
             }
 
-            Long empresaId = clientesService
-                    .obtenerClienteIdPorNombre(empresa, TipoCliente.EMPRESA);
+            Long empresaId = clientesService.obtenerClienteIdPorNombre(empresa);
 
             PagoEmpresa pago = new PagoEmpresa();
             pago.setEmpresaId(empresaId);

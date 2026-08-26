@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
-import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
@@ -108,26 +107,42 @@ public class PagosView extends BorderPane {
 
     private void editar() {
 
-        if (seleccionado == null) {
-            new Alert(Alert.AlertType.WARNING, "Seleccione un pago")
-                    .showAndWait();
-            return;
-        }
+    switch (comboPeriodicidad.getValue()) {
 
-        List<String> empresas = clientesService
-                .obtenerNombresPorTipo(TipoCliente.EMPRESA);
+        case "Mensual" ->
+            seleccionado = vistaMensual.getSeleccionado();
 
-        PagoEmpresa nuevo = DialogPagos.mostrarEditar(
-                empresas,
-                clientesService,
-                ventasBackend,
-                seleccionado);
+        case "Quincenal" ->
+            seleccionado = vistaQuincenal.getSeleccionado();
 
-        if (nuevo != null) {
-            service.modificar(seleccionado.getId(), nuevo);
-            recargar();
-        }
+        case "Consumo varios días" ->
+            seleccionado = vistaConsumo.getSeleccionado();
+
+        case "Semanal" ->
+            seleccionado = vistaSemanal.getSeleccionado();
     }
+
+    if (seleccionado == null) {
+        new Alert(Alert.AlertType.WARNING,
+                "Seleccione un pago")
+                .showAndWait();
+        return;
+    }
+
+    List<String> empresas =
+            clientesService.obtenerNombresPagables();
+
+    PagoEmpresa nuevo = DialogPagos.mostrarEditar(
+            empresas,
+            clientesService,
+            ventasBackend,
+            seleccionado);
+
+    if (nuevo != null) {
+        service.modificar(seleccionado.getId(), nuevo);
+        recargar();
+    }
+}
 
     private void eliminar() {
 
@@ -161,7 +176,7 @@ public class PagosView extends BorderPane {
             seleccionado.setFactura(null);
             seleccionado.setObservacion(null);
             seleccionado.setNumeroPago(null);
-            
+
             System.out.println("CUIT = " + seleccionado.getCuit());
             System.out.println("FACTURA = " + seleccionado.getFactura());
             System.out.println("OBS = " + seleccionado.getObservacion());
