@@ -30,7 +30,7 @@ public class TablaPagos extends VBox {
         tabla = new TableView<>();
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        tabla.setPrefHeight(460);
+        
 
         // Empresa
         TableColumn<PagoEmpresa, String> colEmpresa

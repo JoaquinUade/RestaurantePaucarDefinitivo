@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.pagos.pagosView.PagosQuincenalesView;
 import paucar.pagos.pagosView.PagosSemanalesView;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
@@ -33,7 +34,7 @@ public class PagosView extends BorderPane {
 
     private PagosPeriodicidadView vistaMensual;
     private PagosSemanalesView vistaSemanal;
-    private PagosPeriodicidadView vistaQuincenal;
+    private PagosQuincenalesView vistaQuincenal;
     private PagosPeriodicidadView vistaConsumo;
 
     private final ComboBox<String> comboPeriodicidad
@@ -107,42 +108,42 @@ public class PagosView extends BorderPane {
 
     private void editar() {
 
-    switch (comboPeriodicidad.getValue()) {
+        switch (comboPeriodicidad.getValue()) {
 
-        case "Mensual" ->
-            seleccionado = vistaMensual.getSeleccionado();
+            case "Mensual" ->
+                seleccionado = vistaMensual.getSeleccionado();
 
-        case "Quincenal" ->
-            seleccionado = vistaQuincenal.getSeleccionado();
+            case "Quincenal" ->
+                seleccionado = vistaQuincenal.getSeleccionado();
 
-        case "Consumo varios días" ->
-            seleccionado = vistaConsumo.getSeleccionado();
+            case "Consumo varios días" ->
+                seleccionado = vistaConsumo.getSeleccionado();
 
-        case "Semanal" ->
-            seleccionado = vistaSemanal.getSeleccionado();
+            case "Semanal" ->
+                seleccionado = vistaSemanal.getSeleccionado();
+        }
+
+        if (seleccionado == null) {
+            new Alert(Alert.AlertType.WARNING,
+                    "Seleccione un pago")
+                    .showAndWait();
+            return;
+        }
+
+        List<String> empresas
+                = clientesService.obtenerNombresPagables();
+
+        PagoEmpresa nuevo = DialogPagos.mostrarEditar(
+                empresas,
+                clientesService,
+                ventasBackend,
+                seleccionado);
+
+        if (nuevo != null) {
+            service.modificar(seleccionado.getId(), nuevo);
+            recargar();
+        }
     }
-
-    if (seleccionado == null) {
-        new Alert(Alert.AlertType.WARNING,
-                "Seleccione un pago")
-                .showAndWait();
-        return;
-    }
-
-    List<String> empresas =
-            clientesService.obtenerNombresPagables();
-
-    PagoEmpresa nuevo = DialogPagos.mostrarEditar(
-            empresas,
-            clientesService,
-            ventasBackend,
-            seleccionado);
-
-    if (nuevo != null) {
-        service.modificar(seleccionado.getId(), nuevo);
-        recargar();
-    }
-}
 
     private void eliminar() {
 
@@ -222,13 +223,8 @@ public class PagosView extends BorderPane {
             case "Quincenal" -> {
 
                 if (vistaQuincenal == null) {
-                    vistaQuincenal = new PagosPeriodicidadView(
-                            service,
-                            clientesService,
-                            TipoPeriodicidad.QUINCENAL);
+                    vistaQuincenal = new PagosQuincenalesView(service);
                 }
-
-                vistaQuincenal.actualizarFecha(filtroFecha.getValue());
 
                 contenedorResultado.setCenter(vistaQuincenal);
             }
