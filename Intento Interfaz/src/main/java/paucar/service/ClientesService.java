@@ -85,7 +85,7 @@ public class ClientesService {
                                 : "Sin periodicidad";
                         if (nombre != null && !nombre.isBlank()) {/*Filtra: 'nombre' debe existir y NO estar vacío/espacios */
                             if (tipo == null || !tipo.equalsIgnoreCase("MESA")) {/*Si 'tipo' es null O distinto de "MESA" */
-                                out.add(nombre.trim() + " - " + periodicidad);/*entonces agrega el 'nombre' (sin espacios extremos) a la lista */
+                                out.add(nombre.trim());/*entonces agrega el 'nombre' (sin espacios extremos) a la lista */
                             }
                         }
                     }
@@ -250,9 +250,9 @@ public class ClientesService {
 
                         if (nombre != null && !nombre.isBlank()) {
                             if (tipoStr == null) {
-                                out.add(nombre.trim() + " - " + periodicidad);
+                                out.add(nombre.trim());
                             } else if (tipoStr.equalsIgnoreCase(tipo.name())) {
-                                out.add(nombre.trim() + " - " + periodicidad);
+                                out.add(nombre.trim());
                             }
                         }
                     }
@@ -265,7 +265,7 @@ public class ClientesService {
 
                     if (nombre != null && !nombre.isBlank()) {
                         if (tipoStr == null || tipoStr.equalsIgnoreCase(tipo.name())) {
-                            out.add(nombre.trim() + " - " + periodicidad);
+                            out.add(nombre.trim());
                         }
                     }
                 }
@@ -300,7 +300,7 @@ public class ClientesService {
 
                         if (nombre != null && !nombre.isBlank() && tipoStr != null
                                 && tipoStr.equalsIgnoreCase(tipo.name())) {
-                            out.add(nombre.trim() + " - " + periodicidad);
+                            out.add(nombre.trim());
                         }
                     }
                 } else if (json.isObject()) {
@@ -312,7 +312,7 @@ public class ClientesService {
 
                     if (nombre != null && !nombre.isBlank() && tipoStr != null
                             && tipoStr.equalsIgnoreCase(tipo.name())) {
-                        out.add(nombre.trim() + " - " + periodicidad);
+                        out.add(nombre.trim());
                     }
                 }
 

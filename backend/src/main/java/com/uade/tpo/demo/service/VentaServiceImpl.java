@@ -15,12 +15,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.demo.entity.Cliente;
+import com.uade.tpo.demo.entity.EstadoPago;
+import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.Producto;
+import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.TipoDePago;
+import com.uade.tpo.demo.entity.TipoPeriodicidad;
 import com.uade.tpo.demo.entity.Venta;
 import com.uade.tpo.demo.entity.dto.VentaDTO;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 import com.uade.tpo.demo.repository.ClienteRepository;
+import com.uade.tpo.demo.repository.PagoEmpresaRepository;
 import com.uade.tpo.demo.repository.ProductoRepository;
 import com.uade.tpo.demo.repository.VentaRepository;
 
@@ -35,6 +41,9 @@ public class VentaServiceImpl implements VentaService {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private PagoEmpresaRepository pagoEmpresaRepository;
 
     @Override
     public Venta crearVenta(VentaRequest ventaRequest) {
@@ -105,7 +114,11 @@ public class VentaServiceImpl implements VentaService {
                 .getDisplayName(TextStyle.FULL,
                         new Locale("es", "ES")));
 
-        return ventaRepository.save(venta);
+        Venta ventaGuardada = ventaRepository.save(venta);
+
+        actualizarPagoAutomatico(ventaGuardada);
+
+        return ventaGuardada;
     }
 
     @Override
@@ -288,5 +301,78 @@ public class VentaServiceImpl implements VentaService {
             ventasCreadas.add(ventaCreada);
         }
         return ventasCreadas;
+    }
+
+    private void actualizarPagoAutomatico(Venta venta) {
+
+        if (venta.getEstado() != TipoDePago.DEBE) {
+            return;
+        }
+
+        Cliente cliente = venta.getCliente();
+
+        if (cliente == null) {
+            return;
+        }
+
+        // Por ahora solo empresas
+        if (cliente.getTipoCliente() != TipoCliente.EMPRESA) {
+            return;
+        }
+
+        TipoPeriodicidad periodicidad = cliente.getPeriodicidadPago();
+System.out.println("===========");
+System.out.println("Cliente: " + cliente.getNombre());
+System.out.println("Tipo: " + cliente.getTipoCliente());
+System.out.println("Periodicidad: " + periodicidad);
+System.out.println("===========");
+
+        if (periodicidad == null) {
+            return;
+        }
+
+        int mes = venta.getFecha().getMonthValue();
+        int anio = venta.getFecha().getYear();
+
+        List<PagoEmpresa> pagosExistentes
+                = pagoEmpresaRepository.obtenerPagosPorTipoYMes(
+                        cliente.getIdCliente(),
+                        periodicidad,
+                        mes,
+                        anio);
+
+        if (!pagosExistentes.isEmpty()) {
+
+            PagoEmpresa pago = pagosExistentes.get(0);
+
+            BigDecimal montoActual = pago.getMonto() != null
+                    ? pago.getMonto()
+                    : BigDecimal.ZERO;
+
+            pago.setMonto(
+                    montoActual.add(venta.getMonto()));
+
+            pagoEmpresaRepository.save(pago);
+            System.out.println(
+                    "Periodicidad del cliente: "
+                    + cliente.getPeriodicidadPago());
+                    System.out.println(
+    "Nombre: " + cliente.getNombre());
+    System.out.println(
+    "Tipo: " + cliente.getTipoCliente());
+            return;
+        }
+
+        PagoEmpresa nuevoPago = new PagoEmpresa();
+
+        nuevoPago.setEmpresaId(cliente.getIdCliente());
+        nuevoPago.setNombre(cliente.getNombre());
+        nuevoPago.setTipoPeriodicidad(periodicidad);
+        nuevoPago.setFecha(venta.getFecha());
+        nuevoPago.setMonto(venta.getMonto());
+        nuevoPago.setEstado(EstadoPago.DEBE);
+
+        pagoEmpresaRepository.save(nuevoPago);
+        System.out.println("Creando pago automático...");
     }
 }

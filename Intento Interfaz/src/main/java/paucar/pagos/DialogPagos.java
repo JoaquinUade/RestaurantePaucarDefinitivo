@@ -25,37 +25,54 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
 import paucar.service.ClientesService;
+import paucar.service.VentasBackend;
 
 public class DialogPagos {
 
-    private static final DateTimeFormatter FECHA =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FECHA
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private DialogPagos() {
     }
 
-    /** Abre el diálogo para crear un pago. Devuelve el PagoEmpresa a guardar o null. */
+    /**
+     * Abre el diálogo para crear un pago. Devuelve el PagoEmpresa a guardar o
+     * null.
+     */
     public static PagoEmpresa mostrar(
             List<String> empresas,
-            ClientesService clientesService) {
+            ClientesService clientesService,
+            VentasBackend ventasBackend) {
 
-        return abrirFormulario(empresas, clientesService, null);
+        return abrirFormulario(
+                empresas,
+                clientesService,
+                ventasBackend,
+                null);
     }
 
-    /** Abre el diálogo precargado para editar un pago existente. */
+    /**
+     * Abre el diálogo precargado para editar un pago existente.
+     */
     public static PagoEmpresa mostrarEditar(
             List<String> empresas,
             ClientesService clientesService,
+            VentasBackend ventasBackend,
             PagoEmpresa original) {
 
-        return abrirFormulario(empresas, clientesService, original);
+        return abrirFormulario(
+                empresas,
+                clientesService,
+                ventasBackend,
+                original);
     }
 
     // ===== FORMULARIO (crear y editar) =====
     private static PagoEmpresa abrirFormulario(
-            List<String> empresas,
-            ClientesService clientesService,
-            PagoEmpresa original) {
+        List<String> empresas,
+        ClientesService clientesService,
+        VentasBackend ventasBackend,
+        PagoEmpresa original) {
 
         boolean edicion = original != null;
 
@@ -65,8 +82,8 @@ public class DialogPagos {
                 DialogPagos.class.getResource("/gastos.css").toExternalForm(),
                 DialogPagos.class.getResource("/agregar.css").toExternalForm());
 
-        ButtonType btnGuardar =
-                new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnGuardar
+                = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes()
                 .addAll(btnGuardar, ButtonType.CANCEL);
 
@@ -92,6 +109,8 @@ public class DialogPagos {
         fecha.getStyleClass().add("date-agregar");
 
         TextField txtMonto = new TextField();
+        txtMonto.setEditable(false);
+        txtMonto.setPromptText("Calculado automáticamente");
         TextField txtNumeroPago = new TextField();
         TextField txtFactura = new TextField();
 
@@ -103,7 +122,45 @@ public class DialogPagos {
         comboEstado.setMaxWidth(Double.MAX_VALUE);
 
         TextField txtObservacion = new TextField();
+comboSempras.setOnAction(e -> {
 
+    String empresa = comboSempras.getValue();
+
+if (empresa != null && empresa.contains(" - ")) {
+    empresa = empresa.substring(0, empresa.indexOf(" - "));
+}
+
+    if (empresa == null || empresa.isBlank()) {
+        txtMonto.clear();
+        return;
+    }
+
+    BigDecimal total = ventasBackend.calcularDebeMensual(
+            empresa,
+            fecha.getValue().getMonthValue(),
+            fecha.getValue().getYear());
+
+    txtMonto.setText(total.toPlainString());
+});
+fecha.setOnAction(e -> {
+
+    String empresa = comboSempras.getValue();
+
+if (empresa != null && empresa.contains(" - ")) {
+    empresa = empresa.substring(0, empresa.indexOf(" - "));
+}
+
+    if (empresa == null || empresa.isBlank()) {
+        return;
+    }
+
+    BigDecimal total = ventasBackend.calcularDebeMensual(
+            empresa,
+            fecha.getValue().getMonthValue(),
+            fecha.getValue().getYear());
+
+    txtMonto.setText(total.toPlainString());
+});
         // ---- Precargar en edición ----
         if (edicion) {
             if (original.getNombre() != null) {
@@ -162,16 +219,15 @@ public class DialogPagos {
             }
 
             String empresa = comboSempras.getValue();
+            if (empresa != null && empresa.contains(" - ")) {
+    empresa = empresa.substring(0, empresa.indexOf(" - "));
+}
             if (empresa == null || empresa.isBlank()) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione una empresa")
                         .showAndWait();
                 return null;
             }
-            if (txtCuit.getText() == null || txtCuit.getText().isBlank()) {
-                new Alert(Alert.AlertType.WARNING, "Complete el CUIT")
-                        .showAndWait();
-                return null;
-            }
+           
             if (comboPer.getValue() == null) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione la periodicidad")
                         .showAndWait();
@@ -231,8 +287,8 @@ public class DialogPagos {
         dialog.getDialogPane().getStylesheets().add(
                 DialogPagos.class.getResource("/gastos.css").toExternalForm());
 
-        ButtonType btnEliminar =
-                new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnEliminar
+                = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes()
                 .addAll(btnEliminar, ButtonType.CANCEL);
 
@@ -296,10 +352,14 @@ public class DialogPagos {
     public static String periodicidadTexto(TipoPeriodicidad tipo) {
 
         return switch (tipo) {
-            case MENSUAL -> "Mensual";
-            case QUINCENAL -> "Quincenal";
-            case SEMANAL -> "Semanal";
-            case CONSUMOVARIOSDIAS -> "Consumo varios días";
+            case MENSUAL ->
+                "Mensual";
+            case QUINCENAL ->
+                "Quincenal";
+            case SEMANAL ->
+                "Semanal";
+            case CONSUMOVARIOSDIAS ->
+                "Consumo varios días";
         };
     }
 

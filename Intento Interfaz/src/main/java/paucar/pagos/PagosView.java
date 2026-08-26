@@ -21,11 +21,13 @@ import javafx.scene.layout.VBox;
 import paucar.pagos.pagosView.PagosSemanalesView;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
+import paucar.service.VentasBackend;
 
 public class PagosView extends BorderPane {
 
     private final PagosService service;
     private final ClientesService clientesService;
+    private final VentasBackend ventasBackend;
     private final DatePicker filtroFecha;
     private final Label lblTotal = new Label();
     private PagoEmpresa seleccionado;
@@ -41,10 +43,11 @@ public class PagosView extends BorderPane {
     private final BorderPane contenedorResultado
             = new BorderPane();
 
-    public PagosView(PagosService service, ClientesService clientesService) {
+    public PagosView(PagosService service, ClientesService clientesService, VentasBackend ventasBackend) {
 
         this.service = service;
         this.clientesService = clientesService;
+        this.ventasBackend = ventasBackend;
 
         Label titulo = new Label("Pagos");
         titulo.getStyleClass().add("titulo-xl-blanco");
@@ -54,10 +57,6 @@ public class PagosView extends BorderPane {
         filtroFecha.setOnAction(e -> recargar());
 
         lblTotal.getStyleClass().add("titulo-xl-blanco");
-
-        Button btnAgregar = new Button("+ Agregar");
-        btnAgregar.getStyleClass().add("btn-agregar");
-        btnAgregar.setOnAction(e -> agregar());
 
         Button btnEditar = new Button("Editar");
         btnEditar.getStyleClass().add("btn-editar");
@@ -88,8 +87,8 @@ public class PagosView extends BorderPane {
                 comboPeriodicidad,
                 btnFiltrar,
                 titulo,
-                spacer,
-                btnAgregar);
+                spacer
+                );
         topBar.setPadding(new Insets(10));
         HBox bottomBar = new HBox(10, btnEditar, btnEliminar, spacer);
         bottomBar.setPadding(new Insets(10));
@@ -107,19 +106,6 @@ public class PagosView extends BorderPane {
         aplicarFiltro();
     }
 
-    private void agregar() {
-
-        List<String> empresas = clientesService
-                .obtenerNombresPorTipo(TipoCliente.EMPRESA);
-
-        PagoEmpresa pago = DialogPagos.mostrar(empresas, clientesService);
-
-        if (pago != null) {
-            service.crear(pago);
-            recargar();
-        }
-    }
-
     private void editar() {
 
         if (seleccionado == null) {
@@ -132,7 +118,10 @@ public class PagosView extends BorderPane {
                 .obtenerNombresPorTipo(TipoCliente.EMPRESA);
 
         PagoEmpresa nuevo = DialogPagos.mostrarEditar(
-                empresas, clientesService, seleccionado);
+        empresas,
+        clientesService,
+        ventasBackend,
+        seleccionado);
 
         if (nuevo != null) {
             service.modificar(seleccionado.getId(), nuevo);

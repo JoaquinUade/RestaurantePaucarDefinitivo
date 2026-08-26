@@ -15,12 +15,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import paucar.service.PagosService;
 import paucar.shared.MonedaUtils;
+
 public class TablaPagos extends VBox {
 
     private final TableView<PagoEmpresa> tabla;
     private final Runnable onEstadoCambiado;
-    public TablaPagos(Consumer<PagoEmpresa> onSelect, Runnable onEstadoCambiado, PagosService service) {
-this.onEstadoCambiado = onEstadoCambiado;
+
+    public TablaPagos(
+            Consumer<PagoEmpresa> onSelect,
+            Runnable onEstadoCambiado,
+            PagosService service) {
+
+        this.onEstadoCambiado = onEstadoCambiado;
         tabla = new TableView<>();
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
@@ -61,11 +67,53 @@ this.onEstadoCambiado = onEstadoCambiado;
         // CUIT
         TableColumn<PagoEmpresa, String> colCuit
                 = new TableColumn<>("CUIT");
-
         colCuit.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getCuit() == null
                         ? "" : c.getValue().getCuit()));
+        colCuit.setCellFactory(tc -> new TableCell<>() {
+
+            private final javafx.scene.control.Button btn
+                    = new javafx.scene.control.Button("Completar");
+
+            {
+                btn.setOnAction(e -> {
+
+                    PagoEmpresa pago = getTableRow().getItem();
+
+                    if (pago != null && onSelect != null) {
+                        onSelect.accept(pago);
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                PagoEmpresa pago = getTableRow().getItem();
+
+                if (pago == null
+                        || pago.getCuit() == null
+                        || pago.getCuit().isBlank()) {
+
+                    setText(null);
+                    setGraphic(btn);
+
+                } else {
+
+                    setGraphic(null);
+                    setText(pago.getCuit());
+                }
+            }
+        });
 
         // Fecha
         TableColumn<PagoEmpresa, String> colFecha
@@ -112,57 +160,57 @@ this.onEstadoCambiado = onEstadoCambiado;
                         ? "" : c.getValue().getFactura()));
 
         // Estado
-        TableColumn<PagoEmpresa, EstadoPago> colEstado =
-        new TableColumn<>("Estado");
+        TableColumn<PagoEmpresa, EstadoPago> colEstado
+                = new TableColumn<>("Estado");
 
-colEstado.setCellValueFactory(c ->
-        new javafx.beans.property.SimpleObjectProperty<>(
-                c.getValue().getEstado()));
+        colEstado.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleObjectProperty<>(
+                        c.getValue().getEstado()));
 
-colEstado.setCellFactory(tc -> new TableCell<>() {
+        colEstado.setCellFactory(tc -> new TableCell<>() {
 
-    private final ComboBox<EstadoPago> combo =
-            new ComboBox<>(
-                    FXCollections.observableArrayList(
-                            EstadoPago.values()));
+            private final ComboBox<EstadoPago> combo
+                    = new ComboBox<>(
+                            FXCollections.observableArrayList(
+                                    EstadoPago.values()));
 
-    {
-        combo.setOnAction(e -> {
+            {
+                combo.setOnAction(e -> {
 
-    PagoEmpresa pago = getTableRow().getItem();
+                    PagoEmpresa pago = getTableRow().getItem();
 
-    if (pago != null) {
+                    if (pago != null) {
 
-        pago.setEstado(combo.getValue());
+                        pago.setEstado(combo.getValue());
 
-        service.modificar(pago.getId(), pago);
+                        service.modificar(pago.getId(), pago);
 
-        if (onEstadoCambiado != null) {
-            onEstadoCambiado.run();
-        }
-    }
-});
-    }
+                        if (onEstadoCambiado != null) {
+                            onEstadoCambiado.run();
+                        }
+                    }
+                });
+            }
 
-    @Override
-    protected void updateItem(
-            EstadoPago estado,
-            boolean empty) {
+            @Override
+            protected void updateItem(
+                    EstadoPago estado,
+                    boolean empty) {
 
-        super.updateItem(estado, empty);
+                super.updateItem(estado, empty);
 
-        if (empty || estado == null) {
+                if (empty || estado == null) {
 
-            setGraphic(null);
+                    setGraphic(null);
 
-        } else {
+                } else {
 
-            combo.setValue(estado);
+                    combo.setValue(estado);
 
-            setGraphic(combo);
-        }
-    }
-});
+                    setGraphic(combo);
+                }
+            }
+        });
         // Observación
         TableColumn<PagoEmpresa, String> colObs
                 = new TableColumn<>("Observación");
@@ -197,14 +245,14 @@ colEstado.setCellFactory(tc -> new TableCell<>() {
                 }
             }
         });
-colCuit.setSortable(false);
-colFecha.setSortable(false);
-colNum.setSortable(false);
-colMonto.setSortable(false);
-colMontoIva.setSortable(false);
-colFactura.setSortable(false);
-colEstado.setSortable(false);
-colObs.setSortable(false);
+        colCuit.setSortable(false);
+        colFecha.setSortable(false);
+        colNum.setSortable(false);
+        colMonto.setSortable(false);
+        colMontoIva.setSortable(false);
+        colFactura.setSortable(false);
+        colEstado.setSortable(false);
+        colObs.setSortable(false);
         tabla.getColumns().add(
                 colEmpresa);
         tabla.getColumns().add(colCuit);
@@ -232,21 +280,22 @@ colObs.setSortable(false);
 
     public void setPagos(List<PagoEmpresa> pagos) {
 
-    tabla.setItems(
-            FXCollections.observableArrayList(pagos));
+        tabla.setItems(
+                FXCollections.observableArrayList(pagos));
 
-    ajustarAltura();
-}
+        ajustarAltura();
+    }
+
     private void ajustarAltura() {
 
-    int filas = tabla.getItems().size();
+        int filas = tabla.getItems().size();
 
-    double alturaCabecera = 30;
-    double alturaFila = 28;
+        double alturaCabecera = 30;
+        double alturaFila = 28;
 
-    tabla.setPrefHeight(
-            alturaCabecera
-            + (filas * alturaFila)
-            + 55);
-}
+        tabla.setPrefHeight(
+                alturaCabecera
+                + (filas * alturaFila)
+                + 55);
+    }
 }

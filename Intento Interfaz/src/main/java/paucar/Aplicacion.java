@@ -129,7 +129,8 @@ public class Aplicacion extends Application {
         vistaPagos
                 = new PagosView(
                         services.pagos,
-                        clientesService);
+                        clientesService,
+                backend);
 
         menu.getLogoItem().setOnMouseClicked(e -> {
 

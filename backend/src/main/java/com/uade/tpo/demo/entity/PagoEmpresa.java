@@ -25,7 +25,7 @@ public class PagoEmpresa {
     @Column(name = "tipo_periodicidad", nullable = false)
     private TipoPeriodicidad tipoPeriodicidad;
 
-    @Column(name = "cuit", nullable = false)
+    @Column(name = "cuit")
     private String cuit;
 
     @Column(name = "fecha", nullable = false)
@@ -53,10 +53,10 @@ public class PagoEmpresa {
     public PagoEmpresa() {
     }
 
-    public PagoEmpresa(Long empresaId, String nombre, TipoPeriodicidad tipoPeriodicidad, 
-                       String cuit, LocalDateTime fecha, Integer numeroPago, 
-                       BigDecimal monto, BigDecimal montoConIva, String factura, 
-                       EstadoPago estado, String observacion) {
+    public PagoEmpresa(Long empresaId, String nombre, TipoPeriodicidad tipoPeriodicidad,
+            String cuit, LocalDateTime fecha, Integer numeroPago,
+            BigDecimal monto, BigDecimal montoConIva, String factura,
+            EstadoPago estado, String observacion) {
         this.empresaId = empresaId;
         this.nombre = nombre;
         this.tipoPeriodicidad = tipoPeriodicidad;
@@ -70,7 +70,6 @@ public class PagoEmpresa {
         this.observacion = observacion;
     }
 
-    
     @PrePersist
     @PreUpdate
     private void calcularMontoConIvaAutomatico() {
@@ -79,13 +78,12 @@ public class PagoEmpresa {
         }
     }
 
-    
     private static BigDecimal calcularMontoConIva(BigDecimal monto) {
         if (monto == null) {
             return null;
         }
         return monto.multiply(BigDecimal.ONE.add(PORCENTAJE_IVA))
-                   .setScale(2, java.math.RoundingMode.HALF_UP);
+                .setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
     public Long getId() {

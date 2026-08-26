@@ -19,10 +19,11 @@ public class PagosMensualesView extends BorderPane {
         this.service = service;
 
         tabla = new TablaPagos(
-        null,
-        this::recargar,
-        service
+    null,
+    this::recargar,
+    service
 );
+
 
         setCenter(tabla);
 

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
+import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
@@ -38,9 +39,26 @@ public class PagosPeriodicidadView extends BorderPane {
         this.periodicidad = periodicidad;
 
         tabla = new TablaPagos(
-        null,
-        this::recargar,
-        service);
+    pago -> {
+
+        List<String> empresas =
+                clientesService.obtenerNombresPorTipo(
+                        TipoCliente.EMPRESA);
+
+        PagoEmpresa nuevo = DialogPagos.mostrarEditar(
+                empresas,
+                clientesService,
+                null,
+                pago);
+
+        if (nuevo != null) {
+            service.modificar(pago.getId(), nuevo);
+            recargar();
+        }
+
+    },
+    this::recargar,
+    service);
 
         VBox contenido = new VBox(10, tabla, lblTotal);
         contenido.setPadding(new Insets(10));
@@ -54,44 +72,44 @@ public class PagosPeriodicidadView extends BorderPane {
 
     public void recargar() {
 
-    List<PagoEmpresa> pagos = service.obtenerTodos()
-            .stream()
-            .filter(p -> p.getFecha() != null)
-            .filter(p -> p.getFecha().getMonth() == fecha.getMonth())
-            .filter(p -> p.getFecha().getYear() == fecha.getYear())
-            .filter(p -> p.getTipoPeriodicidad() == periodicidad)
-            .toList();
+        List<PagoEmpresa> pagos = service.obtenerTodos()
+                .stream()
+                .filter(p -> p.getFecha() != null)
+                .filter(p -> p.getFecha().getMonth() == fecha.getMonth())
+                .filter(p -> p.getFecha().getYear() == fecha.getYear())
+                .filter(p -> p.getTipoPeriodicidad() == periodicidad)
+                .toList();
 
-    tabla.setPagos(pagos);
+        tabla.setPagos(pagos);
 
-    BigDecimal totalPagado = pagos.stream()
-            .filter(p -> p.getEstado() != null
-                    && p.getEstado().name().equals("PAGADO"))
-            .map(p -> p.getMonto() == null
-                    ? BigDecimal.ZERO
-                    : p.getMonto())
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPagado = pagos.stream()
+                .filter(p -> p.getEstado() != null
+                && p.getEstado().name().equals("PAGADO"))
+                .map(p -> p.getMonto() == null
+                ? BigDecimal.ZERO
+                : p.getMonto())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    BigDecimal totalDebe = pagos.stream()
-            .filter(p -> p.getEstado() != null
-                    && p.getEstado().name().equals("DEBE"))
-            .map(p -> p.getMonto() == null
-                    ? BigDecimal.ZERO
-                    : p.getMonto())
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalDebe = pagos.stream()
+                .filter(p -> p.getEstado() != null
+                && p.getEstado().name().equals("DEBE"))
+                .map(p -> p.getMonto() == null
+                ? BigDecimal.ZERO
+                : p.getMonto())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    lblTotal.setStyle(
-            "-fx-text-fill: white;"
-            + "-fx-font-size: 18px;"
-            + "-fx-font-weight: bold;"
-    );
+        lblTotal.setStyle(
+                "-fx-text-fill: white;"
+                + "-fx-font-size: 18px;"
+                + "-fx-font-weight: bold;"
+        );
 
-    lblTotal.setText(
-            "Mes de " + FechaUtils.mes(fecha)
-            + "   |   Pagado: " + MonedaUtils.formatearMoneda(totalPagado)
-            + "   |   Nos deben: " + MonedaUtils.formatearMoneda(totalDebe)
-    );
-}
+        lblTotal.setText(
+                "Mes de " + FechaUtils.mes(fecha)
+                + "   |   Pagado: " + MonedaUtils.formatearMoneda(totalPagado)
+                + "   |   Nos deben: " + MonedaUtils.formatearMoneda(totalDebe)
+        );
+    }
 
     public void actualizarFecha(LocalDate fecha) {
 

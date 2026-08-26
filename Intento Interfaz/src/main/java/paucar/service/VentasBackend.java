@@ -273,7 +273,57 @@ public class VentasBackend {
         }
         return List.of();/*devuelve una lista vacía en caso de error */
     }
+public List<Venta> cargarVentasDelMes(int mes, int anio) {
 
+    List<Venta> ventasMes = new ArrayList<>();
+
+    LocalDate fecha = LocalDate.of(anio, mes, 1);
+
+    LocalDate ultimoDia = fecha.withDayOfMonth(
+            fecha.lengthOfMonth());
+
+    while (!fecha.isAfter(ultimoDia)) {
+
+        ventasMes.addAll(cargarVentasDelDia(fecha));
+
+        fecha = fecha.plusDays(1);
+    }
+
+    return ventasMes;
+}
+public BigDecimal calcularDebeMensual(
+        String nombreCliente,
+        int mes,
+        int anio) {
+
+    BigDecimal total = BigDecimal.ZERO;
+
+    List<Venta> ventas = cargarVentasDelMes(mes, anio);
+
+    for (Venta v : ventas) {
+
+        if (v.getCliente() == null) {
+            continue;
+        }
+
+        if (v.getCliente().getTipoCliente() == TipoCliente.MESA) {
+            continue;
+        }
+
+        if (!nombreCliente.equalsIgnoreCase(
+                v.getCliente().getNombre())) {
+            continue;
+        }
+
+        if (v.getEstado() == TipoDePago.DEBE
+                || v.getEstado() == TipoDePago.DEUDA_PAGADA) {
+
+            total = total.add(v.getMonto());
+        }
+    }
+
+    return total;
+}
     // =====================
 // LISTAR CLIENTES POR TIPO (EMPRESA/CLIENTE/MESA)
 // =====================
@@ -392,4 +442,5 @@ public class VentasBackend {
             return false;
         }
     }
+
 }

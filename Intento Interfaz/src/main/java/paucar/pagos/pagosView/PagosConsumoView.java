@@ -18,10 +18,11 @@ public class PagosConsumoView extends BorderPane {
         this.service = service;
 
         tabla = new TablaPagos(
-        null,
-        () -> recargar(),
-        service
+    null,
+    this::recargar,
+    service
 );
+
 
         setCenter(tabla);
 
