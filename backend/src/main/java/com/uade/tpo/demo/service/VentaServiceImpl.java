@@ -145,9 +145,32 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public void borrarVenta(Long id) {
-        ventaRepository.deleteById(id);
+public void borrarVenta(Long id) {
+
+    Venta venta = ventaRepository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Venta no encontrada"));
+
+    Cliente cliente = venta.getCliente();
+
+    ventaRepository.delete(venta);
+
+    List<PagoEmpresa> pagos =
+            pagoEmpresaRepository.obtenerTodosPorEmpresa(
+                    cliente.getIdCliente());
+
+    for (PagoEmpresa pago : pagos) {
+
+        BigDecimal nuevoTotal = calcularTotalPago(
+                cliente,
+                pago.getTipoPeriodicidad(),
+                pago.getFecha());
+
+        pago.setMonto(nuevoTotal);
+
+        pagoEmpresaRepository.save(pago);
     }
+}
 
     @Override
     public List<Venta> filtrarPorMes(int mes, int anio) {
@@ -317,16 +340,16 @@ public class VentaServiceImpl implements VentaService {
 
         // Ahora si empresas y clientes
         if (cliente.getTipoCliente() != TipoCliente.EMPRESA
-        && cliente.getTipoCliente() != TipoCliente.CLIENTE) {
-    return;
-}
+                && cliente.getTipoCliente() != TipoCliente.CLIENTE) {
+            return;
+        }
 
         TipoPeriodicidad periodicidad = cliente.getPeriodicidadPago();
-System.out.println("===========");
-System.out.println("Cliente: " + cliente.getNombre());
-System.out.println("Tipo: " + cliente.getTipoCliente());
-System.out.println("Periodicidad: " + periodicidad);
-System.out.println("===========");
+        System.out.println("===========");
+        System.out.println("Cliente: " + cliente.getNombre());
+        System.out.println("Tipo: " + cliente.getTipoCliente());
+        System.out.println("Periodicidad: " + periodicidad);
+        System.out.println("===========");
 
         if (periodicidad == null) {
             return;
@@ -344,24 +367,49 @@ System.out.println("===========");
 
         if (!pagosExistentes.isEmpty()) {
 
-            PagoEmpresa pago = pagosExistentes.get(0);
+            PagoEmpresa pagoExistente = null;
 
-            BigDecimal montoActual = pago.getMonto() != null
-                    ? pago.getMonto()
-                    : BigDecimal.ZERO;
+            if (periodicidad == TipoPeriodicidad.SEMANAL) {
 
-            pago.setMonto(
-                    montoActual.add(venta.getMonto()));
+                int diaVenta = venta.getFecha().getDayOfMonth();
 
-            pagoEmpresaRepository.save(pago);
-            System.out.println(
-                    "Periodicidad del cliente: "
-                    + cliente.getPeriodicidadPago());
-                    System.out.println(
-    "Nombre: " + cliente.getNombre());
-    System.out.println(
-    "Tipo: " + cliente.getTipoCliente());
-            return;
+                for (PagoEmpresa p : pagosExistentes) {
+
+                    int diaPago = p.getFecha().getDayOfMonth();
+
+                    boolean mismaSemana
+                            = (diaVenta <= 7 && diaPago <= 7)
+                            || (diaVenta >= 8 && diaVenta <= 14
+                            && diaPago >= 8 && diaPago <= 14)
+                            || (diaVenta >= 15 && diaVenta <= 21
+                            && diaPago >= 15 && diaPago <= 21)
+                            || (diaVenta >= 22 && diaPago >= 22);
+
+                    if (mismaSemana) {
+                        pagoExistente = p;
+                        break;
+                    }
+                }
+
+            } else {
+
+                pagoExistente = pagosExistentes.get(0);
+            }
+
+            if (pagoExistente != null) {
+
+                BigDecimal nuevoTotal
+                        = calcularTotalPago(
+                                cliente,
+                                periodicidad,
+                                pagoExistente.getFecha());
+
+                pagoExistente.setMonto(nuevoTotal);
+
+                pagoEmpresaRepository.save(pagoExistente);
+
+                return;
+            }
         }
 
         PagoEmpresa nuevoPago = new PagoEmpresa();
@@ -375,5 +423,63 @@ System.out.println("===========");
 
         pagoEmpresaRepository.save(nuevoPago);
         System.out.println("Creando pago automático...");
+    }
+
+    private BigDecimal calcularTotalPago(
+            Cliente cliente,
+            TipoPeriodicidad periodicidad,
+            LocalDateTime fecha) {
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        List<Venta> ventas = ventaRepository.findAll();
+
+        for (Venta v : ventas) {
+
+            if (v.getCliente() == null) {
+                continue;
+            }
+
+            if (!v.getCliente().getIdCliente()
+                    .equals(cliente.getIdCliente())) {
+                continue;
+            }
+
+            if (v.getEstado() != TipoDePago.DEBE
+                    && v.getEstado() != TipoDePago.DEUDA_PAGADA) {
+                continue;
+            }
+
+            if (periodicidad == TipoPeriodicidad.SEMANAL) {
+
+                int diaReferencia = fecha.getDayOfMonth();
+                int diaVenta = v.getFecha().getDayOfMonth();
+
+                boolean mismaSemana
+                        = (diaReferencia <= 7 && diaVenta <= 7)
+                        || (diaReferencia >= 8 && diaReferencia <= 14
+                        && diaVenta >= 8 && diaVenta <= 14)
+                        || (diaReferencia >= 15 && diaReferencia <= 21
+                        && diaVenta >= 15 && diaVenta <= 21)
+                        || (diaReferencia >= 22 && diaVenta >= 22);
+
+                if (!mismaSemana) {
+                    continue;
+                }
+
+            } else {
+
+                if (v.getFecha().getMonthValue()
+                        != fecha.getMonthValue()
+                        || v.getFecha().getYear()
+                        != fecha.getYear()) {
+                    continue;
+                }
+            }
+
+            total = total.add(v.getMonto());
+        }
+
+        return total;
     }
 }

@@ -273,57 +273,60 @@ public class VentasBackend {
         }
         return List.of();/*devuelve una lista vacía en caso de error */
     }
-public List<Venta> cargarVentasDelMes(int mes, int anio) {
 
-    List<Venta> ventasMes = new ArrayList<>();
+    public List<Venta> cargarVentasDelMes(int mes, int anio) {
 
-    LocalDate fecha = LocalDate.of(anio, mes, 1);
+        List<Venta> ventasMes = new ArrayList<>();
 
-    LocalDate ultimoDia = fecha.withDayOfMonth(
-            fecha.lengthOfMonth());
+        LocalDate fecha = LocalDate.of(anio, mes, 1);
 
-    while (!fecha.isAfter(ultimoDia)) {
+        LocalDate ultimoDia = fecha.withDayOfMonth(
+                fecha.lengthOfMonth());
 
-        ventasMes.addAll(cargarVentasDelDia(fecha));
+        while (!fecha.isAfter(ultimoDia)) {
 
-        fecha = fecha.plusDays(1);
+            ventasMes.addAll(cargarVentasDelDia(fecha));
+
+            fecha = fecha.plusDays(1);
+        }
+
+        return ventasMes;
     }
 
-    return ventasMes;
-}
-public BigDecimal calcularDebeMensual(
-        String nombreCliente,
-        int mes,
-        int anio) {
+    public BigDecimal calcularDebeMensual(
+            String nombreCliente,
+            int mes,
+            int anio) {
+        System.out.println("CALCULANDO MENSUAL");
+        BigDecimal total = BigDecimal.ZERO;
 
-    BigDecimal total = BigDecimal.ZERO;
+        List<Venta> ventas = cargarVentasDelMes(mes, anio);
 
-    List<Venta> ventas = cargarVentasDelMes(mes, anio);
+        for (Venta v : ventas) {
 
-    for (Venta v : ventas) {
+            if (v.getCliente() == null) {
+                continue;
+            }
 
-        if (v.getCliente() == null) {
-            continue;
+            if (v.getCliente().getTipoCliente() == TipoCliente.MESA) {
+                continue;
+            }
+
+            if (!nombreCliente.equalsIgnoreCase(
+                    v.getCliente().getNombre())) {
+                continue;
+            }
+
+            if (v.getEstado() == TipoDePago.DEBE
+                    || v.getEstado() == TipoDePago.DEUDA_PAGADA) {
+
+                total = total.add(v.getMonto());
+            }
         }
 
-        if (v.getCliente().getTipoCliente() == TipoCliente.MESA) {
-            continue;
-        }
-
-        if (!nombreCliente.equalsIgnoreCase(
-                v.getCliente().getNombre())) {
-            continue;
-        }
-
-        if (v.getEstado() == TipoDePago.DEBE
-                || v.getEstado() == TipoDePago.DEUDA_PAGADA) {
-
-            total = total.add(v.getMonto());
-        }
+        return total;
     }
 
-    return total;
-}
     // =====================
 // LISTAR CLIENTES POR TIPO (EMPRESA/CLIENTE/MESA)
 // =====================
@@ -443,4 +446,85 @@ public BigDecimal calcularDebeMensual(
         }
     }
 
+    public BigDecimal calcularDebeSemanal(
+            String nombreCliente,
+            LocalDate fecha) {
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        List<Venta> ventas = cargarVentasDelMes(
+                fecha.getMonthValue(),
+                fecha.getYear());
+
+        int desde;
+        int hasta;
+
+        int dia = fecha.getDayOfMonth();
+
+        if (dia <= 7) {
+            desde = 1;
+            hasta = 7;
+        } else if (dia <= 14) {
+            desde = 8;
+            hasta = 14;
+        } else if (dia <= 21) {
+            desde = 15;
+            hasta = 21;
+        } else {
+            desde = 22;
+            hasta = fecha.lengthOfMonth();
+        }
+
+        System.out.println("=================================");
+        System.out.println("EMPRESA: " + nombreCliente);
+        System.out.println("FECHA SELECCIONADA: " + fecha);
+        System.out.println("SEMANA DESDE: " + desde);
+        System.out.println("SEMANA HASTA: " + hasta);
+
+        for (Venta v : ventas) {
+
+            if (v.getCliente() == null) {
+                continue;
+            }
+
+            if (!nombreCliente.equalsIgnoreCase(
+                    v.getCliente().getNombre())) {
+                continue;
+            }
+
+            System.out.println(
+                    "VENTA ENCONTRADA -> "
+                    + v.getFecha()
+                    + " MONTO="
+                    + v.getMonto());
+
+            int diaVenta = v.getFecha().getDayOfMonth();
+
+            if (diaVenta < desde || diaVenta > hasta) {
+
+                System.out.println(
+                        "IGNORADA POR SEMANA -> DIA "
+                        + diaVenta);
+
+                continue;
+            }
+
+            if (v.getEstado() == TipoDePago.DEBE
+                    || v.getEstado() == TipoDePago.DEUDA_PAGADA) {
+
+                total = total.add(v.getMonto());
+
+                System.out.println(
+                        "SUMADA -> "
+                        + v.getMonto()
+                        + " TOTAL="
+                        + total);
+            }
+        }
+
+        System.out.println("TOTAL FINAL SEMANAL = " + total);
+        System.out.println("=================================");
+
+        return total;
+    }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.uade.tpo.demo.entity.EstadoPago;
 import com.uade.tpo.demo.entity.PagoEmpresa;
-import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
@@ -126,19 +125,30 @@ comboSempras.setOnAction(e -> {
 
     String empresa = comboSempras.getValue();
 
-if (empresa != null && empresa.contains(" - ")) {
-    empresa = empresa.substring(0, empresa.indexOf(" - "));
-}
+    if (empresa != null && empresa.contains(" - ")) {
+        empresa = empresa.substring(0, empresa.indexOf(" - "));
+    }
 
     if (empresa == null || empresa.isBlank()) {
         txtMonto.clear();
         return;
     }
 
-    BigDecimal total = ventasBackend.calcularDebeMensual(
-            empresa,
-            fecha.getValue().getMonthValue(),
-            fecha.getValue().getYear());
+    BigDecimal total;
+
+    if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+
+        total = ventasBackend.calcularDebeSemanal(
+                empresa,
+                fecha.getValue());
+
+    } else {
+
+        total = ventasBackend.calcularDebeMensual(
+                empresa,
+                fecha.getValue().getMonthValue(),
+                fecha.getValue().getYear());
+    }
 
     txtMonto.setText(total.toPlainString());
 });
@@ -154,13 +164,55 @@ if (empresa != null && empresa.contains(" - ")) {
         return;
     }
 
-    BigDecimal total = ventasBackend.calcularDebeMensual(
+    BigDecimal total;
+
+if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+
+    total = ventasBackend.calcularDebeSemanal(
+            empresa,
+            fecha.getValue());
+
+} else {
+
+    total = ventasBackend.calcularDebeMensual(
             empresa,
             fecha.getValue().getMonthValue(),
             fecha.getValue().getYear());
+}
 
     txtMonto.setText(total.toPlainString());
 });
+comboPer.setOnAction(e -> {
+
+    String empresa = comboSempras.getValue();
+
+    if (empresa != null && empresa.contains(" - ")) {
+        empresa = empresa.substring(0, empresa.indexOf(" - "));
+    }
+
+    if (empresa == null || empresa.isBlank()) {
+        return;
+    }
+
+    BigDecimal total;
+
+    if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+
+        total = ventasBackend.calcularDebeSemanal(
+                empresa,
+                fecha.getValue());
+
+    } else {
+
+        total = ventasBackend.calcularDebeMensual(
+                empresa,
+                fecha.getValue().getMonthValue(),
+                fecha.getValue().getYear());
+    }
+
+    txtMonto.setText(total.toPlainString());
+});
+
         // ---- Precargar en edición ----
         if (edicion) {
             if (original.getNombre() != null) {
