@@ -280,44 +280,47 @@ if (empresa != null && empresa.contains(" - ")) {
     }
 
     // ===== ELIMINAR =====
-    public static boolean confirmarEliminacion() {
+   public static boolean confirmarLimpiarDatos() {
 
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Eliminar Pago");
-        dialog.getDialogPane().getStylesheets().add(
-                DialogPagos.class.getResource("/gastos.css").toExternalForm());
+    Dialog<Void> dialog = new Dialog<>();
+    dialog.setTitle("Limpiar datos del pago");
 
-        ButtonType btnEliminar
-                = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes()
-                .addAll(btnEliminar, ButtonType.CANCEL);
+    ButtonType btnEliminar =
+            new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
 
-        PasswordField txtPass = new PasswordField();
+    dialog.getDialogPane().getButtonTypes()
+            .addAll(btnEliminar, ButtonType.CANCEL);
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass);
+    PasswordField txtPass = new PasswordField();
 
-        form.setPadding(new Insets(10));
-        dialog.getDialogPane().setContent(form);
+    VBox form = new VBox(10,
+            new Label("Contraseña"), txtPass);
 
-        final boolean[] confirmado = {false};
+    form.setPadding(new Insets(10));
+    dialog.getDialogPane().setContent(form);
 
-        dialog.setResultConverter(btn -> {
+    final boolean[] confirmado = {false};
 
-            if (btn == btnEliminar
-                    && PasswordManager.verificar(txtPass.getText())) {
-                confirmado[0] = true;
-            } else if (btn == btnEliminar) {
-                new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta")
-                        .showAndWait();
-            }
-            return null;
-        });
+    dialog.setResultConverter(btn -> {
 
-        dialog.showAndWait();
+        if (btn == btnEliminar
+                && PasswordManager.verificar(txtPass.getText())) {
 
-        return confirmado[0];
-    }
+            confirmado[0] = true;
+
+        } else if (btn == btnEliminar) {
+
+            new Alert(Alert.AlertType.ERROR,
+                    "Contraseña incorrecta").showAndWait();
+        }
+
+        return null;
+    });
+
+    dialog.showAndWait();
+
+    return confirmado[0];
+}
 
     // ===== helpers de celdas =====
     private static ListCell<TipoPeriodicidad> celdaPeriodicidad() {

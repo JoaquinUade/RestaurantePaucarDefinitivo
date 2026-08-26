@@ -40,4 +40,8 @@ public class PagosQuincenalesView extends BorderPane {
 
         tabla.setPagos(pagos);
     }
+    public PagoEmpresa getSeleccionado() {
+    return tabla.getSeleccionado();
+}
+
 }

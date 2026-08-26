@@ -45,30 +45,29 @@ public class PagoEmpresaServiceImpl implements PagoEmpresaService {
             if (pagoEmpresa.getTipoPeriodicidad() != null) {
                 existing.setTipoPeriodicidad(pagoEmpresa.getTipoPeriodicidad());
             }
-            if (pagoEmpresa.getCuit() != null) {
                 existing.setCuit(pagoEmpresa.getCuit());
-            }
+            
             if (pagoEmpresa.getFecha() != null) {
                 existing.setFecha(pagoEmpresa.getFecha());
             }
-            if (pagoEmpresa.getNumeroPago() != null) {
+           
                 existing.setNumeroPago(pagoEmpresa.getNumeroPago());
-            }
+            
             if (pagoEmpresa.getMonto() != null) {
                 existing.setMonto(pagoEmpresa.getMonto());
             }
             if (pagoEmpresa.getMontoConIva() != null) {
                 existing.setMontoConIva(pagoEmpresa.getMontoConIva());
             }
-            if (pagoEmpresa.getFactura() != null) {
+            
                 existing.setFactura(pagoEmpresa.getFactura());
-            }
+           
             if (pagoEmpresa.getEstado() != null) {
                 existing.setEstado(pagoEmpresa.getEstado());
             }
-            if (pagoEmpresa.getObservacion() != null) {
+           
                 existing.setObservacion(pagoEmpresa.getObservacion());
-            }
+            
 
             return pagoEmpresaRepository.save(existing);
         }).orElseThrow(() -> new RuntimeException("Pago de empresa no encontrado con id: " + id));

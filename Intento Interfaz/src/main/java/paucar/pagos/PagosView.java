@@ -88,7 +88,7 @@ public class PagosView extends BorderPane {
                 btnFiltrar,
                 titulo,
                 spacer
-                );
+        );
         topBar.setPadding(new Insets(10));
         HBox bottomBar = new HBox(10, btnEditar, btnEliminar, spacer);
         bottomBar.setPadding(new Insets(10));
@@ -118,10 +118,10 @@ public class PagosView extends BorderPane {
                 .obtenerNombresPorTipo(TipoCliente.EMPRESA);
 
         PagoEmpresa nuevo = DialogPagos.mostrarEditar(
-        empresas,
-        clientesService,
-        ventasBackend,
-        seleccionado);
+                empresas,
+                clientesService,
+                ventasBackend,
+                seleccionado);
 
         if (nuevo != null) {
             service.modificar(seleccionado.getId(), nuevo);
@@ -131,12 +131,44 @@ public class PagosView extends BorderPane {
 
     private void eliminar() {
 
+        switch (comboPeriodicidad.getValue()) {
+
+            case "Mensual" ->
+                seleccionado = vistaMensual.getSeleccionado();
+
+            case "Quincenal" ->
+                seleccionado = vistaQuincenal.getSeleccionado();
+
+            case "Consumo varios días" ->
+                seleccionado = vistaConsumo.getSeleccionado();
+
+            case "Semanal" ->
+                seleccionado = vistaSemanal.getSeleccionado();
+        }
+
         if (seleccionado == null) {
+            new Alert(Alert.AlertType.WARNING,
+                    "Seleccione un pago")
+                    .showAndWait();
             return;
         }
 
-        if (DialogPagos.confirmarEliminacion()) {
-            service.eliminar(seleccionado.getId());
+        System.out.println("Pago seleccionado: " + seleccionado.getId());
+
+        if (DialogPagos.confirmarLimpiarDatos()) {
+
+            seleccionado.setCuit(null);
+            seleccionado.setFactura(null);
+            seleccionado.setObservacion(null);
+            seleccionado.setNumeroPago(null);
+            
+            System.out.println("CUIT = " + seleccionado.getCuit());
+            System.out.println("FACTURA = " + seleccionado.getFactura());
+            System.out.println("OBS = " + seleccionado.getObservacion());
+            System.out.println("NUMERO = " + seleccionado.getNumeroPago());
+
+            service.modificar(seleccionado.getId(), seleccionado);
+
             recargar();
         }
     }
@@ -162,9 +194,9 @@ public class PagosView extends BorderPane {
             case "Semanal" -> {
 
                 if (vistaSemanal == null) {
-                    
+
                     vistaSemanal = new PagosSemanalesView(service);
-                    
+
                 }
 
                 vistaSemanal.actualizarFecha(filtroFecha.getValue());
@@ -205,4 +237,5 @@ public class PagosView extends BorderPane {
     private void recargar() {
         aplicarFiltro();
     }
+
 }

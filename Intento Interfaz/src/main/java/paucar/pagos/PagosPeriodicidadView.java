@@ -23,6 +23,7 @@ public class PagosPeriodicidadView extends BorderPane {
     private final PagosService service;
     private final ClientesService clientesService;
     private final TipoPeriodicidad periodicidad;
+ 
 
     private final TablaPagos tabla;
     private final Label lblTotal = new Label();
@@ -39,27 +40,27 @@ public class PagosPeriodicidadView extends BorderPane {
         this.periodicidad = periodicidad;
 
         tabla = new TablaPagos(
-    pago -> {
+                pago -> {
 
-        List<String> empresas =
-                clientesService.obtenerNombresPorTipo(
-                        TipoCliente.EMPRESA);
+                    List<String> empresas
+                    = clientesService.obtenerNombresPorTipo(
+                            TipoCliente.EMPRESA);
 
-        PagoEmpresa nuevo = DialogPagos.mostrarEditar(
-                empresas,
-                clientesService,
-                null,
-                pago);
+                    PagoEmpresa nuevo = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
 
-        if (nuevo != null) {
-            service.modificar(pago.getId(), nuevo);
-            recargar();
-        }
+                    if (nuevo != null) {
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
 
-    },
-    this::recargar,
-    service);
-
+                },
+                this::recargar,
+                service);
+        
         VBox contenido = new VBox(10, tabla, lblTotal);
         contenido.setPadding(new Insets(10));
 
@@ -117,5 +118,7 @@ public class PagosPeriodicidadView extends BorderPane {
 
         recargar();
     }
-
+public PagoEmpresa getSeleccionado() {
+    return tabla.getSeleccionado();
+}
 }

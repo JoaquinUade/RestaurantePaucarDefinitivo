@@ -122,5 +122,24 @@ public class PagosSemanalesView extends BorderPane {
 
         recargar();
     }
+    public PagoEmpresa getSeleccionado() {
 
+    if (tablaSemana1.getSeleccionado() != null) {
+        return tablaSemana1.getSeleccionado();
+    }
+
+    if (tablaSemana2.getSeleccionado() != null) {
+        return tablaSemana2.getSeleccionado();
+    }
+
+    if (tablaSemana3.getSeleccionado() != null) {
+        return tablaSemana3.getSeleccionado();
+    }
+
+    if (tablaSemana4.getSeleccionado() != null) {
+        return tablaSemana4.getSeleccionado();
+    }
+
+    return null;
+}
 }

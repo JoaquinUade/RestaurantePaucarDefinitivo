@@ -266,15 +266,6 @@ public class TablaPagos extends VBox {
 
         tabla.setItems(FXCollections.observableArrayList());
 
-        tabla.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, oldSel, newSel) -> {
-
-                    if (newSel != null && onSelect != null) {
-                        onSelect.accept(newSel);
-                    }
-                });
-
         getChildren().add(tabla);
     }
 
@@ -297,5 +288,9 @@ public class TablaPagos extends VBox {
                 alturaCabecera
                 + (filas * alturaFila)
                 + 55);
+    }
+
+    public PagoEmpresa getSeleccionado() {
+        return tabla.getSelectionModel().getSelectedItem();
     }
 }
