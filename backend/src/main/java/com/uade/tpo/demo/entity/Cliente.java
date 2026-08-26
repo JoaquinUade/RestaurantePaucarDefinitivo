@@ -1,6 +1,7 @@
 package com.uade.tpo.demo.entity;
 
 import jakarta.persistence.*;
+import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 @Entity
 @Table(name = "clientes")
@@ -17,6 +18,10 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cliente", nullable = false)
     private TipoCliente tipoCliente;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "periodicidad_pago")
+    private TipoPeriodicidad periodicidadPago;
 
     public Cliente() {
     }
@@ -48,5 +53,13 @@ public class Cliente {
 
     public void setTipoCliente(TipoCliente tipoCliente) {
         this.tipoCliente = tipoCliente;
+    }
+
+    public TipoPeriodicidad getPeriodicidadPago() {
+        return periodicidadPago;
+    }
+
+    public void setPeriodicidadPago(TipoPeriodicidad periodicidadPago) {
+        this.periodicidadPago = periodicidadPago;
     }
 }

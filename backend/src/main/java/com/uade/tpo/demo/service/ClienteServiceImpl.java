@@ -26,16 +26,21 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public Cliente modificarCliente(Long id, Cliente cliente) {
         return clienteRepository.findById(id).map(existing -> {
+
             if (cliente.getNombre() != null) {
                 existing.setNombre(cliente.getNombre());
             }
+
             if (cliente.getTipoCliente() != null) {
                 existing.setTipoCliente(cliente.getTipoCliente());
             }
+            if (cliente.getPeriodicidadPago() != null) {
+                existing.setPeriodicidadPago(cliente.getPeriodicidadPago());
+            }
             return clienteRepository.save(existing);
+
         }).orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + id));
     }
-
 
     @Override
     public Optional<Cliente> obtenerClienteById(Long id) {

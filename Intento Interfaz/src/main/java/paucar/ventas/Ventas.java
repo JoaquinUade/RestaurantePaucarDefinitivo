@@ -280,7 +280,7 @@ public final class Ventas extends BorderPane {
 
         java.util.concurrent.CompletableFuture/*ejecuta en segundo plano */
                 .supplyAsync(() -> {/*se asegura de que el cliente exista; si no existe, lo crea */
-                    clientesService.crearClienteSiNoExiste(nombreCliente, tipo);
+                    clientesService.crearClienteSiNoExiste(nombreCliente, tipo, null);
 
                     return clientesService.obtenerClienteIdPorNombre(nombreCliente, tipo);/*retorna el ID del cliente que
                                                                                           tiene ese nombre y ese tipo */

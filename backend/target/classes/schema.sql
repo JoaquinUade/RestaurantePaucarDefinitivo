@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS clientes (
   id_cliente BIGINT NOT NULL AUTO_INCREMENT,
   nombre VARCHAR(255) NOT NULL,
   tipo_cliente VARCHAR(50) NOT NULL,
+  periodicidad_pago VARCHAR(50) NULL,
   PRIMARY KEY (id_cliente)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

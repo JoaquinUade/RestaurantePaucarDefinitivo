@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.TipoPeriodicidad;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 public class ClientesService {
@@ -79,9 +80,12 @@ public class ClientesService {
                         var tipo = n.hasNonNull("tipoCliente") ? n.get("tipoCliente").asText() : null;/*si el objeto tiene la clave 'tipoCliente'
                                                                                                                            y no es null lo lee como string, sino 'tipo'
                                                                                                                            queda null */
+                        String periodicidad = n.hasNonNull("periodicidadPago")
+                                ? n.get("periodicidadPago").asText()
+                                : "Sin periodicidad";
                         if (nombre != null && !nombre.isBlank()) {/*Filtra: 'nombre' debe existir y NO estar vacío/espacios */
                             if (tipo == null || !tipo.equalsIgnoreCase("MESA")) {/*Si 'tipo' es null O distinto de "MESA" */
-                                out.add(nombre.trim());/*entonces agrega el 'nombre' (sin espacios extremos) a la lista */
+                                out.add(nombre.trim() + " - " + periodicidad);/*entonces agrega el 'nombre' (sin espacios extremos) a la lista */
                             }
                         }
                     }
@@ -100,20 +104,19 @@ public class ClientesService {
                           ingresados no me queda claro por que*/
     }
 
-    public void crearClienteSiNoExiste(String nombre, TipoCliente tipoCli) {
+    public void crearClienteSiNoExiste(String nombre, TipoCliente tipoCli, TipoPeriodicidad periodicidadPago) {
         if (nombre == null || nombre.isBlank()) {/*si el nombre no es valido, o es null o solo son espacios
                                                  vacios se salga del metodo*/
             return;
         }
         try {
-            var payload = TraductorJSON.createObjectNode()/*Pensalo como: “arranco un JSON {} para llenarlo con nombre y tipCliente */
-                    .put("nombre", nombre.trim())/* Agrega al ObjectNode el campo "nombre" y el valor
-                                                           que le pases, toma el string nombre y le saca los
-                                                           espacios del principio y del final*/
-                    .put("tipoCliente", tipoCli.name());/*Agregá al JSON un campo que se llama
-                                                                  tipoCliente y poné un valor ahi, ya sea
-                                                                  empresa, cliente o mesa*/
+            var payload = TraductorJSON.createObjectNode()
+                    .put("nombre", nombre.trim())
+                    .put("tipoCliente", tipoCli.name());
 
+            if (periodicidadPago != null) {
+                payload.put("periodicidadPago", periodicidadPago.name());
+            }
             var solicitud = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/clientes"))/* Le pongo la URL de destino (BASE_URL + "/clientes") */
                     .header("Content-Type", "application/json")/* evitá dobles barras accidentales.
@@ -143,71 +146,73 @@ public class ClientesService {
             System.err.println("crearClienteSiNoExiste: " + e.getMessage());
         }
     }
-public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
-    try {
-        if (nombre == null || nombre.isBlank() || tipo == null) {
-            return null;
-        }
 
-        String url = BASE_URL + "/clientes?nombre="
-                + URLEncoder.encode(nombre, StandardCharsets.UTF_8)
-                + "&tipoCliente="  // <- OJO: '&' literal (no &amp;)
-                + URLEncoder.encode(tipo.name(), StandardCharsets.UTF_8);
+    public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
+        try {
+            if (nombre == null || nombre.isBlank() || tipo == null) {
+                return null;
+            }
 
-        var solicitud = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+            String url = BASE_URL + "/clientes?nombre="
+                    + URLEncoder.encode(nombre, StandardCharsets.UTF_8)
+                    + "&tipoCliente=" // <- OJO: '&' literal (no &amp;)
+                    + URLEncoder.encode(tipo.name(), StandardCharsets.UTF_8);
 
-        var response = http.send(solicitud, HttpResponse.BodyHandlers.ofString());
+            var solicitud = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
 
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            var json = TraductorJSON.readTree(response.body());
+            var response = http.send(solicitud, HttpResponse.BodyHandlers.ofString());
 
-            com.fasterxml.jackson.databind.JsonNode match = null; // <- declarar una sola variable
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                var json = TraductorJSON.readTree(response.body());
 
-            if (json.isArray()) {
-                String buscado = nombre.trim();
-                for (com.fasterxml.jackson.databind.JsonNode elem : json) {
-                    if (elem != null && elem.hasNonNull("nombre")) {
-                        String n = elem.get("nombre").asText("").trim();
-                        String t = elem.hasNonNull("tipoCliente") ? elem.get("tipoCliente").asText("") : "";
-                        // Coincidencia por nombre y tipo (case-insensitive)
-                        if (n.equalsIgnoreCase(buscado) && t.equalsIgnoreCase(tipo.name())) {
-                            match = elem;
-                            break;
+                com.fasterxml.jackson.databind.JsonNode match = null; // <- declarar una sola variable
+
+                if (json.isArray()) {
+                    String buscado = nombre.trim();
+                    for (com.fasterxml.jackson.databind.JsonNode elem : json) {
+                        if (elem != null && elem.hasNonNull("nombre")) {
+                            String n = elem.get("nombre").asText("").trim();
+                            String t = elem.hasNonNull("tipoCliente") ? elem.get("tipoCliente").asText("") : "";
+                            // Coincidencia por nombre y tipo (case-insensitive)
+                            if (n.equalsIgnoreCase(buscado) && t.equalsIgnoreCase(tipo.name())) {
+                                match = elem;
+                                break;
+                            }
                         }
                     }
-                }
-            } else if (json.isObject()) {
-                String n = json.hasNonNull("nombre") ? json.get("nombre").asText("").trim() : "";
-                String t = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText("") : "";
-                if (n.equalsIgnoreCase(nombre.trim()) && t.equalsIgnoreCase(tipo.name())) {
-                    match = json;
-                }
-            }
-
-            if (match != null && match.hasNonNull("idCliente")) {
-                Long id = match.get("idCliente").asLong();
-                // Integración con VentaRequest (como ya hacías)
-                try {
-                    if (this.venta != null) {
-                        this.venta.setIdCliente(id);
+                } else if (json.isObject()) {
+                    String n = json.hasNonNull("nombre") ? json.get("nombre").asText("").trim() : "";
+                    String t = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText("") : "";
+                    if (n.equalsIgnoreCase(nombre.trim()) && t.equalsIgnoreCase(tipo.name())) {
+                        match = json;
                     }
-                } catch (Exception ignore) {}
-                return id;
+                }
+
+                if (match != null && match.hasNonNull("idCliente")) {
+                    Long id = match.get("idCliente").asLong();
+                    // Integración con VentaRequest (como ya hacías)
+                    try {
+                        if (this.venta != null) {
+                            this.venta.setIdCliente(id);
+                        }
+                    } catch (Exception ignore) {
+                    }
+                    return id;
+                }
+            }
+        } catch (java.io.IOException | InterruptedException e) {
+            System.err.println("obtenerClienteIdPorNombre(nombre,tipo): " + e.getMessage());
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
             }
         }
-    } catch (java.io.IOException | InterruptedException e) {
-        System.err.println("obtenerClienteIdPorNombre(nombre,tipo): " + e.getMessage());
-        if (e instanceof InterruptedException) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
-    // Sin fallback a la versión 1-parámetro para evitar confundir "Victoria CLIENTE" con "Victoria EMPRESA".
-    return null;
-}
+        // Sin fallback a la versión 1-parámetro para evitar confundir "Victoria CLIENTE" con "Victoria EMPRESA".
+        return null;
+    }
 
     public java.util.List<String> obtenerNombresPorTipo(com.uade.tpo.demo.entity.TipoCliente tipo) {
         if (tipo == null) {
@@ -230,25 +235,37 @@ public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
 
                 if (json.isArray()) {
                     for (var n : json) {
-                        String nombre = n.hasNonNull("nombre") ? n.get("nombre").asText() : null;
-                        String tipoStr = n.hasNonNull("tipoCliente") ? n.get("tipoCliente").asText() : null;
+
+                        String nombre = n.hasNonNull("nombre")
+                                ? n.get("nombre").asText()
+                                : null;
+
+                        String tipoStr = n.hasNonNull("tipoCliente")
+                                ? n.get("tipoCliente").asText()
+                                : null;
+
+                        String periodicidad = n.hasNonNull("periodicidadPago")
+                                ? n.get("periodicidadPago").asText()
+                                : "Sin periodicidad";
 
                         if (nombre != null && !nombre.isBlank()) {
                             if (tipoStr == null) {
-                                // No vino el campo tipoCliente para este ítem: lo evaluamos luego
-                                out.add(nombre.trim());
+                                out.add(nombre.trim() + " - " + periodicidad);
                             } else if (tipoStr.equalsIgnoreCase(tipo.name())) {
-                                out.add(nombre.trim());
+                                out.add(nombre.trim() + " - " + periodicidad);
                             }
                         }
                     }
                 } else if (json.isObject()) {
                     String nombre = json.hasNonNull("nombre") ? json.get("nombre").asText() : null;
                     String tipoStr = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText() : null;
+                    String periodicidad = json.hasNonNull("periodicidadPago")
+                            ? json.get("periodicidadPago").asText()
+                            : "Sin periodicidad";
 
                     if (nombre != null && !nombre.isBlank()) {
                         if (tipoStr == null || tipoStr.equalsIgnoreCase(tipo.name())) {
-                            out.add(nombre.trim());
+                            out.add(nombre.trim() + " - " + periodicidad);
                         }
                     }
                 }
@@ -277,19 +294,25 @@ public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
                     for (var n : json) {
                         String nombre = n.hasNonNull("nombre") ? n.get("nombre").asText() : null;
                         String tipoStr = n.hasNonNull("tipoCliente") ? n.get("tipoCliente").asText() : null;
+                        String periodicidad = n.hasNonNull("periodicidadPago")
+                                ? n.get("periodicidadPago").asText()
+                                : "Sin periodicidad";
 
                         if (nombre != null && !nombre.isBlank() && tipoStr != null
                                 && tipoStr.equalsIgnoreCase(tipo.name())) {
-                            out.add(nombre.trim());
+                            out.add(nombre.trim() + " - " + periodicidad);
                         }
                     }
                 } else if (json.isObject()) {
                     String nombre = json.hasNonNull("nombre") ? json.get("nombre").asText() : null;
                     String tipoStr = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText() : null;
+                    String periodicidad = json.hasNonNull("periodicidadPago")
+                            ? json.get("periodicidadPago").asText()
+                            : "Sin periodicidad";
 
                     if (nombre != null && !nombre.isBlank() && tipoStr != null
                             && tipoStr.equalsIgnoreCase(tipo.name())) {
-                        out.add(nombre.trim());
+                        out.add(nombre.trim() + " - " + periodicidad);
                     }
                 }
 
@@ -307,66 +330,73 @@ public Long obtenerClienteIdPorNombre(String nombre, TipoCliente tipo) {
         }
         return java.util.List.of();
     }
+
     public void eliminarCliente(String nombre) {
-    try {
-        Long idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.CLIENTE);
+        try {
+            Long idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.CLIENTE);
 
-        if (idCliente == null) {
-            idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.EMPRESA);
+            if (idCliente == null) {
+                idCliente = obtenerClienteIdPorNombre(nombre, TipoCliente.EMPRESA);
+            }
+
+            if (idCliente == null) {
+                System.err.println("No se encontró el cliente");
+                return;
+            }
+
+            var req = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
+                    .DELETE()
+                    .build();
+
+            var res = http.send(req, HttpResponse.BodyHandlers.ofString());
+
+            if (res.statusCode() != 204) {
+                System.err.println("Error al eliminar: " + res.statusCode());
+            }
+
+        } catch (java.io.IOException | InterruptedException e) {
+            System.err.println("Error eliminar: " + e.getMessage());
         }
-
-        if (idCliente == null) {
-            System.err.println("No se encontró el cliente");
-            return;
-        }
-
-        var req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
-                .DELETE()
-                .build();
-
-        var res = http.send(req, HttpResponse.BodyHandlers.ofString());
-
-        if (res.statusCode() != 204) {
-            System.err.println("Error al eliminar: " + res.statusCode());
-        }
-
-    } catch (java.io.IOException | InterruptedException e) {
-        System.err.println("Error eliminar: " + e.getMessage());
     }
-}
-public void editarCliente(String nombreOriginal, String nuevoNombre, TipoCliente tipo) {
-    try {
-        Long idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.CLIENTE);
 
-        if (idCliente == null) {
-            idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.EMPRESA);
+    public void editarCliente(String nombreOriginal, String nuevoNombre, TipoCliente tipo,
+            TipoPeriodicidad periodicidadPago) {
+        try {
+            Long idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.CLIENTE);
+
+            if (idCliente == null) {
+                idCliente = obtenerClienteIdPorNombre(nombreOriginal, TipoCliente.EMPRESA);
+            }
+
+            if (idCliente == null) {
+                System.err.println("No se encontró el cliente");
+                return;
+            }
+            
+            var json = TraductorJSON.createObjectNode()
+                    .put("nombre", nuevoNombre)
+                    .put("tipoCliente", tipo.name());
+
+            if (periodicidadPago != null) {
+                json.put("periodicidadPago", periodicidadPago.name());
+            }
+
+            var req = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
+                    .header("Content-Type", "application/json")
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(json.toString()))
+                    .build();
+
+            var res = http.send(req, HttpResponse.BodyHandlers.ofString());
+            
+            if (res.statusCode() != 200) {
+                System.err.println("Error al editar: " + res.statusCode());
+            }
+
+        } catch (java.io.IOException | InterruptedException e) {
+            System.err.println("Error editar: " + e.getMessage());
         }
-
-        if (idCliente == null) {
-            System.err.println("No se encontró el cliente");
-            return;
-        }
-
-        var json = TraductorJSON.createObjectNode()
-                .put("nombre", nuevoNombre)
-                .put("tipoCliente", tipo.name());
-
-        var req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/clientes/" + idCliente))
-                .header("Content-Type", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(json.toString()))
-                .build();
-
-        var res = http.send(req, HttpResponse.BodyHandlers.ofString());
-
-        if (res.statusCode() != 200) {
-            System.err.println("Error al editar: " + res.statusCode());
-        }
-
-    } catch (java.io.IOException | InterruptedException e) {
-        System.err.println("Error editar: " + e.getMessage());
     }
-}
 
 }

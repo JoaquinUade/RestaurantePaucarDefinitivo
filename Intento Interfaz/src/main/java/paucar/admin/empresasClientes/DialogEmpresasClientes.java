@@ -1,6 +1,7 @@
 package paucar.admin.empresasClientes;
 
 import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
@@ -27,15 +28,20 @@ public class DialogEmpresasClientes {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField();
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();/*Combo para tipo de cliente */
+ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
 
         txtNombre.setPromptText("Nombre");
+        cmbPeriodicidad.setPromptText("Sin periodicidad");
         cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA, TipoCliente.MESA);
+        cmbPeriodicidad.getItems().addAll(TipoPeriodicidad.MENSUAL,TipoPeriodicidad.QUINCENAL,
+                                          TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(TipoCliente.CLIENTE);
 
         VBox form = new VBox(10,
                 new Label("Contraseña"), txtPass,
                 new Label("Nombre"), txtNombre,
-                new Label("Tipo"), cmbTipo
+                new Label("Tipo"), cmbTipo,
+                new Label("Periodicidad (opcional)"), cmbPeriodicidad
         );
         form.setPadding(new Insets(10));
 
@@ -56,7 +62,7 @@ public class DialogEmpresasClientes {
                     return null;
                 }
 
-                return new Object[]{nombre, cmbTipo.getValue()};/*Retorna los datos como array (nombre y tipo) */
+                return new Object[]{nombre, cmbTipo.getValue(),cmbPeriodicidad.getValue()};/*Retorna los datos como array (nombre y tipo) */
             }
             return null;/*si cancela */
         });
@@ -65,7 +71,8 @@ public class DialogEmpresasClientes {
     }
 
     // ✅ EDITAR
-    public static Object[] abrirDialogEditar(String nombreOriginal, TipoCliente tipoOriginal) {
+    public static Object[] abrirDialogEditar(String nombreOriginal, TipoCliente tipoOriginal,
+                                             TipoPeriodicidad periodicidadOriginal) {
 
         Dialog<Object[]> dialog = new Dialog<>();
         dialog.setTitle("Editar Cliente / Empresa");
@@ -76,14 +83,18 @@ public class DialogEmpresasClientes {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);/*Campo con dato precargado */
         ComboBox<TipoCliente> cmbTipo = new ComboBox<>();
+ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
 
         cmbTipo.getItems().addAll(TipoCliente.CLIENTE, TipoCliente.EMPRESA, TipoCliente.MESA);
+        cmbPeriodicidad.getItems().addAll(TipoPeriodicidad.MENSUAL,TipoPeriodicidad.QUINCENAL,
+                                          TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(tipoOriginal);
-
+cmbPeriodicidad.setValue(periodicidadOriginal);
         VBox form = new VBox(10,
                 new Label("Contraseña"), txtPass,
                 new Label("Nombre"), txtNombre,
-                new Label("Tipo"), cmbTipo
+                new Label("Tipo"), cmbTipo,
+                new Label("Periodicidad (opcional)"), cmbPeriodicidad
         );
         form.setPadding(new Insets(10));
 
@@ -104,7 +115,7 @@ public class DialogEmpresasClientes {
                     return null;
                 }
 
-                return new Object[]{nombre, cmbTipo.getValue()};
+                return new Object[]{nombre, cmbTipo.getValue(),cmbPeriodicidad.getValue()};
             }
             return null;
         });

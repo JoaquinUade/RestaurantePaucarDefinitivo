@@ -3,6 +3,7 @@ package paucar.admin.empresasClientes;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.TipoCliente;
+import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
@@ -139,8 +140,9 @@ public class EmpresasClientes extends BorderPane {
 
                 String nombre = (String) resultado[0];/*Obtiene el nombre ingresado del diálogo*/
                 TipoCliente tipo = (TipoCliente) resultado[1];/*obtiene el tipo ingresado en el dialogo */
-              
-                clientesService.crearClienteSiNoExiste(nombre, tipo);/*Crea el cliente si no existe
+                TipoPeriodicidad periodicidad = (TipoPeriodicidad) resultado[2];
+
+                clientesService.crearClienteSiNoExiste(nombre, tipo, periodicidad);/*Crea el cliente si no existe
                                                                       previamente*/
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */
             }
@@ -159,14 +161,15 @@ public class EmpresasClientes extends BorderPane {
                                                        no, es EMPRESA */
 
             Object[] resultado = DialogEmpresasClientes
-                    .abrirDialogEditar(seleccionado, tipo);/*Abre el diálogo de editar y guarda los datos que
+                    .abrirDialogEditar(seleccionado, tipo, null);/*Abre el diálogo de editar y guarda los datos que
                                                        ingresó el usuario en un arreglo */
 
             if (resultado != null) {
                 String nuevoNombre = (String) resultado[0];/*obtiene el nuevo nombre */
                 TipoCliente nuevoTipo = (TipoCliente) resultado[1];/*obtiene el nuevo tipo */
+                TipoPeriodicidad nuevaPeriodicidad = (TipoPeriodicidad) resultado[2];
 
-                clientesService.editarCliente(seleccionado, nuevoNombre, nuevoTipo);/*Actualiza el cliente/empresa
+                clientesService.editarCliente(seleccionado, nuevoNombre, nuevoTipo, nuevaPeriodicidad);/*Actualiza el cliente/empresa
                                                                                     con los nuevos datos */
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */
             }
@@ -192,14 +195,18 @@ public class EmpresasClientes extends BorderPane {
 
     private String obtenerSeleccionado() {
 
-        if (listaClientes.getSelectionModel().getSelectedItem() != null) {/*Si hay un cliente seleccionado */
-            return listaClientes.getSelectionModel().getSelectedItem();/*lo retorna */
+        String seleccionado = null;
+
+        if (listaClientes.getSelectionModel().getSelectedItem() != null) {
+            seleccionado = listaClientes.getSelectionModel().getSelectedItem();
+        } else if (listaEmpresas.getSelectionModel().getSelectedItem() != null) {
+            seleccionado = listaEmpresas.getSelectionModel().getSelectedItem();
         }
 
-        if (listaEmpresas.getSelectionModel().getSelectedItem() != null) {
-            return listaEmpresas.getSelectionModel().getSelectedItem();
+        if (seleccionado != null && seleccionado.contains(" - ")) {
+            return seleccionado.split(" - ")[0].trim();
         }
 
-        return null;
+        return seleccionado;
     }
 }
