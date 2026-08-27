@@ -1,3 +1,4 @@
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\PagoParcialRepository.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\dto\StockRequest.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\TipoPeriodicidad.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\GastosFijosRepository.java
@@ -7,6 +8,7 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\m
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\dto\VentaRequest.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\controllers\CategoriaGastoVariableController.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\exceptions\CategoryDuplicateException.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\dto\PagoParcialRequest.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\Stock.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\ProductoService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\TipoCliente.java
@@ -25,6 +27,7 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\m
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\CategoriaGastoVariable.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\dto\GastoRequest.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\controllers\GastosVariablesController.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\PagoParcial.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\GastosIndividualesService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\ClienteRepository.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\impl\StockServiceImpl.java
@@ -33,10 +36,12 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\m
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\Cliente.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\EstadoPago.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\GastosVariablesRepository.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\PagoParcialServiceImpl.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\GastosIndividuales.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\controllers\ClienteController.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\Empleado.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\PagoEmpresa.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\controllers\PagoParcialController.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\GastosFijos.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\controllers\GastosController.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\impl\GastosFijosServiceImpl.java
@@ -50,6 +55,7 @@ C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\m
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\VentaRepository.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\Gastos.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\impl\EmpleadoServiceImpl.java
+C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\PagoParcialService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\entity\dto\VentaDTO.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\service\StockService.java
 C:\Users\Usuario\Desktop\CuentasPaucar\RestaurantePaucarDefinitivo\backend\src\main\java\com\uade\tpo\demo\repository\CategoriaGastoVariableRepository.java

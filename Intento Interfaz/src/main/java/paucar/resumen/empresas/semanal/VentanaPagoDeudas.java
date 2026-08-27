@@ -1,6 +1,13 @@
 package paucar.resumen.empresas.semanal;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import com.uade.tpo.demo.entity.TipoDePago;
 import com.uade.tpo.demo.entity.Venta;
@@ -32,6 +39,9 @@ public class VentanaPagoDeudas {
     private final Map<Long, Boolean> seleccionados
             = new java.util.HashMap<>();
 
+    private final Map<Long, DatosAdmin> datosAdmin
+            = new java.util.HashMap<>();
+
     public VentanaPagoDeudas(VentasBackend backend) {
         this.backend = backend;
     }
@@ -49,6 +59,18 @@ public class VentanaPagoDeudas {
 
         Label lblPass = new Label("Contraseña:");
         PasswordField txtPass = new PasswordField();/*Campo de texto para ingresar contraseña*/
+
+        Label lblNombre = new Label("Nombre");
+        TextField txtNombre = new TextField();
+
+        Label lblCuit = new Label("CUIT");
+        TextField txtCuit = new TextField();
+
+        Label lblFactura = new Label("Factura");
+        TextField txtFactura = new TextField();
+
+        Label lblObs = new Label("Observaciones");
+        TextField txtObs = new TextField();
 
         TableView<Venta> tablaDeudas = new TableView<>();/*crea la tabladeudas*/
 
@@ -117,62 +139,52 @@ public class VentanaPagoDeudas {
 
         tablaDeudas.getColumns().add(colCheck);
 
-        // ✅ MONTO (IGUAL FORMATO AR)
+        // ✅ FECHA
+        TableColumn<Venta, String> colFecha = new TableColumn<>("Fecha");
+        colFecha.setCellValueFactory(fila -> {
+            var f = fila.getValue().getFecha();
+            String txt = (f == null) ? "" : f.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return new SimpleObjectProperty<>(txt);
+        });
+        colFecha.setSortable(false);
+
+        
+
+        // ✅ DESCRIPCIÓN (con wrap)
+        TableColumn<Venta, String> colDesc = crearColumnaTexto("Descripción", "descripcion", 12);
+
+        // ✅ MONTO
         TableColumn<Venta, String> colMonto = new TableColumn<>("Monto");
         colMonto.setCellValueFactory(fila -> {
             Number m = fila.getValue().getMonto();
             return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(m));
         });
-
-        TableColumn<Venta, String> colDesc = crearColumnaTexto("Descripción", "descripcion", 13);/*crea la descripcion con wrap*/
-
-        TableColumn<Venta, String> colObs
-                = new TableColumn<>("Observaciones");/*crea la columna observaciones */
-
-        colObs.setCellValueFactory(fila
-                -> new SimpleObjectProperty<>((String) fila.getValue().getObservaciones())
-        );
-
-        colObs.setCellFactory(tc -> new TableCell<>() {
-
-            private final TextField txtObservaciones = new TextField();
-
-            {
-                txtObservaciones.setOnAction(e -> guardar());/*si presionas el campo observaciones*/
-                txtObservaciones.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal) {/*Detecta cuándo el usuario deja de editar el campo*/
-
-                        guardar();/*Guarda el nuevo contenido de observaciones*/
-                    }
-                });
-            }
-
-            private void guardar() {
-                Venta fila = getTableView().getItems().get(getIndex());
-                fila.setObservaciones(txtObservaciones.getText());/*Guardá en la fila el texto que el
-                                                                    usuario escribió en el campo de
-                                                                    observaciones */
-            }
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    txtObservaciones.setText(item != null ? item : "");/*si el texto es null lo deja vacio*/
-                    setGraphic(txtObservaciones);/*Muestra el TextField en la celda como componente editable,
-                                          permitiendo visualizar y modificar el valor*/
-                }
-            }
-        });
-
-        colObs.setSortable(false);
         colMonto.setSortable(false);
+
+        // ✅ MONTO CON IVA (21%)
+        TableColumn<Venta, String> colMontoIva = new TableColumn<>("Monto con IVA");
+        colMontoIva.setCellValueFactory(fila -> {
+            BigDecimal m = fila.getValue().getMonto();
+            BigDecimal iva = (m == null) ? null
+                    : m.multiply(new BigDecimal("1.21"))
+                            .setScale(2, RoundingMode.HALF_UP);
+            return new SimpleObjectProperty<>(MonedaUtils.formatearMoneda(iva));
+        });
+        colMontoIva.setSortable(false);
+
+        // ✅ ESTADO
+        TableColumn<Venta, String> colEstado = new TableColumn<>("Estado");
+        colEstado.setCellValueFactory(fila
+                -> new SimpleObjectProperty<>(fila.getValue().getEstado() == null
+                        ? "" : fila.getValue().getEstado().name()));
+        colEstado.setSortable(false);
+
         colDesc.setSortable(false);
+        tablaDeudas.getColumns().add(colFecha);
         tablaDeudas.getColumns().add(colDesc);
         tablaDeudas.getColumns().add(colMonto);
-        tablaDeudas.getColumns().add(colObs);
+        tablaDeudas.getColumns().add(colMontoIva);
+        tablaDeudas.getColumns().add(colEstado);
 
         tablaDeudas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);/*Define que las columnas se
                                                                            redimensionen para ocupar todo el
@@ -183,6 +195,13 @@ public class VentanaPagoDeudas {
             if (v.getEstado() == TipoDePago.DEBE) {/*si el tipo de pago es debe */
 
                 tablaDeudas.getItems().add(v);/*la agrega a la tablaDeudas*/
+
+                datosAdmin.put(v.getIdVenta(),
+                        new DatosAdmin(
+                                v.getConsumidor(),
+                                null,
+                                null,
+                                v.getObservaciones()));
             }
         }
         Button btnConfirmar = new Button("Confirmar Pago");
@@ -197,6 +216,9 @@ public class VentanaPagoDeudas {
                 return;
             }
 
+            List<Long> idsSeleccionadas = new ArrayList<>();
+            DatosAdmin datosPago = null;
+
             for (Venta v : tablaDeudas.getItems()) {/*recorre todas las filas */
 
                 Boolean seleccionado
@@ -207,26 +229,184 @@ public class VentanaPagoDeudas {
 
                 if (Boolean.TRUE.equals(seleccionado)) {/*Verifica si la fila está seleccionada */
 
-                    Long idVenta = v.getIdVenta();
+                    idsSeleccionadas.add(v.getIdVenta());
 
-                    backend.actualizarEstadoVenta(idVenta, TipoDePago.DEUDA_PAGADA);/*Actualiza el estado de
-                                                                                    la venta a DEUDA_PAGADA*/
+                    DatosAdmin da = datosAdmin.get(v.getIdVenta());
+                    if (da != null && datosPago == null) {
+                        datosPago = da;
+                    }
                 }
             }
+
+            if (idsSeleccionadas.isEmpty()) {
+                Alert alert = new Alert(
+                        Alert.AlertType.INFORMATION,
+                        "Seleccioná al menos una venta para pagar"
+                );
+                alert.show();
+                return;
+            }
+
+            String nombre = txtNombre.getText().trim();
+            String cuit = txtCuit.getText().trim();
+            String factura = txtFactura.getText().trim();
+            String obs = txtObs.getText().trim();
+
+            if (nombre.isBlank()) {
+                nombre = null;
+            }
+
+            if (cuit.isBlank()) {
+                cuit = null;
+            }
+
+            if (factura.isBlank()) {
+                factura = null;
+            }
+
+            if (obs.isBlank()) {
+                obs = null;
+            }
+
+            backend.registrarPagoParcial(idsSeleccionadas, nombre, cuit, factura, obs);
 
             refrescarTabla.run();
 
             ventana.close();
         });
 
-        layout.getChildren().addAll(lblPass, txtPass, tablaDeudas, btnConfirmar);/*añade a la caja vertical
-                                                                                 todos los elementos*/
+        layout.getChildren().addAll(
+        lblPass,
+        txtPass,
 
-        Scene scene = new Scene(layout, 600, 400);/*le mete a la escena el contenido de vbox
+        lblNombre,
+        txtNombre,
+
+        lblCuit,
+        txtCuit,
+
+        lblFactura,
+        txtFactura,
+
+        lblObs,
+        txtObs,
+
+        tablaDeudas,
+        btnConfirmar
+);
+
+        Scene scene = new Scene(layout, 1180, 500);/*le mete a la escena el contenido de vbox
                                                                  y le da tamaño*/
 
         ventana.setScene(scene);/*a la ventana le pasa la escena*/
         ventana.show();/*muestra la ventana */
+    }
+
+    private TableColumn<Venta, String> crearColumnaEditable(
+            String titulo,
+            Function<DatosAdmin, String> lector,
+            BiConsumer<DatosAdmin, String> aplicador) {
+
+        TableColumn<Venta, String> col = new TableColumn<>(titulo);
+        col.setSortable(false);
+
+        col.setCellValueFactory(fila -> {
+            DatosAdmin da = datosAdmin.computeIfAbsent(
+                    fila.getValue().getIdVenta(),
+                    k -> new DatosAdmin(null, null, null, null));
+            return new SimpleObjectProperty<>(lector.apply(da));
+        });
+
+        col.setCellFactory(tc -> new TableCell<>() {
+
+            private final TextField campo = new TextField();
+
+            {
+                campo.setPrefWidth(110);/*Ancho razonable para editar el dato*/
+                campo.setOnAction(e -> guardar());/*si presionas Enter en el campo*/
+                campo.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                    if (!newVal) {/*Detecta cuándo el usuario deja de editar el campo*/
+
+                        guardar();/*Guarda el nuevo valor editado*/
+                    }
+                });
+            }
+
+            private void guardar() {
+                if (getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    return;
+                }
+                Venta fila = getTableView().getItems().get(getIndex());
+                DatosAdmin da = datosAdmin.computeIfAbsent(
+                        fila.getIdVenta(),
+                        k -> new DatosAdmin(null, null, null, null));
+                aplicador.accept(da, campo.getText() == null ? "" : campo.getText());
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    campo.setText(item != null ? item : "");/*si el texto es null lo deja vacio*/
+                    setGraphic(campo);
+                }
+            }
+        });
+
+        return col;
+    }
+
+    /**
+     * Datos administrativos editables que se guardan en el PagoParcial al
+     * confirmar.
+     */
+    private static class DatosAdmin {
+
+        private String consumidor;
+        private String cuit;
+        private String factura;
+        private String observaciones;
+
+        DatosAdmin(String consumidor, String cuit, String factura, String observaciones) {
+            this.consumidor = consumidor;
+            this.cuit = cuit;
+            this.factura = factura;
+            this.observaciones = observaciones;
+        }
+
+        public String getConsumidor() {
+            return consumidor;
+        }
+
+        public void setConsumidor(String consumidor) {
+            this.consumidor = consumidor;
+        }
+
+        public String getCuit() {
+            return cuit;
+        }
+
+        public void setCuit(String cuit) {
+            this.cuit = cuit;
+        }
+
+        public String getFactura() {
+            return factura;
+        }
+
+        public void setFactura(String factura) {
+            this.factura = factura;
+        }
+
+        public String getObservaciones() {
+            return observaciones;
+        }
+
+        public void setObservaciones(String observaciones) {
+            this.observaciones = observaciones;
+        }
     }
 
     private TableColumn<Venta, String> crearColumnaTexto(

@@ -28,4 +28,14 @@ public class FormularioFactory {
 
         return inputObservaciones;
     }
+
+    public static TextField crearConsumidor() {
+
+        TextField inputConsumidor = new TextField();
+
+        inputConsumidor.setPromptText(
+                "Consumidor (opcional)");
+
+        return inputConsumidor;
+    }
 }

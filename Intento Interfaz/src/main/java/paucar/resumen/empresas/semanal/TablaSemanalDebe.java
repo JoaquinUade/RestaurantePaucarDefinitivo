@@ -1,6 +1,7 @@
 package paucar.resumen.empresas.semanal;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
@@ -55,6 +56,15 @@ public class TablaSemanalDebe {
             return new SimpleObjectProperty<>(fecha == null ? "" : FechaUtils.formatearTitulo(fecha));/*devuelve la fecha, si la fecha es null se
                                                                                                   deja vacía sino muestra formateada la fecha*/
         });
+        TableColumn<Venta, String> colConsumidor
+                = new TableColumn<>("Consumidor");
+
+        colConsumidor.setCellValueFactory(fila
+                -> new SimpleObjectProperty<>(
+                        fila.getValue().getConsumidor() == null
+                        ? ""
+                        : fila.getValue().getConsumidor()
+                ));
 
         TableColumn<Venta, String> colDescripcion = crearColumnaTexto("Descripción", "descripcion",
                 13);/*Crea una columna llamada colDescripcion usando un método que arma columnas
@@ -92,17 +102,29 @@ public class TablaSemanalDebe {
                                                                                                                                        tomado de la clave "observaciones" de cada fila,
                                                                                                                                        usando un padding de 16 píxeles*/
 
+        TableColumn<Venta, String> colFechaPago = new TableColumn<>("Fecha de pago");/*Crea una columna que muestra en qué día se pagó la deuda*/
+        colFechaPago.setCellValueFactory(fila -> {
+            LocalDateTime fp = fila.getValue().getFechaPago();
+            String txt = (fp == null) ? "" : FechaUtils.formatearTitulo(fp.toLocalDate());
+            return new SimpleObjectProperty<>(txt);
+        });
+
+
         colFecha.setSortable(false);/*le quita a todas las filas el ordenamiento sort, porque no
                                            corresponde*/
+        colConsumidor.setSortable(false);
         colDescripcion.setSortable(false);
         colMonto.setSortable(false);
         colTipo.setSortable(false);
         colObs.setSortable(false);
+        colFechaPago.setSortable(false);
 
         tabla.getColumns().add(colFecha);/* agrega cada una de las columnas, en el orden deseado */
+        tabla.getColumns().add(colConsumidor);
         tabla.getColumns().add(colDescripcion);
         tabla.getColumns().add(colMonto);
         tabla.getColumns().add(colTipo);
+        tabla.getColumns().add(colFechaPago);
         tabla.getColumns().add(colObs);
 
         tabla.setColumnResizePolicy(

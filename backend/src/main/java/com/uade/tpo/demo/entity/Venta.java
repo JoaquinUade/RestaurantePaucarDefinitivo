@@ -1,10 +1,13 @@
 package com.uade.tpo.demo.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "ventas")
@@ -14,9 +17,6 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_venta")
     private Long idVenta;
-
-    @Column(name = "factura", nullable = true, precision = 19, scale = 2)
-    private BigDecimal Factura;
 
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
@@ -41,6 +41,18 @@ public class Venta {
     @Column(name = "observaciones")
     private String observaciones;
 
+    // Consumidor asociado al consumo (información administrativa opcional)
+    @Column(name = "consumidor")
+    private String consumidor;
+
+    // Fecha en que se pagó la deuda (nullable; se setea cuando se registra un pago parcial)
+    @Column(name = "fecha_pago")
+    private LocalDateTime fechaPago;
+
+    @ManyToMany(mappedBy = "ventas")
+    @JsonIgnore
+    private List<PagoParcial> pagosParciales = new ArrayList<>();
+
     public Venta() {
     }
 
@@ -52,8 +64,8 @@ public class Venta {
         this.observaciones = observaciones;
         this.fecha = fecha;
         this.dia = fecha.getDayOfWeek()
-                       .getDisplayName(TextStyle.FULL, 
-                       new Locale("es", "ES"));
+                .getDisplayName(TextStyle.FULL,
+                        new Locale("es", "ES"));
     }
 
     public Long getIdVenta() {
@@ -62,14 +74,6 @@ public class Venta {
 
     public void setIdVenta(Long idVenta) {
         this.idVenta = idVenta;
-    }
-
-    public BigDecimal getFactura() {
-        return Factura;
-    }
-
-    public void setFactura(BigDecimal Factura) {
-        this.Factura = Factura;
     }
 
     public Cliente getCliente() {
@@ -112,6 +116,22 @@ public class Venta {
         this.observaciones = observaciones;
     }
 
+    public String getConsumidor() {
+        return consumidor;
+    }
+
+    public void setConsumidor(String consumidor) {
+        this.consumidor = consumidor;
+    }
+
+    public LocalDateTime getFechaPago() {
+        return fechaPago;
+    }
+
+    public void setFechaPago(LocalDateTime fechaPago) {
+        this.fechaPago = fechaPago;
+    }
+
     public LocalDateTime getFecha() {
         return fecha;
     }
@@ -119,11 +139,12 @@ public class Venta {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-        public String getDia() {
-            return dia;
-        }
 
-        public void setDia(String dia) {
-            this.dia = dia;
-        }
+    public String getDia() {
+        return dia;
+    }
+
+    public void setDia(String dia) {
+        this.dia = dia;
+    }
 }

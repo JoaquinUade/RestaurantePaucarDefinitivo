@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -204,6 +205,8 @@ public class VentasBackend {
                         var obs = n.hasNonNull("observaciones") ? n.get("observaciones").asText() : "";/*Obtiene las observaciones de la venta desde el JSON
                                                                                                                          si existe, y si no asigna una cadena vacía para
                                                                                                                          evitar valores null */
+                        var consumidor = n.hasNonNull("consumidor") ? n.get("consumidor").asText() : "";/*Obtiene el consumidor de la venta (dato administrativo
+                                                                                                         opcional) desde el JSON */
                         BigDecimal monto = BigDecimal.ZERO;/*le asigna el valor cero a monto */
                         if (n.hasNonNull("monto")) {/*si el JSON tiene un campo llamado monto */
                             monto = new BigDecimal(n.get("monto").asText())
@@ -242,8 +245,31 @@ public class VentasBackend {
                             idVenta = n.get("idVenta").asLong();/*convierte el valor del campo idVenta del JSON a un Long y lo asigna a la variable idVenta*/
                         }
 
-                        Venta ventaLeida = new Venta();
+                        LocalDateTime fechaPago = null;/*Fecha en que se pagó la deuda (dato administrativo opcional)*/
+                        if (n.hasNonNull("fechaPago")) {
+                            var fp = n.get("fechaPago");
+                            if (fp.isTextual()) {
+                                try {
+                                    fechaPago = LocalDateTime.parse(fp.asText());
+                                } catch (Exception ex) {
+                                    fechaPago = null;
+                                }
+                            } else if (fp.isArray() && fp.size() >= 5) {
+                                try {
+                                    fechaPago = LocalDateTime.of(
+                                            fp.get(0).asInt(),
+                                            fp.get(1).asInt(),
+                                            fp.get(2).asInt(),
+                                            fp.get(3).asInt(),
+                                            fp.get(4).asInt());
+                                } catch (Exception ex) {
+                                    fechaPago = null;
+                                }
+                            }
+                        }
 
+                        Venta ventaLeida = new Venta();
+                        
                         Cliente cliente = new Cliente();
 
                         cliente.setIdCliente(idCliente);
@@ -259,6 +285,8 @@ public class VentasBackend {
                         ventaLeida.setMonto(monto);
                         ventaLeida.setEstado(estado);
                         ventaLeida.setObservaciones(obs);
+                        ventaLeida.setConsumidor(consumidor);
+                        ventaLeida.setFechaPago(fechaPago);
                         ventaLeida.setIdVenta(idVenta);
 
                         out.add(ventaLeida);
@@ -442,6 +470,51 @@ public class VentasBackend {
 
         } catch (java.io.IOException | InterruptedException e) {
             System.err.println("Error pagando deuda: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Registra un pago parcial (selectivo) en el backend: crea un comprobante
+     * PagoParcial con los datos administrativos indicados y marca las ventas
+     * seleccionadas como DEUDA_PAGADA.
+     */
+    public boolean registrarPagoParcial(
+            List<Long> idVentas,
+            String nombre,
+            String cuit,
+            String factura,
+            String observaciones) {
+
+        try {
+            var bodyMap = new java.util.HashMap<String, Object>();
+            bodyMap.put("payerName", nombre);
+            bodyMap.put("cuit", cuit);
+            bodyMap.put("factura", factura);
+            bodyMap.put("observaciones", observaciones);
+            bodyMap.put("idVentas", idVentas);
+
+            String bodyJson = TraductorJSON.writeValueAsString(bodyMap);
+
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/pagos-parciales"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                    .build();
+
+            var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("[POST /pagos-parciales] status=" + response.statusCode());
+            System.out.println("[POST /pagos-parciales] body=" + response.body());
+
+            return response.statusCode() >= 200 && response.statusCode() < 300;
+
+        } catch (java.io.IOException e) {
+            System.err.println("Error registrando pago parcial: " + e.getMessage());
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Error registrando pago parcial (interrumpido): " + e.getMessage());
             return false;
         }
     }

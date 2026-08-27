@@ -11,6 +11,7 @@ public class VentaRequest {
     private List<Integer> cantidades;
     private TipoDePago estado;
     private String observaciones;
+    private String consumidor;
     private LocalDate fecha;
 
     public VentaRequest() {
@@ -62,6 +63,14 @@ public class VentaRequest {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public String getConsumidor() {
+        return consumidor;
+    }
+
+    public void setConsumidor(String consumidor) {
+        this.consumidor = consumidor;
     }
 
     public LocalDate getFecha() {

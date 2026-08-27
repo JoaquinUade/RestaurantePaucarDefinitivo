@@ -25,7 +25,8 @@ public final class VentaBuilder {
             DatePicker dpFecha,
             ComboBox<TipoDePago> cbEstado,
             TextField tfObs,
-            VBox contLineas) {
+            VBox contLineas,
+            TextField tfConsumidor) {
 
         String nombre = cbCliente.getEditor().getText();
 
@@ -43,6 +44,11 @@ public final class VentaBuilder {
                 tfObs.getText() == null
                 ? ""
                 : tfObs.getText().trim());
+
+        venta.setConsumidor(
+                tfConsumidor.getText() == null
+                ? ""
+                : tfConsumidor.getText().trim());
 
         if (venta.getIdProductos() == null) {
             venta.setIdProductos(

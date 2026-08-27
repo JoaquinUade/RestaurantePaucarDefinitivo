@@ -105,6 +105,7 @@ public class VentaServiceImpl implements VentaService {
         venta.setMonto(montoTotal);
         venta.setEstado(ventaRequest.getEstado());
         venta.setObservaciones(ventaRequest.getObservaciones());
+        venta.setConsumidor(ventaRequest.getConsumidor());
         if (ventaRequest.getFecha() != null) {
             venta.setFecha(ventaRequest.getFecha().atStartOfDay());
         } else {

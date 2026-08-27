@@ -11,14 +11,19 @@ CREATE TABLE IF NOT EXISTS clientes (
 CREATE TABLE IF NOT EXISTS ventas (
   id_venta BIGINT NOT NULL AUTO_INCREMENT,
   fecha DATETIME NOT NULL,
-  dia VARCHAR(20) NOT NULL,  -- dia en string
+  dia VARCHAR(20) NOT NULL,
   id_cliente BIGINT NOT NULL,
   descripcion VARCHAR(255) NOT NULL,
   estado VARCHAR(50) NOT NULL,
   monto DOUBLE NOT NULL,
   observaciones TEXT,
+  consumidor VARCHAR(255),
+
   PRIMARY KEY (id_venta),
-  CONSTRAINT fk_ventas_cliente FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+
+  CONSTRAINT fk_ventas_cliente
+      FOREIGN KEY (id_cliente)
+      REFERENCES clientes(id_cliente)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabla productos (orden: id_producto, nombre, precio, categoria)
@@ -112,3 +117,40 @@ CREATE TABLE IF NOT EXISTS historial_stock (
         REFERENCES gastos_variables(id_gasto_variable)
 
 );
+CREATE TABLE IF NOT EXISTS pago_parcial (
+
+    id BIGINT NOT NULL AUTO_INCREMENT,
+
+    fecha_pago DATETIME NOT NULL,
+
+    payer_name VARCHAR(255),
+
+    cuit VARCHAR(50),
+
+    factura VARCHAR(255),
+
+    observaciones TEXT,
+
+    monto_total DECIMAL(19,2) NOT NULL,
+
+    PRIMARY KEY (id)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS pago_parcial_venta (
+
+    pago_parcial_id BIGINT NOT NULL,
+
+    id_venta BIGINT NOT NULL,
+
+    PRIMARY KEY (pago_parcial_id, id_venta),
+
+    CONSTRAINT fk_ppv_pago
+        FOREIGN KEY (pago_parcial_id)
+        REFERENCES pago_parcial(id),
+
+    CONSTRAINT fk_ppv_venta
+        FOREIGN KEY (id_venta)
+        REFERENCES ventas(id_venta)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1,8 +1,10 @@
 com\uade\tpo\demo\controllers\VentasController.class
+com\uade\tpo\demo\entity\dto\PagoParcialRequest.class
 com\uade\tpo\demo\entity\TipoPeriodicidad.class
 com\uade\tpo\demo\repository\CategoriaGastoVariableRepository.class
 com\uade\tpo\demo\service\GastosVariablesService.class
 com\uade\tpo\demo\service\ProductoService.class
+com\uade\tpo\demo\service\PagoParcialService.class
 com\uade\tpo\demo\service\PagoEmpresaServiceImpl.class
 com\uade\tpo\demo\entity\Producto.class
 com\uade\tpo\demo\entity\dto\VentaDTO.class
@@ -49,8 +51,10 @@ com\uade\tpo\demo\entity\dto\StockRequest.class
 com\uade\tpo\demo\controllers\CategoriaGastoVariableController.class
 com\uade\tpo\demo\entity\PagoEmpresa.class
 com\uade\tpo\demo\service\ProductoServiceImpl.class
+com\uade\tpo\demo\repository\PagoParcialRepository.class
 com\uade\tpo\demo\service\impl\CategoriaGastoVariableServiceImpl.class
 com\uade\tpo\demo\controllers\HistorialStockController.class
+com\uade\tpo\demo\controllers\PagoParcialController.class
 com\uade\tpo\demo\entity\Categoria.class
 com\uade\tpo\demo\service\VentaServiceImpl.class
 com\uade\tpo\demo\repository\GastosFijosRepository.class
@@ -58,9 +62,11 @@ com\uade\tpo\demo\repository\StockRepository.class
 com\uade\tpo\demo\repository\VentaRepository.class
 com\uade\tpo\demo\entity\TipoDePago.class
 com\uade\tpo\demo\service\impl\GastosVariablesServiceImpl.class
+com\uade\tpo\demo\entity\PagoParcial.class
 com\uade\tpo\demo\repository\GastosIndividualesRepository.class
 com\uade\tpo\demo\service\CategoriaGastoVariableService.class
 com\uade\tpo\demo\entity\HistorialStock.class
+com\uade\tpo\demo\service\PagoParcialServiceImpl.class
 com\uade\tpo\demo\service\VentaService.class
 com\uade\tpo\demo\controllers\GastosFijosController.class
 com\uade\tpo\demo\service\impl\EmpleadoServiceImpl.class

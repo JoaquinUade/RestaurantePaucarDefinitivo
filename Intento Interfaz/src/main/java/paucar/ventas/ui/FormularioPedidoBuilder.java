@@ -28,7 +28,8 @@ public final class FormularioPedidoBuilder {
             TextField tfCantidadPagadores,
             VBox contPagadores,
             Label lblTotal,
-            Label lblRestante) {
+            Label lblRestante,
+            TextField inputConsumidor) {
 
         GridPane grid = new GridPane();
 
@@ -71,6 +72,9 @@ public final class FormularioPedidoBuilder {
 
         grid.add(new Label("Observaciones:"), 0, r);
         grid.add(inputObservaciones, 1, r++);
+
+        grid.add(new Label("Consumidor:"), 0, r);
+        grid.add(inputConsumidor, 1, r++);
 
         return grid;
     }

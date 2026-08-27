@@ -128,6 +128,7 @@ public class AgregarDialogBuilder {
                 .add("combo-agregar");
 
         TextField tfObs = FormularioFactory.crearObservaciones();
+        TextField tfConsumidor = FormularioFactory.crearConsumidor();
         VBox contPagadores
                 = PanelPagadores.crearContenedor();
 
@@ -153,7 +154,8 @@ public class AgregarDialogBuilder {
                 tfCantidadPagadores,
                 contPagadores,
                 lblTotal,
-                lblRestante
+                lblRestante,
+                tfConsumidor
         );
         // --- 8) Validación del botón OK ---
         HBox fila0 = (HBox) contLineas.getChildren().get(0);
@@ -250,7 +252,8 @@ public class AgregarDialogBuilder {
                         dpFecha,
                         cbEstado,
                         tfObs,
-                        contLineas);
+                        contLineas,
+                        tfConsumidor);
             }
             return null;
         });
