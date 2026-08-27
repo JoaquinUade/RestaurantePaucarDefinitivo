@@ -178,6 +178,18 @@ public class TablaSemanal {
             }
             cursor = cursor.plusDays(1);/* Avanza al siguiente día */
         }
+        ajustarAltura();
         return total;/* Devuelve el total de las ventas */
     }
+private void ajustarAltura() {
+
+    int filas = tabla.getItems().size();
+
+    tabla.setPrefHeight(
+            Math.max(
+                    80,
+                    35 + filas * 45
+            )
+    );
+}
 }

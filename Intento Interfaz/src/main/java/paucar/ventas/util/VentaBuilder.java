@@ -24,9 +24,9 @@ public final class VentaBuilder {
             ComboBox<String> cbCliente,
             DatePicker dpFecha,
             ComboBox<TipoDePago> cbEstado,
-            TextField tfObs,
+            TextField tfConsumidor,
             VBox contLineas,
-            TextField tfConsumidor) {
+            TextField tfObs) {
 
         String nombre = cbCliente.getEditor().getText();
 
@@ -34,9 +34,9 @@ public final class VentaBuilder {
             nombre = cbCliente.getValue();
         }
 
-        String nombreLimpio =
-                nombre == null ? ""
-                : nombre.trim();
+        String nombreLimpio
+                = nombre == null ? ""
+                        : nombre.trim();
 
         venta.setEstado(cbEstado.getValue());
         venta.setFecha(dpFecha.getValue());
@@ -45,10 +45,13 @@ public final class VentaBuilder {
                 ? ""
                 : tfObs.getText().trim());
 
+        String consumidor = tfConsumidor.getText();
+
         venta.setConsumidor(
-                tfConsumidor.getText() == null
-                ? ""
-                : tfConsumidor.getText().trim());
+                consumidor == null || consumidor.isBlank()
+                ? null
+                : consumidor.trim()
+        );
 
         if (venta.getIdProductos() == null) {
             venta.setIdProductos(
@@ -89,23 +92,21 @@ public final class VentaBuilder {
 
         @SuppressWarnings("unchecked")
         ComboBox<ProductosService.ProductoItem> comboProducto
-                = (ComboBox<ProductosService.ProductoItem>)
-                fila.getChildren().get(0);
+                = (ComboBox<ProductosService.ProductoItem>) fila.getChildren().get(0);
 
         TextField cant
-                = (TextField)
-                fila.getChildren().get(1);
+                = (TextField) fila.getChildren().get(1);
 
-        var prodElegido =
-                comboProducto.getValue();
+        var prodElegido
+                = comboProducto.getValue();
 
         if (prodElegido == null) {
 
             return Optional.empty();
         }
 
-        int cantidadElegida =
-                Integer.parseInt(
+        int cantidadElegida
+                = Integer.parseInt(
                         cant.getText());
 
         if (cantidadElegida >= 1) {

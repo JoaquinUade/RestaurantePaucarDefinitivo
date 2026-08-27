@@ -13,11 +13,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
@@ -38,7 +38,7 @@ public class SemanalEmpresas extends BorderPane {
     private TablaSemanalDebe tablaDebe;
 
     private TableView<Venta> tablaVentas;
-    private TableView<Venta> tablaVentasDebe;
+    private VBox tablaVentasDebe;
 
     private Label lblTotal;
 
@@ -59,7 +59,7 @@ public class SemanalEmpresas extends BorderPane {
         setCenter(crearVistaResumenSemanal());
     }
 
-    private VBox crearVistaResumenSemanal() {
+    private ScrollPane crearVistaResumenSemanal() {
 
         VBox contenedor = new VBox(5);/* crea un vertical box y le indica que deje 15 píxeles de
                                                espacio entre cada elemento hijo que se agregue dentro*/
@@ -73,7 +73,7 @@ public class SemanalEmpresas extends BorderPane {
         tablaVentas = tablaSemanal.getTabla();/*Obtiene la TableView de tablaSemanal y la guarda en la
                                                variable tablaVentas para mostrarla y usarla en la interfaz*/
 
-        tablaVentasDebe = tablaDebe.getTabla();/*Obtiene la TableView de tablaDebe y la guarda en la
+        tablaVentasDebe = tablaDebe.getVista();/*Obtiene la TableView de tablaDebe y la guarda en la
                                                 variable tablaVentasDebe para mostrarla y usarla en la interfaz*/
 
         lblTotal = new Label("Total: $ 0");/*Crea una etiqueta para mostrar el total de ventas,
@@ -98,15 +98,12 @@ public class SemanalEmpresas extends BorderPane {
                 tablaVentasDebe);/*Agrega varios componentes visuales al VBox contenedor, en ese
                                   orden, para que se muestren uno debajo del otro en la interfaz*/
 
-        VBox.setVgrow(tablaVentas, Priority.ALWAYS);/*Indica que la tabla tablaVentas debe crecer y
-                                                     ocupar todo el espacio vertical disponible dentro del
-                                                     VBox*/
+        ScrollPane scroll = new ScrollPane(contenedor);
 
-        VBox.setVgrow(tablaVentasDebe, Priority.ALWAYS);/*Indica que la tabla tablaVentasDebe debe crecer y
-                                                         ocupar todo el espacio vertical disponible dentro del
-                                                         VBox*/
+        scroll.setFitToWidth(true);
+        scroll.setPannable(true);
 
-        return contenedor;/* Devuelve el VBox que contiene todos los componentes visuales */
+        return scroll;
     }
 
     private HBox crearBarraSuperior() {
@@ -140,7 +137,7 @@ public class SemanalEmpresas extends BorderPane {
                                                                             de clientes cuyo tipo es EMPRESA*/
 
         empresasFiltradas = new FilteredList<>(javafx.collections.FXCollections
-                        .observableArrayList(empresas),s -> true);/*Crea una lista filtrable de empresas a partir
+                .observableArrayList(empresas), s -> true);/*Crea una lista filtrable de empresas a partir
                                                                   de la lista original, inicialmente sin aplicar filtros*/
 
         comboEmpresa = crearComboEmpresas(empresasFiltradas);/*Crea el ComboBox para seleccionar la
@@ -155,7 +152,7 @@ public class SemanalEmpresas extends BorderPane {
     }
 
     private void cargarVentasSemanalesEmpresas() {
-
+        System.out.println("INICIO SEMANA = " + inicioSemana);
         String empresa = comboEmpresa.getValue();/*Obtiene el nombre de la empresa seleccionada
                                                   actualmente en el ComboBox*/
 
@@ -172,8 +169,7 @@ public class SemanalEmpresas extends BorderPane {
                                                                                            los datos de la semana y
                                                                                            devuelve el total, que se
                                                                                            guarda en total*/
-        tablaDebe.cargarDeudasEmpresa(empresa,
-                inicioSemana.minusMonths(12));
+        tablaDebe.cargarDeudasEmpresa(empresa, inicioSemana);
         lblTotal.setText("Total: " + MonedaUtils.formatearMoneda(total));
     }
 
@@ -242,7 +238,7 @@ public class SemanalEmpresas extends BorderPane {
                                                                            * mouse sobre esta empresa, ejecutá este
                                                                            * código antes de que JavaFX haga nada
                                                                            * por defecto
-                                                                           */
+                 */
 
                 if (!celda.isEmpty()) {/*si el usuario hizo clic sobre una empresa y no sobre un espacio
                                         vacío del ComboBox*/
@@ -311,8 +307,9 @@ public class SemanalEmpresas extends BorderPane {
             cargarVentasSemanalesEmpresas();
         }
     }
+
     public void refrescar() {
-    cargarVentasSemanalesEmpresas();
-}
+        cargarVentasSemanalesEmpresas();
+    }
 
 }

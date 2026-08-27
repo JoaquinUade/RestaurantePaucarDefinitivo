@@ -129,6 +129,26 @@ public class AgregarDialogBuilder {
 
         TextField tfObs = FormularioFactory.crearObservaciones();
         TextField tfConsumidor = FormularioFactory.crearConsumidor();
+        tfConsumidor.setPromptText("Consumidor (opcional)");
+        tfConsumidor.setVisible(false);
+        tfConsumidor.setManaged(false);
+        tgTipoCliente.selectedToggleProperty().addListener((obs, anterior, nuevo) -> {
+
+            if (nuevo == null) {
+                tfConsumidor.setVisible(false);
+                tfConsumidor.setManaged(false);
+                return;
+            }
+
+            TipoCliente tipo
+                    = (TipoCliente) nuevo.getUserData();
+
+            boolean empresa
+                    = tipo == TipoCliente.EMPRESA;
+
+            tfConsumidor.setVisible(empresa);
+            tfConsumidor.setManaged(empresa);
+        });
         VBox contPagadores
                 = PanelPagadores.crearContenedor();
 
@@ -251,9 +271,9 @@ public class AgregarDialogBuilder {
                         cbCliente,
                         dpFecha,
                         cbEstado,
-                        tfObs,
+                        tfConsumidor,
                         contLineas,
-                        tfConsumidor);
+                        tfObs);
             }
             return null;
         });

@@ -31,7 +31,6 @@ paucar\gastos\Variables\DialogGastosV$2.class
 paucar\resumen\general\MensualGeneral$2.class
 paucar\gastos\Individuales\DialogGastosIndividuales.class
 paucar\pagos\DialogPagos.class
-paucar\resumen\empresas\semanal\VentanaPagoDeudas$DatosAdmin.class
 paucar\admin\Admin.class
 paucar\gastos\Individuales\TablaSemanalIndividual.class
 paucar\admin\categoriasgastos\TablaCategoriasGastos.class
@@ -170,7 +169,6 @@ paucar\stock\aumentoydisminucion\DialogSumarStock$1.class
 paucar\resumen\empresas\semanal\TablaSemanalDebe$1.class
 paucar\ventas\ui\ProductoLinea.class
 paucar\resumen\empresas\MensualEmpresas$5.class
-paucar\resumen\empresas\semanal\VentanaPagoDeudas$3.class
 paucar\gastos\Variables\PanelCategoriaGastosV.class
 paucar\pagos\PagosPeriodicidadView.class
 paucar\ventas\ui\ProductoAutoCompletar.class
