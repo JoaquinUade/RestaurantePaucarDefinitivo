@@ -1,26 +1,32 @@
 package paucar.resumen;
 
+import java.io.File;
 import java.time.LocalDate;
 
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import paucar.resumen.clientes.MensualClientes;
 import paucar.resumen.clientes.semanal.SemanalClientes;
 import paucar.resumen.empresas.MensualEmpresas;
 import paucar.resumen.empresas.semanal.SemanalEmpresas;
 import paucar.resumen.general.MensualGeneral;
 import paucar.resumen.general.SemanalGeneral;
+import paucar.service.ExcelExportService;
 import paucar.service.VentasBackend;
 
 public class Resumen extends BorderPane {
 
     private final VentasBackend backend;
+    private final ExcelExportService excelExportService;
     // filtros
     private final ComboBox<String> ResumenTipo = new ComboBox<>();/*
                                                                    * ComboBox es un componente para seleccionar
@@ -51,8 +57,11 @@ public class Resumen extends BorderPane {
 
     private final ComboBox<String> tipoResumen = new ComboBox<>();
 
-    public Resumen(VentasBackend backend) {
+    private final Button btnExcel = new Button("Generar Excel");
+
+    public Resumen(VentasBackend backend, ExcelExportService excelExportService) {
         this.backend = backend;
+        this.excelExportService = excelExportService;
 
         setPadding(new Insets(16));/*
                                     * agrega un padding de 16 pixeles a todo el borde
@@ -100,13 +109,17 @@ public class Resumen extends BorderPane {
                                                    * correspondiente según los filtros seleccionados
          */
 
+        btnExcel.getStyleClass().add("btn-agregar");
+        btnExcel.setOnAction(e -> exportarExcel());
+
         pickerFecha.setOnAction(e -> aplicarFiltros());
 
         HBox barraFiltros = new HBox(10,
                 ResumenTipo,
                 pickerFecha,
                 tipoResumen,
-                btnVer);/* crea un contenedor horizontal con los filtros */
+                btnVer,
+                btnExcel);/* crea un contenedor horizontal con los filtros */
 
         barraFiltros.setAlignment(Pos.CENTER_LEFT);/* alinea los elementos a la izquierda */
         barraFiltros.setPadding(new Insets(0, 0, 10, 0));/* agrega un padding de 10 pixeles al fondo */
@@ -206,5 +219,87 @@ vistaSemanalGeneral.refrescar();
                 }
             }
         }
+    }
+
+    private void exportarExcel() {
+
+        LocalDate fecha = pickerFecha.getValue();
+
+        if (fecha == null) {/* si no hay una fecha seleccionada, avisa y corta */
+            Alert aviso = new Alert(Alert.AlertType.WARNING);
+            aviso.setTitle("Falta seleccionar fecha");
+            aviso.setHeaderText(null);
+            aviso.setContentText("Seleccioná una fecha para poder generar el Excel.");
+            aviso.showAndWait();
+            return;
+        }
+
+        int anio = fecha.getYear();
+        int mes = fecha.getMonthValue();
+
+        FileChooser selector = new FileChooser();/* diálogo para elegir dónde guardar el archivo */
+        selector.setTitle("Guardar resumen en Excel");
+        selector.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter(
+                        "Libro de Excel (*.xlsx)", "*.xlsx"));
+        selector.setInitialFileName(
+                "Resumen_" + anio + "-" + String.format("%02d", mes) + ".xlsx");
+
+        File destino = selector.showSaveDialog(getScene().getWindow());
+
+        if (destino == null) {/* si el usuario canceló el diálogo, no hace nada */
+            return;
+        }
+
+        /* La generación va en un hilo aparte para no congelar la interfaz,
+           porque hay que pedir datos al backend por HTTP. */
+        Task<Boolean> tarea = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return excelExportService.exportarExcel(
+                        anio, mes, fecha, destino);
+            }
+        };
+
+        btnExcel.disableProperty().bind(tarea.runningProperty());
+
+        tarea.setOnSucceeded(e -> {
+            btnExcel.disableProperty().unbind();
+
+            if (Boolean.TRUE.equals(tarea.getValue())) {
+                Alert exito = new Alert(Alert.AlertType.INFORMATION);
+                exito.setTitle("Exportación exitosa");
+                exito.setHeaderText(null);
+                exito.setContentText(
+                        "El Excel se generó correctamente en:\n"
+                                + destino.getAbsolutePath());
+                exito.showAndWait();
+            } else {
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Error");
+                error.setHeaderText(null);
+                error.setContentText(
+                        "No se pudo generar el Excel. Revisá que el backend esté corriendo.");
+                error.showAndWait();
+            }
+        });
+
+        tarea.setOnFailed(e -> {
+            btnExcel.disableProperty().unbind();
+
+            Throwable ex = tarea.getException();
+            System.err.println("Error exportando Excel: " + ex);
+
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Error");
+            error.setHeaderText(null);
+            error.setContentText(
+                    "Ocurrió un error al generar el Excel:\n" + ex.getMessage());
+            error.showAndWait();
+        });
+
+        Thread hilo = new Thread(tarea);
+        hilo.setDaemon(true);
+        hilo.start();
     }
 }

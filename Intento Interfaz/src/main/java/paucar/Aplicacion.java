@@ -20,6 +20,7 @@ import paucar.gastos.Gastos;
 import paucar.pagos.PagosView;
 import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
+import paucar.service.ExcelExportService;
 import paucar.service.VentasBackend;
 import paucar.stock.StockView;
 import paucar.ventas.Ventas;
@@ -105,7 +106,15 @@ public class Aplicacion extends Application {
         root.setCenter(contenido);
 
         vistaResumen
-                = new Resumen(backend);
+                = new Resumen(
+                        backend,
+                        new ExcelExportService(
+                                backend,
+                                services.pagos,
+                                services.stock,
+                                services.gastosFijos,
+                                services.gastosVariables,
+                                services.gastosIndividuales));
 
         vistaVentas
                 = new Ventas(vistaResumen);
