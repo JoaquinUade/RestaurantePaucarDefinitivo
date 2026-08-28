@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,7 +19,7 @@ public class CategoriasGastosService {
 
     public CategoriasGastosService(String baseUrl) {
         this.BASE_URL = baseUrl + "/categorias-gasto-variable";
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.mapper = new ObjectMapper();
     }
 

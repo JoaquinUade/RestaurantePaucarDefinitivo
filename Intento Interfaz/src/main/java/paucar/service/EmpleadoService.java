@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,7 +18,7 @@ public class EmpleadoService {
 
     public EmpleadoService(String baseUrl) {
         this.BASE_URL = baseUrl + "/empleados";
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.mapper = new ObjectMapper();
     }
 

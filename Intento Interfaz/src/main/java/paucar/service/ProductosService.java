@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -26,7 +27,7 @@ public class ProductosService {
 
     public ProductosService(String BASE_URL, VentaRequest venta) {
         this.BASE_URL = Objects.requireNonNull(BASE_URL);
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.TraductorJSON = new ObjectMapper();
         this.venta = Objects.requireNonNull(venta, "venta (VentaRequest) no puede ser null");
 

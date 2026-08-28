@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -27,7 +28,7 @@ public class ClientesService {
         this.BASE_URL = Objects.requireNonNull(BASE_URL);/*/*si la URL que me pasaste existe y no es nula,
                                                          la guardo; si es nula, te aviso enseguida porque
                                                          no puedo trabajar sin eso*/
-        this.http = HttpClient.newHttpClient();/*/*Creame una herramienta para poder hacer llamadas al
+        this.http = HttpCompartido.getHttpClient();/*/*Creame una herramienta para poder hacer llamadas al
                                                backend (como GET y POST) y guardámela para usarla cada
                                                vez que necesite hablar con la API*/
         this.TraductorJSON = new ObjectMapper();/*Creame un traductor que convierta JSON a objetos Java y

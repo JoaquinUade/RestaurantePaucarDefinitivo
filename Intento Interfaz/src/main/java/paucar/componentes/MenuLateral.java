@@ -59,7 +59,8 @@ public class MenuLateral extends VBox {
         Image logoImg
                 = new Image(
                         getClass()
-                                .getResourceAsStream("/img/logo paucar.png"));
+                                .getResource("/img/logo paucar.png")
+                                .toExternalForm());
 
         ImageView logoView = new ImageView(logoImg);
 
@@ -90,7 +91,8 @@ public class MenuLateral extends VBox {
         Image img
                 = new Image(
                         getClass()
-                                .getResourceAsStream(rutaIcono));
+                                .getResource(rutaIcono)
+                                .toExternalForm());
 
         ImageView icono = new ImageView(img);
 

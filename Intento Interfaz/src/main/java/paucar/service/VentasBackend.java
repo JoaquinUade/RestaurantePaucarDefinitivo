@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,7 +44,7 @@ public class VentasBackend {
                                                           referencia de objeto que apunta a null)) inmediatamente.
                                                           Esto evita crear una instancia mal configurada */
 
-        this.http = HttpClient.newHttpClient();/*Crea una instancia por defecto de HttpClient (Java 11+), que
+        this.http = HttpCompartido.getHttpClient();/*Crea una instancia por defecto de HttpClient (Java 11+), que
                                                vas a usar para hacer GET/POST al backend */
 
         this.TraductorJSON = new ObjectMapper();/*El campo traductorJson ahora va a contener un ObjectMapper nuevo */

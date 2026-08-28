@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,7 +21,7 @@ public class GastosFijosService {
 
     public GastosFijosService(String baseUrl) {
         this.BASE_URL = baseUrl + "/gastos-fijos";
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new JavaTimeModule());
         this.mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

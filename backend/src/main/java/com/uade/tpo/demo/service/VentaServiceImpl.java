@@ -2,6 +2,7 @@ package com.uade.tpo.demo.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -175,50 +176,44 @@ public void borrarVenta(Long id) {
 
     @Override
     public List<Venta> filtrarPorMes(int mes, int anio) {
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getFecha().getMonthValue() == mes && v.getFecha().getYear() == anio)
-                .collect(Collectors.toList());
+        LocalDateTime inicio = LocalDate.of(anio, mes, 1).atStartOfDay();
+        return ventaRepository.findByRangoFecha(inicio, inicio.plusMonths(1));
     }
 
     @Override
     public List<Venta> filtrarPorAnio(int anio) {
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getFecha().getYear() == anio)
-                .collect(Collectors.toList());
+        LocalDateTime inicio = LocalDate.of(anio, 1, 1).atStartOfDay();
+        return ventaRepository.findByRangoFecha(inicio, inicio.plusYears(1));
     }
 
     @Override
     public List<Venta> filtrarPorDia(int dia) {
         LocalDate today = LocalDate.now();
-        int currentMonth = today.getMonthValue();
-        int currentYear = today.getYear();
 
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getFecha().getDayOfMonth() == dia
-                && v.getFecha().getMonthValue() == currentMonth
-                && v.getFecha().getYear() == currentYear)
-                .collect(Collectors.toList());
+        if (dia < 1 || dia > today.lengthOfMonth()) {
+            return List.of();
+        }
+
+        LocalDateTime inicio = LocalDate
+                .of(today.getYear(), today.getMonthValue(), dia)
+                .atStartOfDay();
+        return ventaRepository.findByRangoFecha(inicio, inicio.plusDays(1));
     }
 
     @Override
     public List<Venta> filtrarPorAnioYMes(int anio, int mes) {
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getFecha().getYear() == anio && v.getFecha().getMonthValue() == mes)
-                .collect(Collectors.toList());
+        LocalDateTime inicio = LocalDate.of(anio, mes, 1).atStartOfDay();
+        return ventaRepository.findByRangoFecha(inicio, inicio.plusMonths(1));
     }
 
     @Override
     public List<Venta> filtrarPorAnioMesDia(int anio, int mes, int dia) {
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getFecha().getYear() == anio
-                && v.getFecha().getMonthValue() == mes
-                && v.getFecha().getDayOfMonth() == dia)
-                .collect(Collectors.toList());
+        if (dia < 1 || dia > YearMonth.of(anio, mes).lengthOfMonth()) {
+            return List.of();
+        }
+
+        LocalDateTime inicio = LocalDate.of(anio, mes, dia).atStartOfDay();
+        return ventaRepository.findByRangoFecha(inicio, inicio.plusDays(1));
     }
 
     @Override
@@ -230,19 +225,22 @@ public void borrarVenta(Long id) {
     public List<VentaDTO> obtenerVentasOrdenadas(Integer mes, Integer anio) {
         int yearFilter = anio != null ? anio : java.time.LocalDate.now().getYear();
 
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> {
-                    // Filtrar por año
-                    if (v.getFecha().getYear() != yearFilter) {
-                        return false;
-                    }
-                    // Filtrar por mes si se proporciona
-                    if (mes != null && v.getFecha().getMonthValue() != mes) {
-                        return false;
-                    }
-                    return true;
-                })
+        List<Venta> base;
+        if (mes != null) {
+            LocalDateTime inicio = LocalDate
+                    .of(yearFilter, mes, 1)
+                    .atStartOfDay();
+            base = ventaRepository.findByRangoFecha(
+                    inicio, inicio.plusMonths(1));
+        } else {
+            LocalDateTime inicio = LocalDate
+                    .of(yearFilter, 1, 1)
+                    .atStartOfDay();
+            base = ventaRepository.findByRangoFecha(
+                    inicio, inicio.plusYears(1));
+        }
+
+        return base.stream()
                 .map(v -> new VentaDTO(
                 v.getFecha(),
                 v.getDia(), // ← Usamos el día de la BD
@@ -265,10 +263,12 @@ public void borrarVenta(Long id) {
         int yearFilter = anio != null ? anio : java.time.LocalDate.now().getYear();
         int mesFilter = mes != null ? mes : java.time.LocalDate.now().getMonthValue();
 
-        return ventaRepository.findAll()
+        LocalDateTime inicioResumen = LocalDate
+                .of(yearFilter, mesFilter, 1)
+                .atStartOfDay();
+        return ventaRepository.findByRangoFecha(
+                inicioResumen, inicioResumen.plusMonths(1))
                 .stream()
-                .filter(v -> v.getFecha().getYear() == yearFilter
-                && v.getFecha().getMonthValue() == mesFilter)
                 .collect(Collectors.groupingBy(v -> v.getFecha().toLocalDate()))
                 .entrySet()
                 .stream()

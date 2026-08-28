@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +20,7 @@ public class AdminService {
     
     public AdminService(String baseUrl) {
         this.BASE_URL = baseUrl;
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.TraductorJSON = new ObjectMapper();
     }
 

@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +31,7 @@ public class PagosService {
 
         this.BASE_URL = apiBase.replace("/api", "") + "/pagos-empresa";
 
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
 
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new JavaTimeModule());

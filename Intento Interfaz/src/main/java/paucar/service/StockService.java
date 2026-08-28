@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class StockService {
 
         this.BASE_URL = baseUrl + "/stock";
 
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
 
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new JavaTimeModule());

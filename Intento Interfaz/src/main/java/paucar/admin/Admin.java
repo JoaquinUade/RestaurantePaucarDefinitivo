@@ -82,7 +82,7 @@ btnPlatos.setOnAction(click -> {
     }
 
     private Button crearTarjeta(String titulo, String rutaIcono) {
-        Image img = new Image(getClass().getResourceAsStream(rutaIcono));/* Carga la imagen del icono */
+        Image img = new Image(getClass().getResource(rutaIcono).toExternalForm());/* Carga la imagen del icono */
 
         ImageView icono = new ImageView(img);/* Crea un ImageView para mostrar el icono */
 

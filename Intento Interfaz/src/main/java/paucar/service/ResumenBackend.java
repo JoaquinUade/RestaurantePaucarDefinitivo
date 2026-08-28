@@ -1,4 +1,5 @@
 package paucar.service;
+import paucar.config.HttpCompartido;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,7 +19,7 @@ public class ResumenBackend {
 
     public ResumenBackend(String baseUrl) {
         this.BASE_URL = baseUrl;
-        this.http = HttpClient.newHttpClient();
+        this.http = HttpCompartido.getHttpClient();
         this.json = new ObjectMapper();
     }
 
