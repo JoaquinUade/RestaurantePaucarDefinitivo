@@ -115,12 +115,14 @@ public class Resumen extends BorderPane {
     }
 
     public void actualizarDatos() {
-
+System.out.println("ACTUALIZAR DATOS");
         if (vistaMensualClientes != null) {
+            
             vistaMensualClientes.refrescar();
         }
 
         if (vistaMensualEmpresas != null) {
+            System.out.println("REFRESCANDO MENSUAL EMPRESAS");
             vistaMensualEmpresas.refrescar();
         }
 

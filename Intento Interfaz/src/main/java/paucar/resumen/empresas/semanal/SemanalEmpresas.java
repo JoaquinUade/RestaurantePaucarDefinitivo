@@ -309,7 +309,22 @@ public class SemanalEmpresas extends BorderPane {
     }
 
     public void refrescar() {
-        cargarVentasSemanalesEmpresas();
-    }
 
+    String seleccionado = comboEmpresa.getValue();
+
+    var lista = backend.obtenerClientesPorTipo(
+            TipoCliente.EMPRESA);
+
+    empresasFiltradas = new FilteredList<>(
+            javafx.collections.FXCollections.observableArrayList(lista),
+            s -> true);
+
+    comboEmpresa.setItems(empresasFiltradas);
+
+    if (seleccionado != null
+            && lista.contains(seleccionado)) {
+
+        comboEmpresa.setValue(seleccionado);
+    }
+}
 }

@@ -239,7 +239,8 @@ public class Aplicacion extends Application {
                             services.adminService,
                             clientesService,
                             services.categorias,
-                            services.empleados
+                            services.empleados,
+                            vistaResumen
                     ));
         });
 

@@ -12,6 +12,7 @@ import paucar.admin.categoriasgastos.CategoriasGastosView;
 import paucar.admin.empleados.EmpleadosView;
 import paucar.admin.empresasClientes.EmpresasClientes;
 import paucar.admin.platos.Platos;
+import paucar.resumen.Resumen;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
@@ -23,14 +24,15 @@ public class Admin extends BorderPane {
     private final ClientesService clientesService;
     private final CategoriasGastosService categoriaService;
     private final EmpleadoService empleadoService;
-
+    private Resumen resumen;
     public Admin(AdminService adminService, ClientesService clientesService,
-            CategoriasGastosService categoriaService, EmpleadoService empleadoService) {
+            CategoriasGastosService categoriaService, EmpleadoService empleadoService, Resumen resumen) {
 
         this.adminService = adminService;
         this.clientesService = clientesService;
         this.categoriaService = categoriaService;
         this.empleadoService = empleadoService;
+        this.resumen = resumen;
 
         getStylesheets().add(getClass().getResource("/admin.css").toExternalForm());/*Cargar CSS específico
                                                                                           para Admin*/
@@ -61,7 +63,7 @@ btnPlatos.setOnAction(click -> {
 
     btnEmpresasClientes.setOnAction(click -> {
         marcarActivo(btnEmpresasClientes, btnPlatos, btnCategoriasGastos, btnEmpleados);
-        setCenter(new EmpresasClientes(clientesService));
+        setCenter(new EmpresasClientes(clientesService, resumen));
     });
 
     btnCategoriasGastos.setOnAction(click -> {

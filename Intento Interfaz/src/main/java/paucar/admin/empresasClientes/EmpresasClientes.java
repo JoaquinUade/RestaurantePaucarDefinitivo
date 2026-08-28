@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
 
 public class EmpresasClientes extends BorderPane {
@@ -30,8 +31,11 @@ public class EmpresasClientes extends BorderPane {
     private List<String> clientesOriginal;
     private List<String> empresasOriginal;
 
-    public EmpresasClientes(ClientesService clientesService) {
+private final Resumen resumen;
+
+    public EmpresasClientes(ClientesService clientesService, Resumen resumen) {
         this.clientesService = clientesService;
+        this.resumen = resumen;
 
         Label titulo = new Label("Administración de Clientes y Empresas");
         titulo.getStyleClass().setAll("administracion-de-empresasclientes");
@@ -148,6 +152,7 @@ public class EmpresasClientes extends BorderPane {
                 clientesService.crearClienteSiNoExiste(nombre, tipo, periodicidad);/*Crea el cliente si no existe
                                                                       previamente*/
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */
+                resumen.actualizarDatos();
             }
         });
 

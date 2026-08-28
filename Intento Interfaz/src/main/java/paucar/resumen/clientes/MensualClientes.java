@@ -28,6 +28,8 @@ public class MensualClientes extends BorderPane {
 
     private ComboBox<String> comboCliente;
     private String clienteSeleccionado;
+    private final ObservableList<String> clientes
+            = FXCollections.observableArrayList();
 
     private final int anio;
     private final int mes;
@@ -40,6 +42,21 @@ public class MensualClientes extends BorderPane {
         tabla.setItems(datos);
 
         cargarClientes();
+
+        javafx.collections.transformation.FilteredList<String> filtradas
+                = new javafx.collections.transformation.FilteredList<>(
+                        clientes,
+                        s -> true);
+
+        comboCliente = crearCombo(filtradas);
+
+        comboCliente.setPromptText("Seleccionar cliente");
+
+        comboCliente.setOnAction(e -> {
+            clienteSeleccionado = comboCliente.getValue();
+            cargarMes();
+        });
+
         crearColumnas();
 
         javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox(comboCliente);
@@ -55,26 +72,9 @@ public class MensualClientes extends BorderPane {
 
     private void cargarClientes() {
 
-        var clientes = backend.obtenerClientesPorTipo(TipoCliente.CLIENTE);
-
-        javafx.collections.transformation.FilteredList<String> filtradas
-                = new javafx.collections.transformation.FilteredList<>(
-                        javafx.collections.FXCollections.observableArrayList(clientes),
-                        s -> true);
-
-        comboCliente = crearCombo(filtradas);
-
-        comboCliente.setPromptText("Seleccionar cliente");
-
-        if (clienteSeleccionado != null) {
-            comboCliente.setValue(clienteSeleccionado);
-            comboCliente.getEditor().setText(clienteSeleccionado);
-        }
-
-        comboCliente.setOnAction(e -> {
-            clienteSeleccionado = comboCliente.getValue();
-            cargarMes();
-        });
+        clientes.setAll(
+                backend.obtenerClientesPorTipo(
+                        TipoCliente.CLIENTE));
     }
 
     private ComboBox<String> crearCombo(
@@ -88,19 +88,26 @@ public class MensualClientes extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, old, txt) -> {
 
-            if (updating.get()) {
-                return;
-            }
+    if (updating.get()) {
+        return;
+    }
 
-            String filtro = (txt == null ? "" : txt.trim().toLowerCase());
+    if (cb.getValue() != null
+            && txt.equals(cb.getValue())) {
+        return;
+    }
 
-            filtradas.setPredicate(item
-                    -> item != null && (filtro.isEmpty() || item.toLowerCase().contains(filtro)));
+    String filtro = (txt == null ? "" : txt.trim().toLowerCase());
 
-            if (!cb.isShowing() && !filtro.isEmpty()) {
-                cb.show();
-            }
-        });
+    filtradas.setPredicate(item ->
+            item != null
+            && (filtro.isEmpty()
+            || item.toLowerCase().contains(filtro)));
+
+    if (!cb.isShowing() && !filtro.isEmpty()) {
+        cb.show();
+    }
+});
 
         cb.setButtonCell(new javafx.scene.control.ListCell<>() {
             @Override
@@ -387,7 +394,17 @@ public class MensualClientes extends BorderPane {
 
         RenderTotalMensual(total);
     }
+
     public void refrescar() {
-        cargarMes();
+
+    String seleccionado = comboCliente.getValue();
+
+    cargarClientes();
+
+    if (seleccionado != null
+            && clientes.contains(seleccionado)) {
+
+        comboCliente.setValue(seleccionado);
     }
+}
 }

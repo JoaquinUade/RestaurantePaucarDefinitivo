@@ -80,7 +80,7 @@ public class SemanalClientes extends BorderPane {
                                                                         pagar deudas, se ejecute ese metodo*/
 
         contenedor.getChildren().addAll(tablaVentas, contenedorTotal, lblDebe, btnPagarDeudas,
-                                        tablaVentasDebe);
+                tablaVentasDebe);
 
         VBox.setVgrow(tablaVentas, Priority.ALWAYS);/*tablaventas toma todo el espacio posible*/
         VBox.setVgrow(tablaVentasDebe, Priority.ALWAYS);
@@ -124,11 +124,10 @@ public class SemanalClientes extends BorderPane {
         }
 
         double total = tablaSemanal
-            .cargarSemanaCliente(cliente, inicioSemana, finSemana);/*Carga las ventas semanales del
+                .cargarSemanaCliente(cliente, inicioSemana, finSemana);/*Carga las ventas semanales del
                                                                     cliente y devuelve el total*/
 
-        tablaDebe.cargarDeudasCliente
-                (cliente, inicioSemana.minusMonths(12));/*Carga las deudas del cliente
+        tablaDebe.cargarDeudasCliente(cliente, inicioSemana.minusMonths(12));/*Carga las deudas del cliente
                                                                         desde hace un año hasta la fecha
                                                                         actual */
 
@@ -145,14 +144,16 @@ public class SemanalClientes extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, a, newVal) -> {
 
-            if (actualizar.get()) return;/*si el cambio fue hecho por el programa y no por
+            if (actualizar.get()) {
+                return;/*si el cambio fue hecho por el programa y no por
                                           el usuario salgo*/
+            }
 
             String txt = (newVal == null ? "" : newVal.trim().toLowerCase());/*Si el valor es null usa
                                                                              vacío, sino elimina espacios
                                                                              y convierte a minúsculas*/
-            datos.setPredicate(item -> item != null &&
-                (txt.isEmpty() || item.toLowerCase().contains(txt)));/*Filtra los clientes mostrando solo
+            datos.setPredicate(item -> item != null
+                    && (txt.isEmpty() || item.toLowerCase().contains(txt)));/*Filtra los clientes mostrando solo
                                                                   los que coinciden con el texto ingresado */
 
             if (!cb.isShowing() && !txt.isEmpty()) {/*Si el ComboBox está cerrado Y el usuario
@@ -211,7 +212,24 @@ public class SemanalClientes extends BorderPane {
             cargarVentasSemanalClientes();/*carga las ventas de ese cliente*/
         }
     }
+
     public void refrescar() {
-    cargarVentasSemanalClientes();
+
+    String seleccionado = comboCliente.getValue();
+
+    var lista = backend.obtenerClientesPorTipo(
+            TipoCliente.CLIENTE);
+
+    clientesFiltrados = new FilteredList<>(
+            javafx.collections.FXCollections.observableArrayList(lista),
+            s -> true);
+
+    comboCliente.setItems(clientesFiltrados);
+
+    if (seleccionado != null
+            && lista.contains(seleccionado)) {
+
+        comboCliente.setValue(seleccionado);
+    }
 }
 }

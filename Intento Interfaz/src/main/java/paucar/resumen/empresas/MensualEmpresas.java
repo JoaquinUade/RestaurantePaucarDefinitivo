@@ -27,6 +27,8 @@ public class MensualEmpresas extends BorderPane {
     private final BorderPane footerTotal = new BorderPane();
     private ComboBox<String> comboEmpresa;
     private String empresaSeleccionada;
+    private final ObservableList<String> empresas
+            = FXCollections.observableArrayList();
 
     private final int anio;
     private final int mes;
@@ -39,6 +41,21 @@ public class MensualEmpresas extends BorderPane {
         tabla.setItems(datos);
 
         cargarEmpresas();
+
+        javafx.collections.transformation.FilteredList<String> filtradas
+                = new javafx.collections.transformation.FilteredList<>(
+                        empresas,
+                        s -> true);
+
+        comboEmpresa = crearComboEmpresas(filtradas);
+
+        comboEmpresa.setPromptText("Seleccionar empresa");
+
+        comboEmpresa.setOnAction(e -> {
+            empresaSeleccionada = comboEmpresa.getValue();
+            cargarMes();
+        });
+
         crearColumnas();
 
         javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox(comboEmpresa);
@@ -54,26 +71,15 @@ public class MensualEmpresas extends BorderPane {
 
     private void cargarEmpresas() {
 
-        var empresas = backend.obtenerClientesPorTipo(TipoCliente.EMPRESA);
+    var lista = backend.obtenerClientesPorTipo(
+            TipoCliente.EMPRESA);
 
-        javafx.collections.transformation.FilteredList<String> filtradas = new javafx.collections.transformation.FilteredList<>(
-                javafx.collections.FXCollections.observableArrayList(empresas),
-                s -> true);
+    System.out.println("========== EMPRESAS RESUMEN ==========");
 
-        comboEmpresa = crearComboEmpresas(filtradas);
+    lista.forEach(System.out::println);
 
-        comboEmpresa.setPromptText("Seleccionar empresa");
-
-        if (empresaSeleccionada != null) {
-            comboEmpresa.setValue(empresaSeleccionada);
-            comboEmpresa.getEditor().setText(empresaSeleccionada);
-        }
-
-        comboEmpresa.setOnAction(e -> {
-            empresaSeleccionada = comboEmpresa.getValue();
-            cargarMes();
-        });
-    }
+    empresas.setAll(lista);
+}
 
     private ComboBox<String> crearComboEmpresas(
             javafx.collections.transformation.FilteredList<String> empresasFiltradas) {
@@ -86,18 +92,26 @@ public class MensualEmpresas extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, old, txt) -> {
 
-            if (updating.get())
-                return;
+    if (updating.get()) {
+        return;
+    }
 
-            String filtro = (txt == null ? "" : txt.trim().toLowerCase());
+    if (cb.getValue() != null
+            && txt.equals(cb.getValue())) {
+        return;
+    }
 
-            empresasFiltradas
-                    .setPredicate(emp -> emp != null && (filtro.isEmpty() || emp.toLowerCase().contains(filtro)));
+    String filtro = (txt == null ? "" : txt.trim().toLowerCase());
 
-            if (!cb.isShowing() && !filtro.isEmpty()) {
-                cb.show();
-            }
-        });
+    empresasFiltradas.setPredicate(emp ->
+            emp != null
+            && (filtro.isEmpty()
+            || emp.toLowerCase().contains(filtro)));
+
+    if (!cb.isShowing() && !filtro.isEmpty()) {
+        cb.show();
+    }
+});
 
         cb.setButtonCell(new javafx.scene.control.ListCell<>() {
             @Override
@@ -319,15 +333,16 @@ public class MensualEmpresas extends BorderPane {
     private void cargarMes() {
         datos.clear();
 
-        if (empresaSeleccionada == null)
+        if (empresaSeleccionada == null) {
             return;
+        }
 
         LocalDate fecha = LocalDate.of(anio, mes, 1);
 
         while (fecha.getMonthValue() == mes) {
 
-            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY &&
-                    fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY
+                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
 
                 VentaResumenDiarioDTO resumen = new VentaResumenDiarioDTO(fecha);
 
@@ -336,20 +351,27 @@ public class MensualEmpresas extends BorderPane {
                 for (var v : ventas) {
 
                     if (v.getCliente() != null
-        && v.getCliente().getTipoCliente() == TipoCliente.EMPRESA
-        && empresaSeleccionada.equals(v.getCliente().getNombre()))  {
+                            && v.getCliente().getTipoCliente() == TipoCliente.EMPRESA
+                            && empresaSeleccionada.equals(v.getCliente().getNombre())) {
 
                         BigDecimal monto = (BigDecimal) v.getMonto();
                         TipoDePago tipo = (TipoDePago) v.getEstado();
 
                         switch (tipo) {
-                            case EFECTIVO -> resumen.setEfectivo(resumen.getEfectivo().add(monto));
-                            case DEBITO -> resumen.setDebito(resumen.getDebito().add(monto));
-                            case CREDITO -> resumen.setCredito(resumen.getCredito().add(monto));
-                            case TRANSFERENCIA -> resumen.setTransferencia(resumen.getTransferencia().add(monto));
-                            case MERCADO_PAGO -> resumen.setMercadoPago(resumen.getMercadoPago().add(monto));
-                            case DEBE -> resumen.setDebe(resumen.getDebe().add(monto));
-                            case DEUDA_PAGADA -> resumen.setDeudaPagada(resumen.getDeudaPagada().add(monto));
+                            case EFECTIVO ->
+                                resumen.setEfectivo(resumen.getEfectivo().add(monto));
+                            case DEBITO ->
+                                resumen.setDebito(resumen.getDebito().add(monto));
+                            case CREDITO ->
+                                resumen.setCredito(resumen.getCredito().add(monto));
+                            case TRANSFERENCIA ->
+                                resumen.setTransferencia(resumen.getTransferencia().add(monto));
+                            case MERCADO_PAGO ->
+                                resumen.setMercadoPago(resumen.getMercadoPago().add(monto));
+                            case DEBE ->
+                                resumen.setDebe(resumen.getDebe().add(monto));
+                            case DEUDA_PAGADA ->
+                                resumen.setDeudaPagada(resumen.getDeudaPagada().add(monto));
                         }
 
                         if (tipo != TipoDePago.DEBE) {
@@ -381,8 +403,18 @@ public class MensualEmpresas extends BorderPane {
 
         RenderTotalMensual(total);
     }
-    
+
     public void refrescar() {
-        cargarMes();
+
+    String seleccionado = comboEmpresa.getValue();
+System.out.println("REFRESCAR EMPRESAS");
+    cargarEmpresas();
+
+    if (seleccionado != null
+            && empresas.contains(seleccionado)) {
+
+        comboEmpresa.setValue(seleccionado);
     }
+}
+
 }
