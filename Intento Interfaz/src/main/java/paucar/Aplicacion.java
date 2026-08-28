@@ -139,7 +139,7 @@ public class Aplicacion extends Application {
                 = new PagosView(
                         services.pagos,
                         clientesService,
-                backend);
+                        backend);
 
         menu.getLogoItem().setOnMouseClicked(e -> {
 
@@ -156,7 +156,6 @@ public class Aplicacion extends Application {
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
                     menu.getBtnPagos(),
-                    menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaVentas);
@@ -172,7 +171,6 @@ public class Aplicacion extends Application {
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
                     menu.getBtnPagos(),
-                    menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaResumen);
@@ -186,7 +184,6 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnStock(),
                     menu.getBtnPagos(),
-                    menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaGastos);
@@ -200,7 +197,6 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnPagos(),
-                    menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaStock);
@@ -214,22 +210,9 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
-                    menu.getBtnCalcula(),
                     menu.getBtnAdmin());
 
             root.setCenter(vistaPagos);
-        });
-
-        menu.getBtnCalcula().setOnAction(e -> {
-
-            marcarActivo(
-                    menu.getBtnCalcula(),
-                    menu.getBtnVentas(),
-                    menu.getBtnResumen(),
-                    menu.getBtnGastos(),
-                    menu.getBtnStock(),
-                    menu.getBtnPagos(),
-                    menu.getBtnAdmin());
         });
 
         menu.getBtnAdmin().setOnAction(e -> {
@@ -240,8 +223,8 @@ public class Aplicacion extends Application {
                     menu.getBtnResumen(),
                     menu.getBtnGastos(),
                     menu.getBtnStock(),
-                    menu.getBtnPagos(),
-                    menu.getBtnCalcula());
+                    menu.getBtnPagos()
+            );
 
             root.setCenter(
                     new Admin(
@@ -250,7 +233,8 @@ public class Aplicacion extends Application {
                             services.categorias,
                             services.empleados,
                             vistaResumen
-                    ));
+                    )
+            );
         });
 
         stage.setTitle("Interfaz");
@@ -266,7 +250,6 @@ public class Aplicacion extends Application {
         menu.getBtnGastos().getStyleClass().remove("active");
         menu.getBtnStock().getStyleClass().remove("active");
         menu.getBtnPagos().getStyleClass().remove("active");
-        menu.getBtnCalcula().getStyleClass().remove("active");
         menu.getBtnAdmin().getStyleClass().remove("active");
     }
 

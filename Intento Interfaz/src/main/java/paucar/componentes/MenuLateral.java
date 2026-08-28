@@ -15,7 +15,6 @@ public class MenuLateral extends VBox {
     private final Button btnGastos;
     private final Button btnStock;
     private final Button btnPagos;
-    private final Button btnCalcula;
     private final Button btnAdmin;
 
     private final StackPane logoItem;
@@ -31,13 +30,12 @@ public class MenuLateral extends VBox {
         setMinWidth(200);
 
         setMaxWidth(200);
-        btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png");
-        btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png");
-        btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png");
-        btnStock = crearBotonConIcono("STOCK", "/img/stock.png");
-        btnPagos = crearBotonConIcono("PAGOS", "/img/pagos.png");
-        btnCalcula = crearBotonConIcono("CALCULA", "/img/calcula.png");
-        btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png");
+        btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png", 65, 65);
+        btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png", 65, 65);
+        btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png", 65, 65);
+        btnStock = crearBotonConIcono("STOCK", "/img/stock.png", 65, 65);
+        btnPagos = crearBotonConIcono("PAGOS", "/img/pagos.png", 75, 65);
+        btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png", 65, 65);
 
         btnVentas.getStyleClass().add("active");
 
@@ -47,7 +45,6 @@ public class MenuLateral extends VBox {
             btnGastos,
             btnStock,
             btnPagos,
-            btnCalcula,
             btnAdmin
         };
 
@@ -79,30 +76,31 @@ public class MenuLateral extends VBox {
                 btnGastos,
                 btnStock,
                 btnPagos,
-                btnCalcula,
                 btnAdmin
         );
     }
 
     private Button crearBotonConIcono(
             String texto,
-            String rutaIcono) {
+            String rutaIcono,
+            double ancho,
+            double alto) {
 
-        Image img
-                = new Image(
-                        getClass()
-                                .getResource(rutaIcono)
-                                .toExternalForm());
+        Image img = new Image(
+                getClass()
+                        .getResource(rutaIcono)
+                        .toExternalForm());
 
         ImageView icono = new ImageView(img);
 
-        icono.setFitWidth(65);
-        icono.setFitHeight(65);
-        
+        icono.setFitWidth(ancho);
+        icono.setFitHeight(alto);
+
         Button btn = new Button(texto);
         btn.setGraphic(icono);
         btn.setGraphicTextGap(8);
         btn.setContentDisplay(ContentDisplay.TOP);
+
         return btn;
     }
 
@@ -124,10 +122,6 @@ public class MenuLateral extends VBox {
 
     public Button getBtnPagos() {
         return btnPagos;
-    }
-
-    public Button getBtnCalcula() {
-        return btnCalcula;
     }
 
     public Button getBtnAdmin() {

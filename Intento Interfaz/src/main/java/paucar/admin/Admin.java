@@ -52,9 +52,9 @@ public class Admin extends BorderPane {
 
         Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
                                                                                        platos*/
-        Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/platos.png");
-        Button btnCategoriasGastos = crearTarjeta("GASTOS VARIABLES", "/img/gastos.png");
-        Button btnEmpleados = crearTarjeta("EMPLEADOS", "/img/gastos.png");
+        Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/empresas clientes.png");
+        Button btnCategoriasGastos = crearTarjeta("GASTOS VARIABLES", "/img/gastos variables.png");
+        Button btnEmpleados = crearTarjeta("EMPLEADOS", "/img/empleado.png");
         
 btnPlatos.setOnAction(click -> {
         marcarActivo(btnPlatos, btnEmpresasClientes, btnCategoriasGastos, btnEmpleados);

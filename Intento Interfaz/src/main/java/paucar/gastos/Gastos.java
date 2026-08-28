@@ -50,9 +50,9 @@ public class Gastos extends BorderPane {
         grid.setHgap(20);
         /* Establece el espacio horizontal entre los elementos del GridPane */
 
-        Button btnGastosVariables = crearTarjeta("VARIABLES", "/img/platos.png");
+        Button btnGastosVariables = crearTarjeta("VARIABLES", "/img/gastos variables.png");
         Button btnGastosIndividuales = crearTarjeta("INDIVIDUALES", "/img/platos.png");
-        Button btnGastosFijos = crearTarjeta("FIJOS", "/img/platos.png");
+        Button btnGastosFijos = crearTarjeta("FIJOS", "/img/gastos fijos.png");
 
         btnGastosVariables.setOnAction(click -> {
             marcarActivo(btnGastosVariables, btnGastosIndividuales);

@@ -1,5 +1,6 @@
 package paucar;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.Stock;
@@ -39,14 +40,21 @@ public class AlertasStockView extends ScrollPane {
 
         for (Stock stock : alertas) {
 
-            AlertaStockCard card
-                    = new AlertaStockCard(
-                            stock.getNombreProducto(),
-                            stock.getCantidad() + " " + stock.getUnidadCantidad(),
-                            stock.getStockMinimo() + " " + stock.getUnidadCantidad()
-                    );
+            AlertaStockCard card = new AlertaStockCard(
+                    stock.getNombreProducto(),
+                    formatearCantidad(stock.getCantidad())
+                    + " "
+                    + stock.getUnidadCantidad(),
+                    formatearCantidad(stock.getStockMinimo())
+                    + " "
+                    + stock.getUnidadCantidad()
+            );
 
             contenedor.getChildren().add(card);
         }
     }
+
+    private String formatearCantidad(BigDecimal valor) {
+    return valor.stripTrailingZeros().toPlainString();
+}
 }
