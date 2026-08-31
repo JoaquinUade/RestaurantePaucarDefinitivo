@@ -10,6 +10,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 
 public class DialogEmpleados {
 
@@ -22,15 +23,20 @@ public class DialogEmpleados {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField();
         txtNombre.setPromptText("Nombre");
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Nombre"), txtNombre
         );
         form.setPadding(new Insets(10));
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -53,15 +59,20 @@ public class DialogEmpleados {
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Nombre"), txtNombre
         );
         form.setPadding(new Insets(10));
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -83,15 +94,21 @@ public class DialogEmpleados {
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnEliminar, ButtonType.CANCEL);
         PasswordField txtPass = new PasswordField();
-        VBox form = new VBox(10,
-                new Label("Contraseña"),
-                txtPass
-        );
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
+            );
+        }
         form.setPadding(new Insets(10));
         dialog.getDialogPane().setContent(form);
         final boolean[] confirmado = {false};
         dialog.setResultConverter(btn -> {
-            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
+            if (btn == btnEliminar && PasswordManager.verificarConSesion(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnEliminar) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();

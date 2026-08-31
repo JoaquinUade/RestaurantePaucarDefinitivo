@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 
@@ -189,9 +190,10 @@ public class VentanaPagoDeudas {
         Button btnConfirmar = new Button("Confirmar Pago");
         VBox panelInputs = new VBox(10);
 
+        if (!SesionPassword.estaAutorizado()) {
+            panelInputs.getChildren().addAll(lblPass, txtPass);
+        }
         panelInputs.getChildren().addAll(
-                lblPass,
-                txtPass,
                 lblNombre,
                 txtNombre,
                 lblCuit,
@@ -218,7 +220,7 @@ public class VentanaPagoDeudas {
                 tablaSemana4
         );
         btnConfirmar.setOnAction(e -> {/*si presiona el boton confirmar */
-            if (!PasswordManager.verificar(txtPass.getText())) {
+            if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                 Alert alert = new Alert(
                         Alert.AlertType.ERROR,
                         "Contraseña incorrecta"

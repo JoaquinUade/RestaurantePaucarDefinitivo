@@ -23,6 +23,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 
@@ -184,7 +186,7 @@ public class VentanaPagoDeudasCliente {
         btnConfirmar.setOnAction(e -> {/*si presiona el boton confirmar */
             String pass = txtPass.getText();/*obtiene lo que el usuario escribió en el campo de contraseña*/
 
-            if (!"1234".equals(pass)) {/*si la contraseña es incorrecta */
+            if (!PasswordManager.verificarConSesion(pass)) {/*si la contraseña es incorrecta */
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta");
                 alert.show();
                 return;
@@ -212,7 +214,10 @@ public class VentanaPagoDeudasCliente {
             ventana.close();
         });
 
-        layout.getChildren().addAll(lblPass, txtPass, tablaDeudas, btnConfirmar);/*añade a la caja vertical
+        if (!SesionPassword.estaAutorizado()) {
+            layout.getChildren().addAll(lblPass, txtPass);/*solo se pide contraseña si el token venció */
+        }
+        layout.getChildren().addAll(tablaDeudas, btnConfirmar);/*añade a la caja vertical
                                                                                  todos los elementos*/
 
         Scene scene = new Scene(layout, 600, 400);/*le mete a la escena el contenido de vbox

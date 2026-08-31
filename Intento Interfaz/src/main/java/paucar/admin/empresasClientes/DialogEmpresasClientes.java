@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 
 public class DialogEmpresasClientes {
 
@@ -37,8 +38,13 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
                                           TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(TipoCliente.CLIENTE);
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Nombre"), txtNombre,
                 new Label("Tipo"), cmbTipo,
                 new Label("Periodicidad (opcional)"), cmbPeriodicidad
@@ -50,7 +56,7 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -90,8 +96,13 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
                                           TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(tipoOriginal);
 cmbPeriodicidad.setValue(periodicidadOriginal);
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Nombre"), txtNombre,
                 new Label("Tipo"), cmbTipo,
                 new Label("Periodicidad (opcional)"), cmbPeriodicidad
@@ -103,7 +114,7 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -136,8 +147,18 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
 
         PasswordField txtPass = new PasswordField();/*Campo para ingresar la contraseña de forma oculta */
 
-        VBox form = new VBox(10, new Label("Contraseña"), txtPass);/*Crea un contenedor vertical con un
-                                                                   texto y un campo de contraseña */
+        VBox form = new VBox(10);
+
+        if (!SesionPassword.estaAutorizado()) {/*Si la sesión expiró, pedimos la contraseña */
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
+            );
+        }
+
         form.setPadding(new Insets(10));
 
         dialog.getDialogPane().setContent(form);/*Establece el contenido del diálogo (el formulario) */
@@ -146,7 +167,7 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
 
         dialog.setResultConverter(btn -> {/*Define qué hacer según el botón presionado en el diálogo */
 
-            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
+            if (btn == btnEliminar && PasswordManager.verificarConSesion(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnEliminar) {/*Si presionó eliminar pero la contraseña es incorrecta */
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();

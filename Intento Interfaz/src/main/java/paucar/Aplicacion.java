@@ -19,6 +19,7 @@ import paucar.config.ServiceContainer;
 import paucar.gastos.Gastos;
 import paucar.pagos.PagosView;
 import paucar.resumen.Resumen;
+import paucar.security.SesionPassword;
 import paucar.service.ClientesService;
 import paucar.service.ExcelExportService;
 import paucar.service.VentasBackend;
@@ -143,12 +144,16 @@ public class Aplicacion extends Application {
 
         menu.getLogoItem().setOnMouseClicked(e -> {
 
+            SesionPassword.invalidar();
+
             limpiarActivos(menu);
 
             root.setCenter(contenido);
         });
 
         menu.getBtnVentas().setOnAction(e -> {
+
+            SesionPassword.invalidar();
 
             marcarActivo(
                     menu.getBtnVentas(),
@@ -165,6 +170,8 @@ public class Aplicacion extends Application {
 
         menu.getBtnResumen().setOnAction(e -> {
 
+            SesionPassword.invalidar();
+
             marcarActivo(
                     menu.getBtnResumen(),
                     menu.getBtnVentas(),
@@ -177,6 +184,8 @@ public class Aplicacion extends Application {
         });
 
         menu.getBtnGastos().setOnAction(e -> {
+
+            SesionPassword.invalidar();
 
             marcarActivo(
                     menu.getBtnGastos(),
@@ -191,6 +200,8 @@ public class Aplicacion extends Application {
 
         menu.getBtnStock().setOnAction(e -> {
 
+            SesionPassword.invalidar();
+
             marcarActivo(
                     menu.getBtnStock(),
                     menu.getBtnVentas(),
@@ -204,6 +215,8 @@ public class Aplicacion extends Application {
 
         menu.getBtnPagos().setOnAction(e -> {
 
+            SesionPassword.invalidar();
+
             marcarActivo(
                     menu.getBtnPagos(),
                     menu.getBtnVentas(),
@@ -216,6 +229,8 @@ public class Aplicacion extends Application {
         });
 
         menu.getBtnAdmin().setOnAction(e -> {
+
+            SesionPassword.invalidar();
 
             marcarActivo(
                     menu.getBtnAdmin(),

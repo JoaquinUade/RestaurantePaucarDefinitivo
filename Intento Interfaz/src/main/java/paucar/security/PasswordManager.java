@@ -52,4 +52,25 @@ public class PasswordManager {
                 HASH
         );
     }
+    /**
+     * Verifica la contraseña teniendo en cuenta el token de sesión.
+     *
+     * - Si el token sigue activo: devuelve true sin pedir contraseña.
+     * - Si el token expiró/no existe: verifica la contraseña y, si es
+     *   correcta, emite un nuevo token.
+     */
+    public static boolean verificarConSesion(String passwordIngresada) {
+
+        if (SesionPassword.estaAutorizado()) {
+            return true;
+        }
+
+        boolean resultado = verificar(passwordIngresada);
+
+        if (resultado) {
+            SesionPassword.autorizar();
+        }
+
+        return resultado;
+    }
 }

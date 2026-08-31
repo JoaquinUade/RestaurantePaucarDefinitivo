@@ -23,6 +23,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
 
@@ -243,8 +244,13 @@ comboPer.setOnAction(e -> {
             comboEstado.setValue(EstadoPago.PAGADO);
         }
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Empresa"), comboSempras,
                 new Label("CUIT"), txtCuit,
                 new Label("Periodicidad"), comboPer,
@@ -264,7 +270,7 @@ comboPer.setOnAction(e -> {
                 return null;
             }
 
-            if (!PasswordManager.verificar(txtPass.getText())) {
+            if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta")
                         .showAndWait();
                 return null;
@@ -344,8 +350,14 @@ comboPer.setOnAction(e -> {
 
     PasswordField txtPass = new PasswordField();
 
-    VBox form = new VBox(10,
-            new Label("Contraseña"), txtPass);
+    VBox form = new VBox(10);
+    if (!SesionPassword.estaAutorizado()) {
+        form.getChildren().addAll(
+                new Label("Contraseña"), txtPass);
+    } else {
+        form.getChildren().add(
+                new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
+    }
 
     form.setPadding(new Insets(10));
     dialog.getDialogPane().setContent(form);
@@ -355,7 +367,7 @@ comboPer.setOnAction(e -> {
     dialog.setResultConverter(btn -> {
 
         if (btn == btnEliminar
-                && PasswordManager.verificar(txtPass.getText())) {
+                && PasswordManager.verificarConSesion(txtPass.getText())) {
 
             confirmado[0] = true;
 

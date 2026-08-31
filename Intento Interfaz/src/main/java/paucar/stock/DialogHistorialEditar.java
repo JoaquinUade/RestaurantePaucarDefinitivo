@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 import paucar.stock.aumentoydisminucion.TablaItemsComprados;
 
 public class DialogHistorialEditar {
@@ -177,11 +178,16 @@ public class DialogHistorialEditar {
         PasswordField txtPass
                 = new PasswordField();
 
-        VBox form = new VBox(
-                10,
-                new Label("Contraseña"),
-                txtPass
-        );
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
+            );
+        }
 
         form.setPadding(new Insets(10));
 
@@ -193,7 +199,7 @@ public class DialogHistorialEditar {
 
         dialog.setResultConverter(btn -> {
 
-            if (btn == btnEliminar && PasswordManager.verificar(txtPass.getText())) {
+            if (btn == btnEliminar && PasswordManager.verificarConSesion(txtPass.getText())) {
 
                 confirmado[0] = true;
 

@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.gastos.Fijos.DialogGastosFijos;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 
 public class DialogGastosV {
 
@@ -60,8 +61,13 @@ public class DialogGastosV {
         TextField txtCantidad = new TextField();
         TextField txtPrecio = new TextField();
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Fecha"), fecha,
                 new Label("Categoría"), combo,
                 new Label("Nombre"), txtNombre,
@@ -74,7 +80,7 @@ public class DialogGastosV {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -189,8 +195,13 @@ public class DialogGastosV {
 
         TextField txtPrecio = new TextField(precioFormateado);
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass,
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        }
+        form.getChildren().addAll(
                 new Label("Fecha"), fecha,
                 new Label("Categoría"), combo,
                 new Label("Nombre"), txtNombre,
@@ -203,7 +214,7 @@ public class DialogGastosV {
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
 
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -265,8 +276,14 @@ public class DialogGastosV {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass);
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass);
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
+        }
 
         form.setPadding(new Insets(10));
         dialog.getDialogPane().setContent(form);
@@ -275,7 +292,7 @@ public class DialogGastosV {
 
         dialog.setResultConverter(btn -> {
             if (btn == btnEliminar
-                    && PasswordManager.verificar(txtPass.getText())) {
+                    && PasswordManager.verificarConSesion(txtPass.getText())) {
 
                 confirmado[0] = true;
             } else if (btn == btnEliminar) {

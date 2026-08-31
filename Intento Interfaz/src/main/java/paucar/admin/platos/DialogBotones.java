@@ -16,6 +16,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import paucar.security.PasswordManager;
+import paucar.security.SesionPassword;
 import paucar.shared.MonedaUtils;
 
 public class DialogBotones {
@@ -54,7 +55,11 @@ public class DialogBotones {
                 "SANDWICHES", "ENSALADAS", "FAJITAS", "PASTAS", "VINOS", "DESAYUNO", "GUARNICIONES",
                 "CARNE", "POSTRES");/*agrega las opciones de categoría al combo box */
 
-        VBox form = new VBox(10, new Label("Contraseña"), txtPass, new Label("Nombre"), txtNombre, new Label("Precio"),
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(new Label("Contraseña"), txtPass);
+        }
+        form.getChildren().addAll(new Label("Nombre"), txtNombre, new Label("Precio"),
                 txtPrecio, new Label("Categoría"), cmbCategoria);/*crea un contenedor vertical (VBox) que organiza los elementos del formulario
                             uno debajo del otro, con un espacio de 10 píxeles entre ellos */
 
@@ -65,7 +70,7 @@ public class DialogBotones {
         dialog.setResultConverter(btn -> {
             /*Según el botón presionado, devuelve el objeto creado o null*/
             if (btn == btnGuardar) {/*si el boton es guardar */
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -131,7 +136,11 @@ public class DialogBotones {
                                                               producto para que aparezca seleccionada
                                                               automáticamente cuando se muestra*/
 
-        VBox form = new VBox(10, new Label("Contraseña"), txtPass, new Label("Nombre"), txtNombre, new Label("Precio"),
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(new Label("Contraseña"), txtPass);
+        }
+        form.getChildren().addAll(new Label("Nombre"), txtNombre, new Label("Precio"),
                 txtPrecio, new Label("Categoría"), cmbCategoria);/*Crea un contenedor vertical
                                                                           (VBox) que organiza elementos
                                                                           uno debajo del otro */
@@ -144,7 +153,7 @@ public class DialogBotones {
 
             if (btn == btnGuardar) {/*Si el botón presionado es guardar, se actualizan los datos del
                                     producto con los valores ingresados en el formulario */
-                if (!PasswordManager.verificar(txtPass.getText())) {
+                if (!PasswordManager.verificarConSesion(txtPass.getText())) {
                     new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
                     return null;
                 }
@@ -183,9 +192,16 @@ public class DialogBotones {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10,
-                new Label("Contraseña"), txtPass
-        );
+        VBox form = new VBox(10);
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass
+            );
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
+            );
+        }
         form.setPadding(new Insets(10));
 
         dialog.getDialogPane().setContent(form);
@@ -193,7 +209,7 @@ public class DialogBotones {
         final boolean[] confirmado = {false};
 
         dialog.setResultConverter(btn -> {
-            if (btn == btnConfirmar && PasswordManager.verificar(txtPass.getText())) {
+            if (btn == btnConfirmar && PasswordManager.verificarConSesion(txtPass.getText())) {
                 confirmado[0] = true;
             } else if (btn == btnConfirmar) {
                 new Alert(Alert.AlertType.ERROR, "Contraseña incorrecta").showAndWait();
