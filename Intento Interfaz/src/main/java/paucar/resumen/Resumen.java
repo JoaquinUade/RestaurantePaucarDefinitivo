@@ -1,5 +1,7 @@
 package paucar.resumen;
 
+
+import paucar.config.Responsive;
 import java.io.File;
 import java.time.LocalDate;
 
@@ -63,7 +65,7 @@ public class Resumen extends BorderPane {
         this.backend = backend;
         this.excelExportService = excelExportService;
 
-        setPadding(new Insets(16));/*
+        setPadding(Responsive.insets(16));/*
                                     * agrega un padding de 16 pixeles a todo el borde
                                     * de la pestaña Resumen, arriba abajo y los costados
          */
@@ -114,7 +116,7 @@ public class Resumen extends BorderPane {
 
         pickerFecha.setOnAction(e -> aplicarFiltros());
 
-        HBox barraFiltros = new HBox(10,
+        HBox barraFiltros = new HBox(Responsive.pe(10),
                 ResumenTipo,
                 pickerFecha,
                 tipoResumen,
@@ -122,7 +124,7 @@ public class Resumen extends BorderPane {
                 btnExcel);/* crea un contenedor horizontal con los filtros */
 
         barraFiltros.setAlignment(Pos.CENTER_LEFT);/* alinea los elementos a la izquierda */
-        barraFiltros.setPadding(new Insets(0, 0, 10, 0));/* agrega un padding de 10 pixeles al fondo */
+        barraFiltros.setPadding(Responsive.insets(0, 0, 10, 0));/* agrega un padding de 10 pixeles al fondo */
 
         return barraFiltros;/* retorna la barra de filtros */
     }

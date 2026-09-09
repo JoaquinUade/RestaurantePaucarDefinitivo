@@ -1,12 +1,12 @@
 package paucar.componentes;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 
 public class MenuLateral extends VBox {
 
@@ -22,20 +22,17 @@ public class MenuLateral extends VBox {
     public MenuLateral() {
 
         getStyleClass().add("menu");
-        setPadding(new Insets(20));
-        setSpacing(15);
-        setPrefWidth(200);
-        setPadding(new Insets(20));
+        setPadding(Responsive.insets(20));
+        setSpacing(Responsive.pe(15));
+        setPrefWidth(Responsive.px(200));
         setFillWidth(true);
-        setMinWidth(200);
 
-        setMaxWidth(200);
-        btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png", 65, 65);
-        btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png", 65, 65);
-        btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png", 65, 65);
-        btnStock = crearBotonConIcono("STOCK", "/img/stock.png", 65, 65);
-        btnPagos = crearBotonConIcono("PAGOS", "/img/pagos.png", 75, 65);
-        btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png", 65, 65);
+        btnVentas = crearBotonConIcono("VENTAS", "/img/ventas.png", Responsive.px(65), Responsive.py(65));
+        btnResumen = crearBotonConIcono("RESUMEN", "/img/resumen.png", Responsive.px(65), Responsive.py(65));
+        btnGastos = crearBotonConIcono("GASTOS", "/img/gastos.png", Responsive.px(65), Responsive.py(65));
+        btnStock = crearBotonConIcono("STOCK", "/img/stock.png", Responsive.px(65), Responsive.py(65));
+        btnPagos = crearBotonConIcono("PAGOS", "/img/pagos.png", Responsive.px(75), Responsive.py(65));
+        btnAdmin = crearBotonConIcono("ADMIN", "/img/admin.png", Responsive.px(65), Responsive.py(65));
 
         btnVentas.getStyleClass().add("active");
 
@@ -61,7 +58,7 @@ public class MenuLateral extends VBox {
 
         ImageView logoView = new ImageView(logoImg);
 
-        logoView.setFitWidth(130);
+        logoView.setFitWidth(Responsive.px(130));
         logoView.setPreserveRatio(true);
         logoView.setSmooth(true);
         logoView.setCache(true);
@@ -98,7 +95,7 @@ public class MenuLateral extends VBox {
 
         Button btn = new Button(texto);
         btn.setGraphic(icono);
-        btn.setGraphicTextGap(8);
+        btn.setGraphicTextGap(Responsive.pe(8));
         btn.setContentDisplay(ContentDisplay.TOP);
 
         return btn;

@@ -1,5 +1,7 @@
 package paucar.stock.aumentoydisminucion;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -72,7 +74,7 @@ public class DialogSumarStock {
 
         TableColumn<GastosVariables, String> colProducto
                 = new TableColumn<>("Producto");
-        colProducto.setPrefWidth(120);
+        colProducto.setPrefWidth(Responsive.px(120));
         colProducto.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getProducto()));
@@ -106,7 +108,7 @@ public class DialogSumarStock {
         });
         TableColumn<GastosVariables, String> colCantidad
                 = new TableColumn<>("Cantidad");
-        colCantidad.setPrefWidth(120);
+        colCantidad.setPrefWidth(Responsive.px(120));
         colCantidad.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getCantComprada()
@@ -119,7 +121,7 @@ public class DialogSumarStock {
         colMedida.setCellValueFactory(c
                 -> new SimpleStringProperty(
                         c.getValue().getMedida()));
-        colMedida.setPrefWidth(120);
+        colMedida.setPrefWidth(Responsive.px(120));
         colProducto.setSortable(false);
         colCantidad.setSortable(false);
         colMedida.setSortable(false);
@@ -133,8 +135,7 @@ public class DialogSumarStock {
                 });
 
         dialog.getDialogPane().setContent(
-                new VBox(
-                        10,
+                new VBox(Responsive.pe(10),
                         new Label("Fecha de ingreso"),
                         dpFecha,
                         new Label("Compras disponibles"),

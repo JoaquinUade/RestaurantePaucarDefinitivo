@@ -1,5 +1,7 @@
 package paucar.resumen.empresas.semanal;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -42,7 +44,7 @@ public class TablaSemanalDebe {
         tablaSemana3 = new TableView<>();
         tablaSemana4 = new TableView<>();
 
-        contenedor = new VBox(10);
+        contenedor = new VBox(Responsive.pe(10));
 
         definirColumnas();
         contenedor.getChildren().addAll(

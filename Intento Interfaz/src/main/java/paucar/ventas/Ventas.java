@@ -1,5 +1,7 @@
 package paucar.ventas;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.CompletableFuture;
@@ -62,7 +64,7 @@ public final class Ventas extends BorderPane {
     // ====== Constructor ======
     public Ventas(Resumen resumen) {
         this.resumen = resumen;
-        setPadding(new Insets(16));
+        setPadding(Responsive.insets(16));
         venta.setEstado(TipoDePago.DEBE);
         venta.setObservaciones("");
         initUI();
@@ -124,11 +126,11 @@ public final class Ventas extends BorderPane {
         var separador = new Region();/*crea separador invisible */
         HBox.setHgrow(separador, Priority.ALWAYS);
 
-        var barra = new HBox(12, lblTitulo, separador, btnAgregar);/*ordena el titulo con la
+        var barra = new HBox(Responsive.pe(12), lblTitulo, separador, btnAgregar);/*ordena el titulo con la
                                                                             fecha el separador y el boton
                                                                             agregar */
         barra.setAlignment(Pos.CENTER_LEFT);/*centra */
-        barra.setPadding(new Insets(0, 0, 10, 0));/*añade 10px abajo del boton
+        barra.setPadding(Responsive.insets(0, 0, 10, 0));/*añade 10px abajo del boton
                                                                           + agregar */
         return barra;/*retorna la barra */
     }
@@ -154,13 +156,13 @@ public final class Ventas extends BorderPane {
                                                    el texto del total, empujando al texto del total
                                                    hacia la derecha */
 
-        var box = new HBox(10, separador, TituloTotal, TextoVisualTotal);/*crea una caja que
+        var box = new HBox(Responsive.pe(10), separador, TituloTotal, TextoVisualTotal);/*crea una caja que
                                                                                   posiciona en orden de 
                                                                                   izquierda a derecha
                                                                                   donde estara el espacio
                                                                                   y el contenido visual */
         box.setAlignment(Pos.CENTER_RIGHT);/*posiciona el contenido de box de forma centrada verticalmente */
-        box.setPadding(new Insets(10, 0, 0, 0));/*agrega 10 px arriba del contenido */
+        box.setPadding(Responsive.insets(10, 0, 0, 0));/*agrega 10 px arriba del contenido */
         return box;/*retorna la box */
     }
 

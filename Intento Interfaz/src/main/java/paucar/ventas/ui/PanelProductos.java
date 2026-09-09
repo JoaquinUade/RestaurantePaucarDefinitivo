@@ -1,5 +1,7 @@
 package paucar.ventas.ui;
 
+
+import paucar.config.Responsive;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -21,10 +23,10 @@ public class PanelProductos {
 
     this.recalcular = recalcular;
     
-    contLineas  = new VBox(6);
+    contLineas  = new VBox(Responsive.pe(6));
 
     contLineas.setPadding (
-    new Insets(6));
+    Responsive.insets(6));
 
         lblTotal  = new Label("Total: $0");
     lblRestante  = new Label("Restan pagar: $0");

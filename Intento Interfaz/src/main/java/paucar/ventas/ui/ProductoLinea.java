@@ -1,5 +1,7 @@
 package paucar.ventas.ui;
 
+
+import paucar.config.Responsive;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -22,7 +24,7 @@ public final class ProductoLinea {
 
         cbProd.getStyleClass().add("combo-agregar");
 
-        cbProd.setPrefWidth(280);
+        cbProd.setPrefWidth(Responsive.px(280));
         cbProd.setPromptText("Producto");
         cbProd.setEditable(true);
         cbProd.valueProperty().addListener((obs, oldV, newV)
@@ -34,7 +36,7 @@ public final class ProductoLinea {
         TextField tfCant = new TextField();
 
         tfCant.setPromptText("Cant.");
-        tfCant.setPrefWidth(70);
+        tfCant.setPrefWidth(Responsive.px(70));
 
         tfCant.textProperty().addListener((o, a, b) -> {
 
@@ -50,8 +52,7 @@ public final class ProductoLinea {
 
         btnDelete.getStyleClass().add("btn-danger");
 
-        HBox fila = new HBox(
-                6,
+        HBox fila = new HBox(Responsive.pe(6),
                 cbProd,
                 tfCant,
                 btnDelete);

@@ -1,5 +1,7 @@
 package paucar.gastos.Individuales;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -61,7 +63,7 @@ public class DialogGastosIndividuales {
         TextField txtDetalle = new TextField();
         TextField txtMonto = new TextField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -73,7 +75,7 @@ public class DialogGastosIndividuales {
                 new Label("Detalle"), txtDetalle,
                 new Label("Monto"), txtMonto);
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -154,7 +156,7 @@ public class DialogGastosIndividuales {
         TextField txtDetalle = new TextField(original.getDetalle());
         TextField txtMonto = new TextField(original.getMonto().toString());
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -166,7 +168,7 @@ public class DialogGastosIndividuales {
                 new Label("Detalle"), txtDetalle,
                 new Label("Monto"), txtMonto);
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -213,7 +215,7 @@ public class DialogGastosIndividuales {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass);
@@ -222,7 +224,7 @@ public class DialogGastosIndividuales {
                     new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
 
         final boolean[] confirmado = {false};

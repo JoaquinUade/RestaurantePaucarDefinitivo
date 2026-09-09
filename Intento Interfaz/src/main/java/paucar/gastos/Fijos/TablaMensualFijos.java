@@ -1,5 +1,6 @@
 package paucar.gastos.Fijos;
 
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -12,6 +13,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.shared.MonedaUtils;
 
 public class TablaMensualFijos extends VBox {
@@ -165,7 +167,7 @@ public class TablaMensualFijos extends VBox {
                 g.setObservacion(e.getNewValue());
             });
         }
-        tabla.setPrefHeight(460);
+        tabla.setPrefHeight(Responsive.pe(460));
         // ✅ TABLA EDITABLE
         tabla.setEditable(true);
         // ✅ AGREGAR COLUMNAS

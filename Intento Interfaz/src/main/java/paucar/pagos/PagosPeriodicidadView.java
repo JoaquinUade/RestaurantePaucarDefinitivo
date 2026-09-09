@@ -1,5 +1,7 @@
 package paucar.pagos;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -59,8 +61,8 @@ public class PagosPeriodicidadView extends BorderPane {
                 this::recargar,
                 service);
         
-        VBox contenido = new VBox(10, tabla, lblTotal);
-        contenido.setPadding(new Insets(10));
+        VBox contenido = new VBox(Responsive.pe(10), tabla, lblTotal);
+        contenido.setPadding(Responsive.insets(10));
 
         VBox.setVgrow(tabla, Priority.ALWAYS);
 

@@ -1,5 +1,7 @@
 package paucar.ventas;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
@@ -258,7 +260,9 @@ contLineas.getChildren().add(
         dialog.getDialogPane().setContent(sp);
 
         dialog.setResizable(true);
-        dialog.getDialogPane().setPrefSize(600, 500);
+        dialog.getDialogPane().setPrefSize(
+                        Responsive.px(600),
+                        Responsive.py(500));
 
         dialog.setResultConverter(btn -> {
             if (btn == okType) {

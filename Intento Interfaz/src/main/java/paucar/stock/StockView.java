@@ -1,5 +1,6 @@
 package paucar.stock;
 
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
@@ -32,7 +33,7 @@ public class StockView extends BorderPane {
     private final CategoriasGastosService categoriasService;
     private Stock stockSeleccionado;
     private final GastosVariablesService gastosVariablesService;
-    private final HBox contenedorCategorias = new HBox(20);
+    private final HBox contenedorCategorias = new HBox(Responsive.pe(20));
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
     private final Consumer<Stock> onSelect;
@@ -131,11 +132,11 @@ public class StockView extends BorderPane {
 
         Region spacerBottom = new Region();
         HBox.setHgrow(spacerBottom, Priority.ALWAYS);
-        contenedorCategorias.setPadding(new Insets(15));
+        contenedorCategorias.setPadding(Responsive.insets(15));
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
         scroll.getStyleClass().add("scroll-pane");
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMinHeight(507);
+        
         // 🔥 claves
         scroll.setFitToWidth(false); // permite scroll horizontal
         scroll.setFitToHeight(false);
@@ -144,14 +145,14 @@ public class StockView extends BorderPane {
 
         VBox fondo = new VBox();
         fondo.getStyleClass().add("fondo-rojo");
-        fondo.setPadding(new Insets(15));
-        fondo.setSpacing(15);
+        fondo.setPadding(Responsive.insets(15));
+        fondo.setSpacing(Responsive.pe(15));
 
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
-        HBox topBar = new HBox(10, filtroFecha, lblFecha, spacerTop, btnAgregar);
-        HBox barraBotones = new HBox(10, btnEditar, btnEliminar);
+        HBox topBar = new HBox(Responsive.pe(10), filtroFecha, lblFecha, spacerTop, btnAgregar);
+        HBox barraBotones = new HBox(Responsive.pe(10), btnEditar, btnEliminar);
 
-        topBar.setPadding(new Insets(10));
+        topBar.setPadding(Responsive.insets(10));
         fondo.getChildren().addAll(topBar, scroll, barraBotones);
         setCenter(fondo);
 

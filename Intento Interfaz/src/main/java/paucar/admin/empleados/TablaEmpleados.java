@@ -1,5 +1,7 @@
 package paucar.admin.empleados;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.Empleado;
 
 import javafx.geometry.Insets;
@@ -35,9 +37,9 @@ public class TablaEmpleados extends VBox {
                 } else {
                     Label lblNombre = new Label(item.getNombre());
                     lblNombre.getStyleClass().add("nombre-empresasclientes");
-                    HBox top = new HBox(10, lblNombre);
-                    VBox card = new VBox(5, top);
-                    card.setPadding(new Insets(15));
+                    HBox top = new HBox(Responsive.pe(10), lblNombre);
+                    VBox card = new VBox(Responsive.pe(5), top);
+                    card.setPadding(Responsive.insets(15));
                     card.getStyleClass().setAll("card");
                     setGraphic(card);
                 }

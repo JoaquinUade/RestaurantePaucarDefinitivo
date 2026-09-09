@@ -1,5 +1,7 @@
 package paucar.stock;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -86,8 +88,7 @@ public class DialogStock {
         );
         DatePicker dateFecha
                 = new DatePicker(LocalDate.now());
-        VBox form = new VBox(
-                10,
+        VBox form = new VBox(Responsive.pe(10),
                 new Label("Fecha"),
                 dateFecha,
                 new Label("Categoría"),
@@ -99,7 +100,7 @@ public class DialogStock {
                 new Label("Unidad"),
                 txtUnidad);
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
 
         dialog.getDialogPane().setContent(form);
 
@@ -249,8 +250,7 @@ public class DialogStock {
                 = new TextField(
                         original.getUnidadCantidad());
 
-        VBox form = new VBox(
-                10,
+        VBox form = new VBox(Responsive.pe(10),
                 new Label("Categoría"),
                 comboCategoria,
                 new Label("Producto"),
@@ -261,7 +261,7 @@ public class DialogStock {
                 txtUnidad
         );
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
 
         dialog.getDialogPane()
                 .setContent(form);
@@ -317,7 +317,7 @@ public class DialogStock {
         PasswordField txtPass
                 = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -328,7 +328,7 @@ public class DialogStock {
             );
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane()
                 .setContent(form);

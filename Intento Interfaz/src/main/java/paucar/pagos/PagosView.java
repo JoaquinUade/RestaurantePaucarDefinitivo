@@ -1,5 +1,7 @@
 package paucar.pagos;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -81,26 +83,24 @@ public class PagosView extends BorderPane {
         comboPeriodicidad.setValue("Mensual");
         btnFiltrar.setOnAction(e -> aplicarFiltro());
 
-        HBox topBar = new HBox(
-                10,
+        HBox topBar = new HBox(Responsive.pe(10),
                 filtroFecha,
                 comboPeriodicidad,
                 btnFiltrar,
                 titulo,
                 spacer
         );
-        topBar.setPadding(new Insets(10));
-        HBox bottomBar = new HBox(10, btnEditar, btnEliminar, spacer);
-        bottomBar.setPadding(new Insets(10));
+        topBar.setPadding(Responsive.insets(10));
+        HBox bottomBar = new HBox(Responsive.pe(10), btnEditar, btnEliminar, spacer);
+        bottomBar.setPadding(Responsive.insets(10));
 
-        VBox fondo = new VBox(
-                15,
+        VBox fondo = new VBox(Responsive.pe(15),
                 topBar,
                 contenedorResultado,
                 bottomBar);
 
         fondo.getStyleClass().add("fondo-rojo");
-        fondo.setPadding(new Insets(5));
+        fondo.setPadding(Responsive.insets(5));
         setCenter(fondo);
 
         aplicarFiltro();

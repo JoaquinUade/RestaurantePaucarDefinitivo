@@ -1,5 +1,7 @@
 package paucar.admin.platos;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.Categoria;
 import com.uade.tpo.demo.entity.Producto;
 
@@ -36,8 +38,8 @@ public class Platos extends BorderPane {
         construirCategorias();
         ScrollPane scroll = crearScroll(gridCategorias);
         HBox botones = crearBotones();
-        VBox contenedor = new VBox(20, titulo, scroll, botones);
-        contenedor.setPadding(new Insets(20));
+        VBox contenedor = new VBox(Responsive.pe(20), titulo, scroll, botones);
+        contenedor.setPadding(Responsive.insets(20));
 
         setCenter(contenedor);
     }
@@ -86,11 +88,11 @@ public class Platos extends BorderPane {
         gridCategorias.getColumnConstraints().addAll(col1, col2, col3);/*le agrega las restricciones al
                                                                       conjunto de 3 columnas */
 
-        gridCategorias.setHgap(20);/*Dejá 20 píxeles de espacio horizontal entre cada columna de
+        gridCategorias.setHgap(Responsive.pe(20));/*Dejá 20 píxeles de espacio horizontal entre cada columna de
                                          la grilla */
-        gridCategorias.setVgap(20);/*deja 20 pixeles de espacio vertical entre cada columna de
+        gridCategorias.setVgap(Responsive.pe(20));/*deja 20 pixeles de espacio vertical entre cada columna de
                                           la grilla */
-        gridCategorias.setPadding(new Insets(10));/*Dejá un espacio de 10 píxeles entre
+        gridCategorias.setPadding(Responsive.insets(10));/*Dejá un espacio de 10 píxeles entre
                                                                      el borde de la grilla y el contenido */
         return gridCategorias;/* retorna gridCategorias*/
     }
@@ -144,10 +146,10 @@ public class Platos extends BorderPane {
         refrescarVista();
     }
 });
-        HBox botones = new HBox(10, btnCrear, btnEditar, btnEliminar);/*pone los 3 botones en
+        HBox botones = new HBox(Responsive.pe(10), btnCrear, btnEditar, btnEliminar);/*pone los 3 botones en
                                                                                una caja horizontal llamada
                                                                                 botones */
-        botones.setPadding(new Insets(0));/*le pone un padding alrededor de botones
+        botones.setPadding(Responsive.insets(0));/*le pone un padding alrededor de botones
                                                               de 10px */                                                         
         btnCrear.setFocusTraversable(false);
         btnEditar.setFocusTraversable(false);

@@ -1,5 +1,7 @@
 package paucar.stock.aumentoydisminucion;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.GastosVariables;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -31,7 +33,7 @@ public class TablaItemsComprados {
         TableColumn<GastosVariables, String> colProducto
                 = new TableColumn<>("Producto");
 
-        colProducto.setPrefWidth(200);
+        colProducto.setPrefWidth(Responsive.px(200));
 
         colProducto.setCellValueFactory(c
                 -> new SimpleStringProperty(
@@ -101,7 +103,7 @@ public class TablaItemsComprados {
         tabla.getColumns().add(colCantidad);
         tabla.getColumns().add(colPrecio);
 
-        tabla.setPrefHeight(250);
+        tabla.setPrefHeight(Responsive.py(250));
 
         return tabla;
     }

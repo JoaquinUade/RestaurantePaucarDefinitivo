@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
+import paucar.config.Responsive;
 import paucar.service.VentasBackend;
 import paucar.shared.FechaUtils;
 import paucar.shared.MonedaUtils;
@@ -186,10 +187,10 @@ private void ajustarAltura() {
     int filas = tabla.getItems().size();
 
     tabla.setPrefHeight(
-            Math.max(
-                    80,
-                    35 + filas * 45
-            )
-    );
+        Math.max(
+                Responsive.py(80),
+                Responsive.py(35 + filas * 45)
+        )
+);
 }
 }

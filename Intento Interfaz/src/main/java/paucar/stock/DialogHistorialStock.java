@@ -1,5 +1,7 @@
 package paucar.stock;
 
+
+import paucar.config.Responsive;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -49,9 +51,9 @@ public class DialogHistorialStock {
                                 TreeMap::new,
                                 Collectors.toList()));
 
-        VBox root = new VBox(15);
+        VBox root = new VBox(Responsive.pe(15));
         root.setPadding(
-                new Insets(20));
+                Responsive.insets(20));
         int semana = 1;
 
         for (Map.Entry<LocalDate, List<HistorialStock>> entry
@@ -80,7 +82,8 @@ public class DialogHistorialStock {
         scrollPane.setFitToWidth(true);
 
         Scene scene
-                = new Scene(scrollPane, 1200, 600);
+                = new Scene(scrollPane,
+                Responsive.px(1200), Responsive.py(600));
 
         ventana.setScene(scene);
         ventana.showAndWait();
@@ -260,8 +263,7 @@ public class DialogHistorialStock {
                 } else {
 
                     HBox botones
-                            = new HBox(
-                                    5,
+                            = new HBox(Responsive.pe(5),
                                     btnEditar,
                                     btnEliminar);
 

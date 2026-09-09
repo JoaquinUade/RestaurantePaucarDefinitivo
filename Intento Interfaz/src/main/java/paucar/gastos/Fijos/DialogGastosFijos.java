@@ -1,5 +1,7 @@
 package paucar.gastos.Fijos;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -75,15 +77,14 @@ public class DialogGastosFijos {
             dialog.close();
         });
 
-        HBox filaBotones = new HBox(10, btnPersonal, btnGeneral);
+        HBox filaBotones = new HBox(Responsive.pe(10), btnPersonal, btnGeneral);
 
-        VBox contenido = new VBox(
-                10,
+        VBox contenido = new VBox(Responsive.pe(10),
                 new Label("Seleccione el tipo de gasto"),
                 filaBotones
         );
 
-        contenido.setPadding(new Insets(15));
+        contenido.setPadding(Responsive.insets(15));
 
         dialog.getDialogPane().setContent(contenido);
 
@@ -112,7 +113,7 @@ public class DialogGastosFijos {
         TextField txtMonto = new TextField(original.getMonto().toString());
         TextField txtObs = new TextField(original.getObservacion());
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -125,7 +126,7 @@ public class DialogGastosFijos {
                 new Label("Observación"), txtObs
         );
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -198,7 +199,7 @@ public class DialogGastosFijos {
         TextField txtMonto = new TextField();
         TextField txtObs = new TextField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -209,7 +210,7 @@ public class DialogGastosFijos {
                 new Label("Fecha"), fecha,
                 new Label("Monto"), txtMonto);
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -267,7 +268,7 @@ public class DialogGastosFijos {
         TextField txtMonto = new TextField();
         TextField txtObs = new TextField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -280,7 +281,7 @@ public class DialogGastosFijos {
                 new Label("Observación"), txtObs
         );
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -334,7 +335,7 @@ public class DialogGastosFijos {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -345,7 +346,7 @@ public class DialogGastosFijos {
             );
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
 
         final boolean[] confirmado = {false};

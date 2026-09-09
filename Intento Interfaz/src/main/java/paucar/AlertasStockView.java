@@ -1,5 +1,7 @@
 package paucar;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -16,8 +18,8 @@ public class AlertasStockView extends ScrollPane {
 
     public AlertasStockView(StockService stockService) {
         System.out.println("ENTRE A ALERTAS");
-        contenedor = new VBox(15);
-        contenedor.setPadding(new Insets(20));
+        contenedor = new VBox(Responsive.pe(15));
+        contenedor.setPadding(Responsive.insets(20));
         contenedor.setStyle("""
             -fx-background-color: transparent;
         """);

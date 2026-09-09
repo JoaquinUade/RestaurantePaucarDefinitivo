@@ -1,5 +1,7 @@
 package paucar.admin.categoriasgastos;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 
 import javafx.geometry.Insets;
@@ -33,8 +35,8 @@ public class CategoriasGastosView extends BorderPane {
 
         HBox botones = crearBotones();
 
-        VBox layout = new VBox(20, titulo, panel, botones);
-        layout.setPadding(new Insets(20));
+        VBox layout = new VBox(Responsive.pe(20), titulo, panel, botones);
+        layout.setPadding(Responsive.insets(20));
         layout.getStyleClass().add("fondo-empresasclientes");
 
         setCenter(layout);
@@ -94,7 +96,7 @@ public class CategoriasGastosView extends BorderPane {
             }
         });
 
-        return new HBox(10, btnCrear, btnEditar, btnEliminar);
+        return new HBox(Responsive.pe(10), btnCrear, btnEditar, btnEliminar);
     }
 
     // ✅ CARGAR DATOS

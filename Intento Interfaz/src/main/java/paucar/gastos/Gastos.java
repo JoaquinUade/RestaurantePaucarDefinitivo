@@ -1,5 +1,7 @@
 package paucar.gastos;
 
+
+import paucar.config.Responsive;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -46,8 +48,8 @@ public class Gastos extends BorderPane {
         grid.getStyleClass().add("boton");
         grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
-        grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
-        grid.setHgap(20);
+        grid.setPadding(Responsive.insets(40));/* Establece el relleno del GridPane */
+        grid.setHgap(Responsive.pe(20));
         /* Establece el espacio horizontal entre los elementos del GridPane */
 
         Button btnGastosVariables = crearTarjeta("VARIABLES", "/img/gastos variables.png");

@@ -1,5 +1,7 @@
 package paucar.resumen.general;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -37,7 +39,7 @@ public class SemanalGeneral extends BorderPane {
     private final ObservableList<VentaResumenDiarioDTO> filaTotalSemana = FXCollections.observableArrayList();
 
     private final VentasBackend backend;
-    private final VBox contenido = new VBox(8);/*contenedor vertical en el que pondremos los
+    private final VBox contenido = new VBox(Responsive.pe(8));/*contenedor vertical en el que pondremos los
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
     private final LocalDate fechaBase;
@@ -55,8 +57,8 @@ public class SemanalGeneral extends BorderPane {
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
         tablaTotalSemanal.setEditable(false);
-        tablaTotalSemanal.setFixedCellSize(38);
-        tablaTotalSemanal.setPrefHeight(38 + 30); // fila + header
+        tablaTotalSemanal.setFixedCellSize(Responsive.py(38));
+        tablaTotalSemanal.setPrefHeight(Responsive.py(38) + Responsive.py(30)); // fila + header
         tablaTotalSemanal.setSelectionModel(null);
         tablaTotalSemanal.getStyleClass().add("tabla-total-dorada");
         setBottom(tablaTotalSemanal);
@@ -71,9 +73,9 @@ public class SemanalGeneral extends BorderPane {
         Region sep = new Region();
         HBox.setHgrow(sep, Priority.ALWAYS);
 
-        HBox header = new HBox(12, titulo, sep);
+        HBox header = new HBox(Responsive.pe(12), titulo, sep);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(0, 0, 10, 0));
+        header.setPadding(Responsive.insets(0, 0, 10, 0));
 
         ScrollPane scroll = new ScrollPane(contenido);
         scroll.setFitToWidth(true);
@@ -198,7 +200,7 @@ public class SemanalGeneral extends BorderPane {
         lblTotalDia.getStyleClass().add("total-dia");/*Agrega la clase CSS "total-dia" al label para
                                                         aplicarle estilos*/
 
-        return new VBox(6, tituloDia, tabla, lblTotalDia);/*Devuelve un contenedor vertical (VBox)
+        return new VBox(Responsive.pe(6), tituloDia, tabla, lblTotalDia);/*Devuelve un contenedor vertical (VBox)
                                                                    que contiene el título del día, la
                                                                    tabla y el label del total*/
     }

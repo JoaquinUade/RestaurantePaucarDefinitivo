@@ -1,5 +1,7 @@
 package paucar.admin.empresasClientes;
 
+
+import paucar.config.Responsive;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.TipoCliente;
@@ -89,7 +91,7 @@ private final Resumen resumen;
         });
 
         // Layout tablas
-        HBox listas = new HBox(20, panelClientes, panelEmpresas);/*crea un contenedor horizontal con un
+        HBox listas = new HBox(Responsive.pe(20), panelClientes, panelEmpresas);/*crea un contenedor horizontal con un
                                                                  espacio de 20px entre elementos*/
 
         HBox.setHgrow(panelClientes, Priority.ALWAYS);/*crece para ocupar todo el espacio disponible */
@@ -107,8 +109,8 @@ private final Resumen resumen;
 
         HBox botones = crearBotones();/*crea botones y los guarda en hbox botones */
 
-        VBox pantalla = new VBox(20, titulo, txtBuscar, listas, botones);/*caja vertical */
-        pantalla.setPadding(new Insets(20));/*le pone un relleno alrededor de 20px */
+        VBox pantalla = new VBox(Responsive.pe(20), titulo, txtBuscar, listas, botones);/*caja vertical */
+        pantalla.setPadding(Responsive.insets(20));/*le pone un relleno alrededor de 20px */
         pantalla.getStyleClass().add("fondo-empresasclientes");
 
         setCenter(pantalla);/*centra la caja vertical llamada pantalla */
@@ -197,7 +199,7 @@ private final Resumen resumen;
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla  */
             }
         });
-        return new HBox(10, btnCrear, btnEditar, btnEliminar);/*Devuelve un contenedor horizontal con
+        return new HBox(Responsive.pe(10), btnCrear, btnEditar, btnEliminar);/*Devuelve un contenedor horizontal con
                                                               los botones*/
     }
 

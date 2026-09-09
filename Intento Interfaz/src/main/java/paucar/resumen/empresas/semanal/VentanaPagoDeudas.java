@@ -1,5 +1,7 @@
 package paucar.resumen.empresas.semanal;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
@@ -49,10 +51,10 @@ public class VentanaPagoDeudas {
         Stage ventana = new Stage();/*crea ventana emergente */
         ventana.setTitle("Pagar Deudas");
 
-        HBox layout = new HBox(15);
+        HBox layout = new HBox(Responsive.pe(15));
         
 
-        layout.setPadding(new Insets(15));/*le agrega relleno de 15px alrededor */
+        layout.setPadding(Responsive.insets(15));/*le agrega relleno de 15px alrededor */
 
         Label lblPass = new Label("Contraseña:");
         PasswordField txtPass = new PasswordField();/*Campo de texto para ingresar contraseña*/
@@ -78,10 +80,10 @@ public class VentanaPagoDeudas {
         tablaSemana2.getColumns().add(crearColumnaCheck());
         tablaSemana3.getColumns().add(crearColumnaCheck());
         tablaSemana4.getColumns().add(crearColumnaCheck());
-        tablaSemana1.setPrefHeight(90);
-        tablaSemana2.setPrefHeight(90);
-        tablaSemana3.setPrefHeight(90);
-        tablaSemana4.setPrefHeight(90);
+        tablaSemana1.setPrefHeight(Responsive.py(90));
+        tablaSemana2.setPrefHeight(Responsive.py(90));
+        tablaSemana3.setPrefHeight(Responsive.py(90));
+        tablaSemana4.setPrefHeight(Responsive.py(90));
 
         // ✅ FECHA
         TableColumn<Venta, String> colFecha = new TableColumn<>("Fecha");
@@ -188,7 +190,7 @@ public class VentanaPagoDeudas {
         Label lblSemana3 = new Label("Semana 3 (15-21)");
         Label lblSemana4 = new Label("Semana 4 (22-fin)");
         Button btnConfirmar = new Button("Confirmar Pago");
-        VBox panelInputs = new VBox(10);
+        VBox panelInputs = new VBox(Responsive.pe(10));
 
         if (!SesionPassword.estaAutorizado()) {
             panelInputs.getChildren().addAll(lblPass, txtPass);
@@ -205,9 +207,9 @@ public class VentanaPagoDeudas {
                 btnConfirmar
         );
 
-        panelInputs.setPrefWidth(250);
+        panelInputs.setPrefWidth(Responsive.px(250));
 
-        VBox panelTablas = new VBox(10);
+        VBox panelTablas = new VBox(Responsive.pe(10));
 
         panelTablas.getChildren().addAll(
                 lblSemana1,
@@ -298,7 +300,8 @@ public class VentanaPagoDeudas {
                 scrollTablas
         );
 
-        Scene scene = new Scene(layout, 1180, 500);/*le mete a la escena el contenido de vbox
+        Scene scene = new Scene(layout,
+                Responsive.px(1180), Responsive.py(500));/*le mete a la escena el contenido de vbox
                                                                  y le da tamaño*/
 
         ventana.setScene(scene);/*a la ventana le pasa la escena*/

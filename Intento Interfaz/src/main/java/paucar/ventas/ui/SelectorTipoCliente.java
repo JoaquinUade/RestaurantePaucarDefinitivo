@@ -1,5 +1,7 @@
 package paucar.ventas.ui;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.TipoCliente;
 
 import javafx.geometry.Pos;
@@ -54,8 +56,7 @@ public final class SelectorTipoCliente {
                 .add("segmented-right");
 
         HBox selector =
-                new HBox(
-                        6,
+                new HBox(Responsive.pe(6),
                         btnMesa,
                         btnCliente,
                         btnEmpresa);

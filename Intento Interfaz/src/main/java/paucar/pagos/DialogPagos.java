@@ -1,5 +1,7 @@
 package paucar.pagos;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -244,7 +246,7 @@ comboPer.setOnAction(e -> {
             comboEstado.setValue(EstadoPago.PAGADO);
         }
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -261,7 +263,7 @@ comboPer.setOnAction(e -> {
                 new Label("Estado"), comboEstado,
                 new Label("Observación (opcional)"), txtObservacion);
 
-        form.setPadding(new Insets(15));
+        form.setPadding(Responsive.insets(15));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -350,7 +352,7 @@ comboPer.setOnAction(e -> {
 
     PasswordField txtPass = new PasswordField();
 
-    VBox form = new VBox(10);
+    VBox form = new VBox(Responsive.pe(10));
     if (!SesionPassword.estaAutorizado()) {
         form.getChildren().addAll(
                 new Label("Contraseña"), txtPass);
@@ -359,7 +361,7 @@ comboPer.setOnAction(e -> {
                 new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
     }
 
-    form.setPadding(new Insets(10));
+    form.setPadding(Responsive.insets(10));
     dialog.getDialogPane().setContent(form);
 
     final boolean[] confirmado = {false};

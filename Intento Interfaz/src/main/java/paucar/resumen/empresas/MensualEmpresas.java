@@ -1,5 +1,7 @@
 package paucar.resumen.empresas;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -59,8 +61,8 @@ public class MensualEmpresas extends BorderPane {
         crearColumnas();
 
         javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox(comboEmpresa);
-        topBar.setPadding(new javafx.geometry.Insets(10)); // 🔥 espacio alrededor
-        topBar.setSpacing(10); // (por si después agregás más cosas)
+        topBar.setPadding(Responsive.insets(10)); // 🔥 espacio alrededor
+        topBar.setSpacing(Responsive.pe(10)); // (por si después agregás más cosas)
 
         setTop(topBar);
         setCenter(tabla);
@@ -296,7 +298,7 @@ public class MensualEmpresas extends BorderPane {
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
 
         // ✅ ajustes visuales
-        grid.setHgap(5);
+        grid.setHgap(Responsive.pe(5));
         grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         for (TableColumn<?, ?> columna : tabla.getColumns()) {

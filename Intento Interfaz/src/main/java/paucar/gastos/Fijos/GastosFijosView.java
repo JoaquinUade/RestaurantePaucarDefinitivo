@@ -1,5 +1,6 @@
 package paucar.gastos.Fijos;
 
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -7,7 +8,6 @@ import com.uade.tpo.demo.entity.Empleado;
 import com.uade.tpo.demo.entity.GastosFijos;
 import com.uade.tpo.demo.entity.dto.GastoFijoRequest;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.EmpleadoService;
 import paucar.service.GastosFijosService;
 
@@ -24,7 +25,7 @@ public class GastosFijosView extends VBox {
 
     private final GastosFijosService service;
     private final EmpleadoService empleadoService;
-    private final VBox contenedor = new VBox(15);
+    private final VBox contenedor = new VBox(Responsive.pe(15));
     private final DatePicker filtroFecha;
     private GastosFijos gastoSeleccionado;
 
@@ -108,20 +109,19 @@ public class GastosFijosView extends VBox {
         Label titulo = new Label("Gastos Fijos");
         titulo.getStyleClass().add("subtitulo-mid-blanco");
         // ✅ FILA SUPERIOR
-        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
+        HBox filaSuperior = new HBox(Responsive.pe(10), filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
         HBox barraBotones = crearBarraBotones();
-        barraBotones.setPadding(new Insets(0));
+        barraBotones.setPadding(Responsive.insets(0));
 
         // ✅ CONTENEDOR
-        contenedor.setPadding(new Insets(15));
+        contenedor.setPadding(Responsive.insets(15));
         ScrollPane scroll = new ScrollPane(contenedor);
         scroll.setFitToWidth(true);
-        scroll.setMinHeight(537);
 
         // ✅ FONDO (igual que tu otra vista)
-        VBox fondo = new VBox(15);
+        VBox fondo = new VBox(Responsive.pe(15));
         fondo.getStyleClass().add("fondo-rojo");
-        fondo.setPadding(new Insets(15));
+        fondo.setPadding(Responsive.insets(15));
 
         fondo.getChildren().addAll(filaSuperior, scroll, barraBotones);
 
@@ -174,10 +174,10 @@ labelPagosPersonal.getStyleClass().add("card-header");
 labelPagosPersonal.setText("Pagos al personal");
 labelPagosPersonal.setMaxWidth(Double.MAX_VALUE);
 
-VBox bloqueGenerales = new VBox(0, labelGastosFijos, tablaGenerales);
-VBox bloquePersonal = new VBox(0, labelPagosPersonal, tablaPersonal);
+VBox bloqueGenerales = new VBox(Responsive.pe(0), labelGastosFijos, tablaGenerales);
+VBox bloquePersonal = new VBox(Responsive.pe(0), labelPagosPersonal, tablaPersonal);
 // ✅ contenedor horizontal
-        HBox fila = new HBox(20, bloquePersonal, bloqueGenerales);
+        HBox fila = new HBox(Responsive.pe(20), bloquePersonal, bloqueGenerales);
 
 // ✅ ESTO ES LA CLAVE
         HBox.setHgrow(bloquePersonal, Priority.ALWAYS);
@@ -244,6 +244,6 @@ VBox bloquePersonal = new VBox(0, labelPagosPersonal, tablaPersonal);
             }
         });
 
-        return new HBox(10, btnEditar, btnEliminar);
+        return new HBox(Responsive.pe(10), btnEditar, btnEliminar);
     }
 }

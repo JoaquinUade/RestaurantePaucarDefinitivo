@@ -1,5 +1,7 @@
 package paucar.admin.empresasClientes;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
@@ -38,7 +40,7 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
                                           TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(TipoCliente.CLIENTE);
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -49,7 +51,7 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
                 new Label("Tipo"), cmbTipo,
                 new Label("Periodicidad (opcional)"), cmbPeriodicidad
         );
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane().setContent(form);
 
@@ -96,7 +98,7 @@ ComboBox<TipoPeriodicidad> cmbPeriodicidad = new ComboBox<>();
                                           TipoPeriodicidad.SEMANAL, TipoPeriodicidad.CONSUMOVARIOSDIAS);
         cmbTipo.setValue(tipoOriginal);
 cmbPeriodicidad.setValue(periodicidadOriginal);
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -107,7 +109,7 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
                 new Label("Tipo"), cmbTipo,
                 new Label("Periodicidad (opcional)"), cmbPeriodicidad
         );
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane().setContent(form);
 
@@ -147,7 +149,7 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
 
         PasswordField txtPass = new PasswordField();/*Campo para ingresar la contraseña de forma oculta */
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
 
         if (!SesionPassword.estaAutorizado()) {/*Si la sesión expiró, pedimos la contraseña */
             form.getChildren().addAll(
@@ -159,7 +161,7 @@ cmbPeriodicidad.setValue(periodicidadOriginal);
             );
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane().setContent(form);/*Establece el contenido del diálogo (el formulario) */
 

@@ -1,5 +1,7 @@
 package paucar.ventas.ui;
 
+
+import paucar.config.Responsive;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -17,7 +19,7 @@ public final class PanelPagadores {
     TextField tfCantidadPagadores =
             new TextField("1");
 
-    tfCantidadPagadores.setPrefWidth(80);
+    tfCantidadPagadores.setPrefWidth(Responsive.px(80));
     tfCantidadPagadores.setPromptText("Cantidad");
 
     tfCantidadPagadores.textProperty().addListener(
@@ -63,8 +65,7 @@ public final class PanelPagadores {
                 });
 
         HBox fila =
-                new HBox(
-                        10,
+                new HBox(Responsive.pe(10),
                         new Label(
                                 "Persona "
                                 + i
@@ -89,6 +90,6 @@ public final class PanelPagadores {
 }
 
     public static VBox crearContenedor() {
-        return new VBox(5);
+        return new VBox(Responsive.pe(5));
     }
 }

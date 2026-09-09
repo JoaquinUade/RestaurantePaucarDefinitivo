@@ -9,7 +9,6 @@ import com.uade.tpo.demo.entity.Empleado;
 import com.uade.tpo.demo.entity.GastosIndividuales;
 import com.uade.tpo.demo.entity.dto.GastoIndividualRequest;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -18,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.EmpleadoService;
 import paucar.service.GastosIndividualesService;
 
@@ -28,7 +28,7 @@ public class GastosIndividualesView extends VBox {
     private final DatePicker filtroFecha;
     private final EmpleadoService empleadoService;
 
-    private final HBox contenedor = new HBox(20);
+    private final HBox contenedor = new HBox(Responsive.pe(20));
 
     public GastosIndividualesView(GastosIndividualesService service,
             EmpleadoService empleadoService) {
@@ -60,13 +60,13 @@ public class GastosIndividualesView extends VBox {
         btnFiltrar.setOnAction(e -> recargar(filtroFecha.getValue()));
 
         HBox barraBotones = crearBarraBotones();
-        barraBotones.setPadding(new Insets(0));
-        contenedor.setPadding(new Insets(15));
+        barraBotones.setPadding(Responsive.insets(0));
+        contenedor.setPadding(Responsive.insets(15));
 
         ScrollPane scroll = new ScrollPane(contenedor);
         scroll.getStyleClass().add("scroll-pane");
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMinHeight(537);
+
         // 🔥 claves
         scroll.setFitToWidth(false); // permite scroll horizontal
         scroll.setFitToHeight(false);
@@ -75,8 +75,10 @@ public class GastosIndividualesView extends VBox {
 
         VBox fondo = new VBox();
         fondo.getStyleClass().add("fondo-rojo");
-        fondo.setPadding(new Insets(15));
-        fondo.setSpacing(15);
+        fondo.setPadding(Responsive.insets(15));
+        fondo.setSpacing(Responsive.pe(15));
+        fondo.setFillWidth(true);
+        VBox.setVgrow(fondo, Priority.ALWAYS);
 
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
 
@@ -84,7 +86,7 @@ public class GastosIndividualesView extends VBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label titulo = new Label("Gastos Individuales");
         titulo.getStyleClass().add("subtitulo-mid-blanco");
-        HBox top = new HBox(10, filtroFecha, btnFiltrar,titulo, spacer, btnAgregar);
+        HBox top = new HBox(Responsive.pe(10), filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
 
         fondo.getChildren().addAll(top, scroll, barraBotones);
 
@@ -145,7 +147,7 @@ public class GastosIndividualesView extends VBox {
             }
         });
 
-        return new HBox(10, btnEditar, btnEliminar);
+        return new HBox(Responsive.pe(10), btnEditar, btnEliminar);
     }
 
     private void recargar(LocalDate fechaFiltro) {

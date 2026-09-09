@@ -1,5 +1,7 @@
 package paucar.admin.empleados;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.Empleado;
 
 import javafx.geometry.Insets;
@@ -30,9 +32,9 @@ public class EmpleadosView extends BorderPane {
 
         HBox botones = crearBotones();
 
-        VBox layout = new VBox(20, titulo, panel, botones);
+        VBox layout = new VBox(Responsive.pe(20), titulo, panel, botones);
         layout.getStyleClass().add("fondo-empresasclientes");
-        layout.setPadding(new Insets(20));
+        layout.setPadding(Responsive.insets(20));
 
         setCenter(layout);
     }
@@ -93,7 +95,7 @@ public class EmpleadosView extends BorderPane {
             }
         });
 
-        return new HBox(10, btnCrear, btnEditar, btnEliminar);
+        return new HBox(Responsive.pe(10), btnCrear, btnEditar, btnEliminar);
     }
 
     // ===== CARGAR DATOS =====

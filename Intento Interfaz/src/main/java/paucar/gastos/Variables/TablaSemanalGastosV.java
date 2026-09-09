@@ -1,5 +1,6 @@
 package paucar.gastos.Variables;
 
+
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +14,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 
 public class TablaSemanalGastosV extends VBox {
 
@@ -36,7 +38,7 @@ public class TablaSemanalGastosV extends VBox {
                 });
                 // ✅ PRODUCTO
                 TableColumn<GastosVariables, String> colNombre = new TableColumn<>("Producto");
-                colNombre.setPrefWidth(200);
+                colNombre.setPrefWidth(Responsive.px(200));
                 colNombre.setCellValueFactory(
                                 c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getProducto()));
 
@@ -96,7 +98,7 @@ public class TablaSemanalGastosV extends VBox {
                 tabla.getColumns().add(colCantidad);
                 tabla.getColumns().add(colPrecio);
                 tabla.setItems(FXCollections.observableArrayList(gastos));
-                tabla.setPrefHeight((gastos.size() * 30) + 35);
+                tabla.setPrefHeight(Responsive.pe((gastos.size() * 30) + 35));
                 // ✅ DETECTAR SELECCIÓN EN LA TABLA
                 tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
                         if (newSel != null) {

@@ -1,5 +1,7 @@
 package paucar.resumen.empresas.semanal;
 
+
+import paucar.config.Responsive;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -52,7 +54,7 @@ public class SemanalEmpresas extends BorderPane {
     }
 
     private void initUI() {
-        setPadding(new Insets(10));
+        setPadding(Responsive.insets(10));
 
         CargarComboEmpresas();
         setTop(crearBarraSuperior());
@@ -61,7 +63,7 @@ public class SemanalEmpresas extends BorderPane {
 
     private ScrollPane crearVistaResumenSemanal() {
 
-        VBox contenedor = new VBox(5);/* crea un vertical box y le indica que deje 15 píxeles de
+        VBox contenedor = new VBox(Responsive.pe(5));/* crea un vertical box y le indica que deje 15 píxeles de
                                                espacio entre cada elemento hijo que se agregue dentro*/
 
         tablaSemanal = new TablaSemanal(backend);/*Crea un objeto SemanalTablaEmpresas, le pasa
@@ -117,14 +119,14 @@ public class SemanalEmpresas extends BorderPane {
                                                                 fecha que fue elegida, toma como rango el
                                                                 lunes de esa semana al domingo*/
 
-        HBox barra = new HBox(15, comboEmpresa, rangoSemana);/*Crea una barra horizontal que
+        HBox barra = new HBox(Responsive.pe(15), comboEmpresa, rangoSemana);/*Crea una barra horizontal que
                                                                      contiene el ComboBox para seleccionar
                                                                      la empresa y el rango de fechas que
                                                                      mostrara la tabla de ventas*/
 
         barra.setAlignment(Pos.CENTER_LEFT);/* Alinea los elementos de la barra a la izquierda */
 
-        barra.setPadding(new Insets(0, 0, 10, 0));/*Agrega un espacio de 10
+        barra.setPadding(Responsive.insets(0, 0, 10, 0));/*Agrega un espacio de 10
                                                                           píxeles para separar el HBox de
                                                                           la tabla de ventas*/
 

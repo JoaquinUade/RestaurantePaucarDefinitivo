@@ -1,5 +1,7 @@
 package paucar.resumen.clientes;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -60,8 +62,8 @@ public class MensualClientes extends BorderPane {
         crearColumnas();
 
         javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox(comboCliente);
-        topBar.setPadding(new javafx.geometry.Insets(10));
-        topBar.setSpacing(10);
+        topBar.setPadding(Responsive.insets(10));
+        topBar.setSpacing(Responsive.pe(10));
 
         setTop(topBar);
         setCenter(tabla);
@@ -287,7 +289,7 @@ public class MensualClientes extends BorderPane {
 
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
 
-        grid.setHgap(5);
+        grid.setHgap(Responsive.pe(5));
         grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         for (TableColumn<?, ?> columna : tabla.getColumns()) {

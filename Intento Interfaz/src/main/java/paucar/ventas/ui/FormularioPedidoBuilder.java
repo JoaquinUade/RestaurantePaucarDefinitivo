@@ -1,5 +1,7 @@
 package paucar.ventas.ui;
 
+
+import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.TipoDePago;
 
 import javafx.geometry.Insets;
@@ -33,9 +35,9 @@ public final class FormularioPedidoBuilder {
 
         GridPane grid = new GridPane();
 
-        grid.setHgap(15);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10));
+        grid.setHgap(Responsive.pe(15));
+        grid.setVgap(Responsive.pe(15));
+        grid.setPadding(Responsive.insets(10));
 
         int r = 1;
 
@@ -51,8 +53,7 @@ public final class FormularioPedidoBuilder {
         grid.add(new Label("Productos:"), 0, r);
 
         VBox productosBox
-                = new VBox(
-                        6,
+                = new VBox(Responsive.pe(6),
                         listaProductos,
                         btnAgregarProducto);
 

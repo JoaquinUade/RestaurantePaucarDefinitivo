@@ -1,5 +1,7 @@
 package paucar.pagos.pagosView;
 
+
+import paucar.config.Responsive;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
@@ -39,8 +41,7 @@ public class PagosQuincenalesView extends BorderPane {
         lbl1.setStyle("-fx-text-fill: white;");
         lbl2.setStyle("-fx-text-fill: white;");
 
-        VBox contenido = new VBox(
-                15,
+        VBox contenido = new VBox(Responsive.pe(15),
                 lbl1,
                 tablaQuincena1,
                 lbl2,

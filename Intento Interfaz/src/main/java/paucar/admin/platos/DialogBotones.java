@@ -1,5 +1,7 @@
 package paucar.admin.platos;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 
 import com.uade.tpo.demo.entity.Categoria;
@@ -55,7 +57,7 @@ public class DialogBotones {
                 "SANDWICHES", "ENSALADAS", "FAJITAS", "PASTAS", "VINOS", "DESAYUNO", "GUARNICIONES",
                 "CARNE", "POSTRES");/*agrega las opciones de categoría al combo box */
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(new Label("Contraseña"), txtPass);
         }
@@ -63,7 +65,7 @@ public class DialogBotones {
                 txtPrecio, new Label("Categoría"), cmbCategoria);/*crea un contenedor vertical (VBox) que organiza los elementos del formulario
                             uno debajo del otro, con un espacio de 10 píxeles entre ellos */
 
-        form.setPadding(new Insets(10));/*pone relleno alrededor del dialog */
+        form.setPadding(Responsive.insets(10));/*pone relleno alrededor del dialog */
 
         dialog.getDialogPane().setContent(form);/* Establece el contenido del panel de diálogo */
 
@@ -136,7 +138,7 @@ public class DialogBotones {
                                                               producto para que aparezca seleccionada
                                                               automáticamente cuando se muestra*/
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(new Label("Contraseña"), txtPass);
         }
@@ -144,7 +146,7 @@ public class DialogBotones {
                 txtPrecio, new Label("Categoría"), cmbCategoria);/*Crea un contenedor vertical
                                                                           (VBox) que organiza elementos
                                                                           uno debajo del otro */
-        form.setPadding(new Insets(10));/*Establece relleno a los lados del
+        form.setPadding(Responsive.insets(10));/*Establece relleno a los lados del
                                                              contenedor editar*/
 
         dialog.getDialogPane().setContent(form);/*Establece el contenido de la ventana */
@@ -192,7 +194,7 @@ public class DialogBotones {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -202,7 +204,7 @@ public class DialogBotones {
                     new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
             );
         }
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane().setContent(form);
 

@@ -1,5 +1,7 @@
 package paucar.admin.empleados;
 
+
+import paucar.config.Responsive;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -23,7 +25,7 @@ public class DialogEmpleados {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField();
         txtNombre.setPromptText("Nombre");
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -32,7 +34,7 @@ public class DialogEmpleados {
         form.getChildren().addAll(
                 new Label("Nombre"), txtNombre
         );
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
@@ -59,7 +61,7 @@ public class DialogEmpleados {
         dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -68,7 +70,7 @@ public class DialogEmpleados {
         form.getChildren().addAll(
                 new Label("Nombre"), txtNombre
         );
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
         dialog.setResultConverter(btn -> {
             if (btn == btnGuardar) {
@@ -94,7 +96,7 @@ public class DialogEmpleados {
         ButtonType btnEliminar = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnEliminar, ButtonType.CANCEL);
         PasswordField txtPass = new PasswordField();
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -104,7 +106,7 @@ public class DialogEmpleados {
                     new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación.")
             );
         }
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
         final boolean[] confirmado = {false};
         dialog.setResultConverter(btn -> {

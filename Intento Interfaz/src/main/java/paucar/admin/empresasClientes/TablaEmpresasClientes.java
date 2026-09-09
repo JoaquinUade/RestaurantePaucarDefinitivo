@@ -1,5 +1,7 @@
 package paucar.admin.empresasClientes;
 
+
+import paucar.config.Responsive;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -41,11 +43,11 @@ public class TablaEmpresasClientes extends VBox {
                                                         que recibió */
                     lblNombre.getStyleClass().add("nombre-empresasclientes");
 
-                    HBox top = new HBox(10, lblNombre);/*guarda el nombre en una caja horizontal */
+                    HBox top = new HBox(Responsive.pe(10), lblNombre);/*guarda el nombre en una caja horizontal */
 
-                    VBox card = new VBox(5, top);/*guarda la caja horizontal en una caja vertical
+                    VBox card = new VBox(Responsive.pe(5), top);/*guarda la caja horizontal en una caja vertical
                                                 llamada card */
-                    card.setPadding(new Insets(15));/*le pone un relleno alrededor de 15px */
+                    card.setPadding(Responsive.insets(15));/*le pone un relleno alrededor de 15px */
                     card.getStyleClass().setAll("card");
 
                     setGraphic(card);/*Muestra la tarjeta (diseño personalizado) en la celda */

@@ -1,5 +1,7 @@
 package paucar.ventas;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
@@ -41,8 +43,8 @@ public class Tabla extends VBox {
         this.OnEliminar = onEliminar;
         this.onCambiarEstado = onCambiarEstado;
 
-        setSpacing(8);
-        setPadding(new Insets(0));
+        setSpacing(Responsive.pe(8));
+        setPadding(Responsive.insets(0));
 
         tabla.setEditable(true);
         tabla.setItems(items);
@@ -84,7 +86,7 @@ public class Tabla extends VBox {
                         c.getValue().getCliente().getNombre()
                 ));
 
-        col.setPrefWidth(200);
+        col.setPrefWidth(Responsive.px(200));
 
         return col;
     }
@@ -121,7 +123,7 @@ public class Tabla extends VBox {
             }
         });
         col.setEditable(false);
-        col.setPrefWidth(420);
+        col.setPrefWidth(Responsive.px(420));
         col.setSortable(false);
 
         return col;
@@ -137,7 +139,7 @@ public class Tabla extends VBox {
 
         col.setCellFactory(TextFieldTableCell.forTableColumn());
         col.setEditable(false);
-        col.setPrefWidth(140);
+        col.setPrefWidth(Responsive.px(140));
         col.setSortable(false);
 
         return col;
@@ -197,7 +199,7 @@ public class Tabla extends VBox {
             }
         });
 
-        col.setPrefWidth(180);
+        col.setPrefWidth(Responsive.px(180));
         col.setSortable(false);
 
         return col;
@@ -232,7 +234,7 @@ public class Tabla extends VBox {
                 }
             }
         });
-        col.setPrefWidth(179);
+        col.setPrefWidth(Responsive.px(179));
         col.setSortable(false);
 
         return col;

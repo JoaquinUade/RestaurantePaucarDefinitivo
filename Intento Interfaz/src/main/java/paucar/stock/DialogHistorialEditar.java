@@ -1,5 +1,7 @@
 package paucar.stock;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -59,8 +61,7 @@ public class DialogHistorialEditar {
                                 .stripTrailingZeros()
                                 .toPlainString());
 
-        VBox datosBox = new VBox(
-                10,
+        VBox datosBox = new VBox(Responsive.pe(10),
                 new Label("Fecha"),
                 dateFecha,
                 new Label("Movimiento"),
@@ -99,22 +100,20 @@ public class DialogHistorialEditar {
             }
         }
 
-        VBox historialBox = new VBox(
-                10,
+        VBox historialBox = new VBox(Responsive.pe(10),
                 new Label("Gasto asociado"),
                 tabla
         );
 
-        tabla.setPrefWidth(450);
+        tabla.setPrefWidth(Responsive.px(450));
 
-        HBox form = new HBox(
-                20,
+        HBox form = new HBox(Responsive.pe(20),
                 datosBox,
                 historialBox
         );
 
         form.setPadding(
-                new Insets(15));
+                Responsive.insets(15));
 
         dialog.getDialogPane()
                 .setContent(form);
@@ -178,7 +177,7 @@ public class DialogHistorialEditar {
         PasswordField txtPass
                 = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -189,7 +188,7 @@ public class DialogHistorialEditar {
             );
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
 
         dialog.getDialogPane()
                 .setContent(form);

@@ -16,6 +16,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
@@ -261,7 +262,8 @@ public class TablaHistorialStock extends VBox {
                     }
                 });
         tabla.setPrefHeight(
-                (stocks.size() * 30) + 60);
+        Responsive.py(
+                (stocks.size() * 30) + 60));
 
         long faltantes
                 = stocks.stream()

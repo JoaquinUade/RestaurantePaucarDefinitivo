@@ -1,5 +1,7 @@
 package paucar.admin.categoriasgastos;
 
+
+import paucar.config.Responsive;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -27,7 +29,7 @@ public class DialogCategoriasGastos {
         TextField txtNombre = new TextField();
         txtNombre.setPromptText("Nombre");
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -37,7 +39,7 @@ public class DialogCategoriasGastos {
                 new Label("Nombre"), txtNombre
         );
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -73,7 +75,7 @@ public class DialogCategoriasGastos {
         PasswordField txtPass = new PasswordField();
         TextField txtNombre = new TextField(nombreOriginal);
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -83,7 +85,7 @@ public class DialogCategoriasGastos {
                 new Label("Nombre"), txtNombre
         );
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
 
         dialog.setResultConverter(btn -> {
@@ -118,7 +120,7 @@ public class DialogCategoriasGastos {
 
         PasswordField txtPass = new PasswordField();
 
-        VBox form = new VBox(10);
+        VBox form = new VBox(Responsive.pe(10));
         if (!SesionPassword.estaAutorizado()) {
             form.getChildren().addAll(
                     new Label("Contraseña"), txtPass
@@ -129,7 +131,7 @@ public class DialogCategoriasGastos {
             );
         }
 
-        form.setPadding(new Insets(10));
+        form.setPadding(Responsive.insets(10));
         dialog.getDialogPane().setContent(form);
 
         final boolean[] confirmado = {false};

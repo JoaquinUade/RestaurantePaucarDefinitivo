@@ -1,6 +1,5 @@
 package paucar.admin;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -12,6 +11,7 @@ import paucar.admin.categoriasgastos.CategoriasGastosView;
 import paucar.admin.empleados.EmpleadosView;
 import paucar.admin.empresasClientes.EmpresasClientes;
 import paucar.admin.platos.Platos;
+import paucar.config.Responsive;
 import paucar.resumen.Resumen;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
@@ -25,6 +25,7 @@ public class Admin extends BorderPane {
     private final CategoriasGastosService categoriaService;
     private final EmpleadoService empleadoService;
     private Resumen resumen;
+
     public Admin(AdminService adminService, ClientesService clientesService,
             CategoriasGastosService categoriaService, EmpleadoService empleadoService, Resumen resumen) {
 
@@ -47,34 +48,34 @@ public class Admin extends BorderPane {
         grid.getStyleClass().add("boton");
         grid.setAlignment(Pos.CENTER);/* Centra el contenido del GridPane */
 
-        grid.setPadding(new Insets(40));/* Establece el relleno del GridPane */
-        grid.setHgap(20);
+        grid.setPadding(Responsive.insets(40));/* Establece el relleno del GridPane */
+        grid.setHgap(Responsive.pe(20));
 
         Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
                                                                                        platos*/
         Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/empresas clientes.png");
-        Button btnCategoriasGastos = crearTarjeta("GASTOS VARIABLES", "/img/gastos variables.png");
+        Button btnCategoriasGastos = crearTarjeta(" CATEGORIAS DE\n GASTOS VARIABLES", "/img/gastos variables.png");
         Button btnEmpleados = crearTarjeta("EMPLEADOS", "/img/empleado.png");
-        
-btnPlatos.setOnAction(click -> {
-        marcarActivo(btnPlatos, btnEmpresasClientes, btnCategoriasGastos, btnEmpleados);
-        setCenter(new Platos(adminService));
-    });
 
-    btnEmpresasClientes.setOnAction(click -> {
-        marcarActivo(btnEmpresasClientes, btnPlatos, btnCategoriasGastos, btnEmpleados);
-        setCenter(new EmpresasClientes(clientesService, resumen));
-    });
+        btnPlatos.setOnAction(click -> {
+            marcarActivo(btnPlatos, btnEmpresasClientes, btnCategoriasGastos, btnEmpleados);
+            setCenter(new Platos(adminService));
+        });
 
-    btnCategoriasGastos.setOnAction(click -> {
-        marcarActivo(btnCategoriasGastos, btnPlatos, btnEmpresasClientes, btnEmpleados);
-        setCenter(new CategoriasGastosView(categoriaService));
-    });
+        btnEmpresasClientes.setOnAction(click -> {
+            marcarActivo(btnEmpresasClientes, btnPlatos, btnCategoriasGastos, btnEmpleados);
+            setCenter(new EmpresasClientes(clientesService, resumen));
+        });
 
-    btnEmpleados.setOnAction(click -> {
-        marcarActivo(btnEmpleados, btnPlatos, btnEmpresasClientes, btnCategoriasGastos);
-        setCenter(new EmpleadosView(empleadoService));
-    });
+        btnCategoriasGastos.setOnAction(click -> {
+            marcarActivo(btnCategoriasGastos, btnPlatos, btnEmpresasClientes, btnEmpleados);
+            setCenter(new CategoriasGastosView(categoriaService));
+        });
+
+        btnEmpleados.setOnAction(click -> {
+            marcarActivo(btnEmpleados, btnPlatos, btnEmpresasClientes, btnCategoriasGastos);
+            setCenter(new EmpleadosView(empleadoService));
+        });
 
         grid.add(btnPlatos, 0, 0);
         grid.add(btnEmpresasClientes, 1, 0);
@@ -88,8 +89,8 @@ btnPlatos.setOnAction(click -> {
 
         ImageView icono = new ImageView(img);/* Crea un ImageView para mostrar el icono */
 
-        icono.setFitWidth(90);/* Establece el ancho fit del icono */
-        icono.setFitHeight(90);/* Establece el alto fit del icono */
+        icono.setFitWidth(Responsive.px(90));/* Establece el ancho fit del icono */
+        icono.setFitHeight(Responsive.py(90));/* Establece el alto fit del icono */
 
         icono.setPreserveRatio(true);/*Mantiene la proporción de la imagen evitando que
                                             se deforme*/

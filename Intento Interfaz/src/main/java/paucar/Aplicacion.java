@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import paucar.admin.Admin;
 import paucar.componentes.MenuLateral;
 import paucar.config.CssLoader;
+import paucar.config.Responsive;
 import paucar.config.ServiceContainer;
 import paucar.gastos.Gastos;
 import paucar.pagos.PagosView;
@@ -42,9 +43,15 @@ public class Aplicacion extends Application {
     @Override
     public void start(Stage stage) {
 
+        // Mide la pantalla actual y calcula las escalas de la UI.
+        Responsive.inicializar();
+
         BorderPane root = new BorderPane();
 
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(
+                root,
+                Responsive.px(1000),
+                Responsive.py(700));
 
         CssLoader.cargar(scene);
 
@@ -64,22 +71,22 @@ public class Aplicacion extends Application {
         MenuLateral menu
                 = new MenuLateral();
 
-        VBox contenido = new VBox(30);
+        VBox contenido = new VBox(Responsive.pe(30));
         contenido.getStyleClass().add("content");
         contenido.setAlignment(Pos.TOP_CENTER);
 
         Label titulo = new Label("Alertas de Stock");
         titulo.getStyleClass().add("titulo-welcome");
 
-        VBox lineas = new VBox(20);
+        VBox lineas = new VBox(Responsive.pe(20));
 
         for (int i = 0; i < 4; i++) {
 
             Region linea = new Region();
 
             linea.getStyleClass().add("line");
-            linea.setPrefHeight(50);
-            linea.setMaxWidth(600);
+            linea.setPrefHeight(Responsive.py(50));
+            linea.setMaxWidth(Responsive.px(600));
 
             // lineas.getChildren().add(linea);
         }

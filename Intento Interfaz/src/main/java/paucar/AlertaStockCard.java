@@ -1,5 +1,7 @@
 package paucar;
 
+
+import paucar.config.Responsive;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -11,8 +13,8 @@ public class AlertaStockCard extends VBox {
             String cantidad,
             String stockMinimo) {
 
-        setSpacing(10);
-        setPadding(new Insets(18));
+        setSpacing(Responsive.pe(10));
+        setPadding(Responsive.insets(18));
 
         setStyle("""
             -fx-background-color: linear-gradient(to bottom, #FFF8E1, #FFE082);

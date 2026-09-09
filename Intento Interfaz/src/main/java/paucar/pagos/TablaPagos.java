@@ -13,6 +13,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.PagosService;
 import paucar.shared.MonedaUtils;
 
@@ -285,9 +286,9 @@ public class TablaPagos extends VBox {
         double alturaFila = 28;
 
         tabla.setPrefHeight(
-                alturaCabecera
-                + (filas * alturaFila)
-                + 55);
+        Responsive.pe(alturaCabecera)
+        + (filas * Responsive.pe(alturaFila))
+        + Responsive.pe(55));
     }
 
     public PagoEmpresa getSeleccionado() {

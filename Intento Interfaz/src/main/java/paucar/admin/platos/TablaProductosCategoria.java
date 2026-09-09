@@ -1,4 +1,6 @@
 package paucar.admin.platos;
+
+import paucar.config.Responsive;
 import javafx.scene.control.Label;
 import com.uade.tpo.demo.entity.Categoria;
 import com.uade.tpo.demo.entity.Producto;
@@ -29,9 +31,9 @@ public class TablaProductosCategoria {
 
         lblTitulo.setAlignment(Pos.CENTER);/*lo pongo centrado */
 
-        VBox listaProductos = new VBox(4);/*creo una caja vertical y la llamo lista de producto
+        VBox listaProductos = new VBox(Responsive.pe(4));/*creo una caja vertical y la llamo lista de producto
                                                    con 4px de espaciado*/
-        listaProductos.setPadding(new Insets(5));/*le da un padding alrededor de 5px */
+        listaProductos.setPadding(Responsive.insets(5));/*le da un padding alrededor de 5px */
 
         productos.stream().filter(p -> p.getCategoria() == categoria)
                 .forEach(p -> {/*Toma la lista de productos, filtra los que pertenecen a una categoría
@@ -46,12 +48,12 @@ public class TablaProductosCategoria {
                                                            visible en pantalla*/
                 });
 
-        VBox contenedor = new VBox(8, lblTitulo, listaProductos);/*crea un vbox que muestra la
+        VBox contenedor = new VBox(Responsive.pe(8), lblTitulo, listaProductos);/*crea un vbox que muestra la
                                                                          listaproductos visible con su
                                                                          titulo, teniendo un espaciado
                                                                          entre ellos de 8px */
 
-        contenedor.setPadding(new Insets(10));/*añade relleno de 10px alrededor del
+        contenedor.setPadding(Responsive.insets(10));/*añade relleno de 10px alrededor del
                                                                  vbox*/
         contenedor.setMaxWidth(Double.MAX_VALUE);/*Permite que el contenedor se estire al máximo ancho
                                                   disponible */
@@ -76,8 +78,8 @@ public class TablaProductosCategoria {
                                                  verticalmente */
 
         GridPane fila = new GridPane();/*crea un gridpane llamado fila */
-        fila.setHgap(0);/*define una distancia de 10px entre los elementos del gridpane */
-        fila.setPadding(new Insets(4, 2, 4, 2));
+        fila.setHgap(Responsive.pe(0));/*define una distancia de 10px entre los elementos del gridpane */
+        fila.setPadding(Responsive.insets(4, 2, 4, 2));
 
         ColumnConstraints colNombre = new ColumnConstraints();/*Configura la columna del nombre del producto */
 
@@ -86,7 +88,7 @@ public class TablaProductosCategoria {
 
         ColumnConstraints colPrecio = new ColumnConstraints();/*configura la columna del precio */
 
-        colPrecio.setMinWidth(90);/*evita que la columna del precio se haga más chica que 90 píxeles*/
+        colPrecio.setMinWidth(Responsive.px(90));/*evita que la columna del precio se haga más chica que 90 píxeles*/
 
         colPrecio.setHgrow(Priority.NEVER);/*La columna mantiene su tamaño fijo y no crece */
 

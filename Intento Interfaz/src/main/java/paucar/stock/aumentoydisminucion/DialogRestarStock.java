@@ -1,5 +1,7 @@
 package paucar.stock.aumentoydisminucion;
 
+
+import paucar.config.Responsive;
 import java.math.BigDecimal;
 
 import javafx.scene.control.Alert;
@@ -46,8 +48,7 @@ public class DialogRestarStock {
                 "Cantidad consumida");
 
         dialog.getDialogPane().setContent(
-                new VBox(
-                        10,
+                new VBox(Responsive.pe(10),
                         lblProducto,
                         lblStock,
                         new Label("Cantidad a descontar"),

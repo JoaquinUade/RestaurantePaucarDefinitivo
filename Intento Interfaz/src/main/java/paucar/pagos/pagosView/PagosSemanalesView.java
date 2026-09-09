@@ -1,5 +1,7 @@
 package paucar.pagos.pagosView;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -55,8 +57,7 @@ public class PagosSemanalesView extends BorderPane {
         lbl2.setStyle("-fx-text-fill: white;");
         lbl3.setStyle("-fx-text-fill: white;");
         lbl4.setStyle("-fx-text-fill: white;");
-        VBox contenido = new VBox(
-                15,
+        VBox contenido = new VBox(Responsive.pe(15),
                 lbl1,
                 tablaSemana1,
                 lbl2,

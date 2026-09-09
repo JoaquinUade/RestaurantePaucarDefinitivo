@@ -9,7 +9,6 @@ import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 import com.uade.tpo.demo.entity.GastoVariableRequest;
 import com.uade.tpo.demo.entity.GastosVariables;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -18,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 
@@ -28,7 +28,7 @@ public class GastosVariablesView extends VBox {
     private GastosVariables gastoSeleccionado;
     private DatePicker filtroFecha;
 
-    private final HBox contenedorCategorias = new HBox(20);
+    private final HBox contenedorCategorias = new HBox(Responsive.pe(20));
 
     public GastosVariablesView(GastosVariablesService service, CategoriasGastosService catService) {
         this.service = service;
@@ -61,13 +61,12 @@ public class GastosVariablesView extends VBox {
         });
 
         HBox barraBotones = crearBarraBotones();
-        barraBotones.setPadding(new Insets(0));
-        contenedorCategorias.setPadding(new Insets(15));
+        barraBotones.setPadding(Responsive.insets(0));
+        contenedorCategorias.setPadding(Responsive.insets(15));
 
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
         scroll.getStyleClass().add("scroll-pane");
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMinHeight(537);
         // 🔥 claves
         scroll.setFitToWidth(false); // permite scroll horizontal
         scroll.setFitToHeight(false);
@@ -75,8 +74,14 @@ public class GastosVariablesView extends VBox {
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // horizontal
         VBox fondo = new VBox();
         fondo.getStyleClass().add("fondo-rojo");
-        fondo.setPadding(new Insets(15));
-        fondo.setSpacing(15);
+        fondo.setPadding(Responsive.insets(15));
+        fondo.setSpacing(Responsive.pe(15));
+        fondo.setFillWidth(true);
+
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        scroll.setMaxHeight(Double.MAX_VALUE);
+
+        VBox.setVgrow(fondo, Priority.ALWAYS);
 
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
 
@@ -84,7 +89,7 @@ public class GastosVariablesView extends VBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label titulo = new Label("Gastos Variables");
         titulo.getStyleClass().add("subtitulo-mid-blanco");
-        HBox filaSuperior = new HBox(10, filtroFecha, btnFiltrar,titulo, spacer, btnAgregar);
+        HBox filaSuperior = new HBox(Responsive.pe(10), filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
 
         fondo.getChildren().addAll(filaSuperior, scroll, barraBotones);
 
@@ -141,7 +146,7 @@ public class GastosVariablesView extends VBox {
             }
         });
 
-        return new HBox(10, btnEditar, btnEliminar);
+        return new HBox(Responsive.pe(10), btnEditar, btnEliminar);
     }
 
     private void recargar(LocalDate fechaFiltro) {

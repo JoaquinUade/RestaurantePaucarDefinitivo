@@ -1,5 +1,7 @@
 package paucar.resumen.clientes.semanal;
 
+
+import paucar.config.Responsive;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,14 +52,14 @@ public class SemanalClientes extends BorderPane {
     }
 
     private void initUI() {
-        setPadding(new Insets(10));/*relleno de 10px*/
+        setPadding(Responsive.insets(10));/*relleno de 10px*/
         cargarComboClientes();
         setTop(crearBarraSuperior());
         setCenter(crearVistaResumenSemanal());
     }
 
     private VBox crearVistaResumenSemanal() {
-        VBox contenedor = new VBox(5);/*crea una caja vertical llamada contenedor */
+        VBox contenedor = new VBox(Responsive.pe(5));/*crea una caja vertical llamada contenedor */
 
         tablaSemanal = new TablaSemanalCliente(backend);
         tablaDebe = new TablaSemanalDebeCliente(backend);
@@ -94,9 +96,9 @@ public class SemanalClientes extends BorderPane {
         Label rangoSemana = new Label("Semana: " + inicioSemana + " a " + finSemana);/*formatea el rango
                                                                                      que abarca esa semana */
 
-        HBox barra = new HBox(15, comboCliente, rangoSemana);/*mete en la caja horizontal */
+        HBox barra = new HBox(Responsive.pe(15), comboCliente, rangoSemana);/*mete en la caja horizontal */
         barra.setAlignment(Pos.CENTER_LEFT);
-        barra.setPadding(new Insets(0, 0, 10, 0));
+        barra.setPadding(Responsive.insets(0, 0, 10, 0));
 
         return barra;
     }

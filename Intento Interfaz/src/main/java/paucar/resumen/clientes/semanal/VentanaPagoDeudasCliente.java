@@ -1,5 +1,7 @@
 package paucar.resumen.clientes.semanal;
 
+
+import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -44,10 +46,10 @@ public class VentanaPagoDeudasCliente {
         Stage ventana = new Stage();/*crea ventana emergente */
         ventana.setTitle("Pagar Deudas");
 
-        VBox layout = new VBox(10);/*crea una caja vertical con espaciado de 10px entre
+        VBox layout = new VBox(Responsive.pe(10));/*crea una caja vertical con espaciado de 10px entre
                                            objetos visuales*/
 
-        layout.setPadding(new Insets(15));/*le agrega relleno de 15px alrededor */
+        layout.setPadding(Responsive.insets(15));/*le agrega relleno de 15px alrededor */
 
         Label lblPass = new Label("Contraseña:");
         PasswordField txtPass = new PasswordField();/*Campo de texto para ingresar contraseña*/
@@ -220,7 +222,8 @@ public class VentanaPagoDeudasCliente {
         layout.getChildren().addAll(tablaDeudas, btnConfirmar);/*añade a la caja vertical
                                                                                  todos los elementos*/
 
-        Scene scene = new Scene(layout, 600, 400);/*le mete a la escena el contenido de vbox
+        Scene scene = new Scene(layout,
+                Responsive.px(600), Responsive.py(400));/*le mete a la escena el contenido de vbox
                                                                  y le da tamaño*/
 
         ventana.setScene(scene);/*a la ventana le pasa la escena*/
