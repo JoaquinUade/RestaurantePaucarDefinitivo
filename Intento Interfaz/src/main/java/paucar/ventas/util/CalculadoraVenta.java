@@ -20,35 +20,49 @@ public final class CalculadoraVenta {
         for (Node n : contLineas.getChildren()) {
 
             if (n instanceof HBox fila) {
-
+                System.out.println(
+                        "Cantidad de hijos de la fila: "
+                        + fila.getChildren().size()
+                );
+                for (Node hijo : fila.getChildren()) {
+                    System.out.println(
+                            hijo.getClass().getName()
+                    );
+                }
                 @SuppressWarnings("unchecked")
                 ComboBox<ProductosService.ProductoItem> cbProd
-                        = (ComboBox<ProductosService.ProductoItem>)
-                        fila.getChildren().get(0);
+                        = (ComboBox<ProductosService.ProductoItem>) fila.getChildren().get(0);
 
                 TextField tfCant
-                        = (TextField)
-                        fila.getChildren().get(1);
+                        = (TextField) fila.getChildren().get(1);
 
                 if (cbProd.getValue() != null
                         && !tfCant.getText().isBlank()) {
 
                     try {
 
-                        int cantidad =
-                                Integer.parseInt(
+                        int cantidad
+                                = Integer.parseInt(
                                         tfCant.getText());
 
-                        total +=
-                                cbProd.getValue().precio()
+                        double subtotal
+                                = cbProd.getValue().precio()
                                 * cantidad;
+
+                        System.out.println("-----------");
+                        System.out.println("Producto: " + cbProd.getValue());
+                        System.out.println("Cantidad: " + cantidad);
+                        System.out.println("Subtotal: " + subtotal);
+
+                        total += subtotal;
 
                     } catch (Exception ex) {
                     }
                 }
             }
         }
-
+        System.out.println(
+                "Total calculado = " + total);
         return total;
     }
 }

@@ -15,9 +15,9 @@ public final class ProductoLinea {
     }
 
     public static HBox crear(
-        VBox contLineas,
-        ObservableList<ProductosService.ProductoItem> productos) {
-
+            VBox contLineas,
+            ObservableList<ProductosService.ProductoItem> productos,
+            Runnable recalcular) {
         ComboBox<ProductosService.ProductoItem> cbProd = new ComboBox<>();
 
         cbProd.getStyleClass().add("combo-agregar");
@@ -25,6 +25,8 @@ public final class ProductoLinea {
         cbProd.setPrefWidth(280);
         cbProd.setPromptText("Producto");
         cbProd.setEditable(true);
+        cbProd.valueProperty().addListener((obs, oldV, newV)
+                -> recalcular.run());
 
         ProductoAutoCompletar.configurar(
                 cbProd,
@@ -36,12 +38,13 @@ public final class ProductoLinea {
 
         tfCant.textProperty().addListener((o, a, b) -> {
 
-    if (b != null && !b.matches("\\d*")) {
-        tfCant.setText(
-                b.replaceAll("[^\\d]", ""));
-    }
+            if (b != null && !b.matches("\\d*")) {
+                tfCant.setText(
+                        b.replaceAll("[^\\d]", ""));
+            }
 
-});
+            recalcular.run();
+        });
 
         Button btnDelete = new Button("✕");
 

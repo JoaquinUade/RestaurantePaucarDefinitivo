@@ -13,29 +13,39 @@ public class PanelProductos {
     private final Label lblTotal;
     private final Label lblRestante;
     private final Button btnAgregarLinea;
+    private Runnable recalcular;
 
     public PanelProductos(
-            ObservableList<ProductosService.ProductoItem> productos) {
+            ObservableList<ProductosService.ProductoItem> productos,
+            Runnable recalcular) {
 
-        contLineas = new VBox(6);
-        contLineas.setPadding(new Insets(6));
+    this.recalcular = recalcular;
+    
+    contLineas  = new VBox(6);
 
-        lblTotal = new Label("Total: $0");
-        lblRestante = new Label("Restan pagar: $0");
+    contLineas.setPadding (
+    new Insets(6));
 
-        btnAgregarLinea = new Button("+ Producto");
-        btnAgregarLinea.getStyleClass().add("btn-primary");
+        lblTotal  = new Label("Total: $0");
+    lblRestante  = new Label("Restan pagar: $0");
 
-        btnAgregarLinea.setOnAction(e ->
-                contLineas.getChildren().add(
+    btnAgregarLinea  = new Button("+ Producto");
+
+    btnAgregarLinea.getStyleClass ()
+         .add("btn-primary");
+
+        btnAgregarLinea.setOnAction(e
+                -> contLineas.getChildren().add(
                         ProductoLinea.crear(
                                 contLineas,
-                                productos)));
+                                productos,
+                                this.recalcular)));
 
         contLineas.getChildren().add(
                 ProductoLinea.crear(
                         contLineas,
-                        productos));
+                        productos,
+                        this.recalcular));
     }
 
     public VBox getContLineas() {
@@ -52,5 +62,9 @@ public class PanelProductos {
 
     public Button getBtnAgregarLinea() {
         return btnAgregarLinea;
+    }
+
+    public void setRecalcular(Runnable recalcular) {
+        this.recalcular = recalcular;
     }
 }

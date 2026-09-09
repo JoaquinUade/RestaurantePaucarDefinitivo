@@ -195,7 +195,15 @@ public class Aplicacion extends Application {
                     menu.getBtnPagos(),
                     menu.getBtnAdmin());
 
-            root.setCenter(vistaGastos);
+            root.setCenter(
+    new Gastos(
+        services.gastosVariables,
+        services.categorias,
+        services.gastosIndividuales,
+        services.empleados,
+        services.gastosFijos
+    )
+);
         });
 
         menu.getBtnStock().setOnAction(e -> {

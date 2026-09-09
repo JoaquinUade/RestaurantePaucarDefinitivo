@@ -99,9 +99,12 @@ public class AgregarDialogBuilder {
                 clientesFiltrados,
                 cbCliente);
 
+                
         // --- 5) Productos (líneas dinámicas) ---
-        PanelProductos panelProductos
-                = new PanelProductos(productos);
+        PanelProductos panelProductos =
+        new PanelProductos(
+                productos,
+                () -> {});
 
         VBox contLineas
                 = panelProductos.getContLineas();
@@ -114,10 +117,7 @@ public class AgregarDialogBuilder {
 
         Button btnAgregarLinea
                 = panelProductos.getBtnAgregarLinea();
-        contLineas.getChildren().add(
-                ProductoLinea.crear(
-                        contLineas,
-                        productos));
+        
         DatePicker dpFecha = FormularioFactory.crearSelectorFecha();
         dpFecha.getStyleClass().add("date-agregar");
         // --- 6) Estado y observaciones ---
@@ -152,6 +152,24 @@ public class AgregarDialogBuilder {
         VBox contPagadores
                 = PanelPagadores.crearContenedor();
 
+panelProductos.setRecalcular(
+        () -> VentaTotalManager.actualizarTotales(
+                contLineas,
+                contPagadores,
+                lblTotal,
+                lblRestante));
+contLineas.getChildren().clear();
+
+contLineas.getChildren().add(
+        ProductoLinea.crear(
+                contLineas,
+                productos,
+                () -> VentaTotalManager.actualizarTotales(
+                        contLineas,
+                        contPagadores,
+                        lblTotal,
+                        lblRestante)));
+                        
         TextField tfCantidadPagadores
                 = PanelPagadores.crearCantidadPagadores(
                         contPagadores,
@@ -178,23 +196,9 @@ public class AgregarDialogBuilder {
                 tfConsumidor
         );
         // --- 8) Validación del botón OK ---
-        HBox fila0 = (HBox) contLineas.getChildren().get(0);
-        @SuppressWarnings("unchecked")
-        ComboBox<ProductosService.ProductoItem> cbProd0 = (ComboBox<ProductosService.ProductoItem>) fila0.getChildren().get(0);
-        TextField tfCant0 = (TextField) fila0.getChildren().get(1);
-        cbProd0.valueProperty().addListener((obs, oldValue, newValue)
-                -> VentaTotalManager.actualizarTotales(
-                        contLineas,
-                        contPagadores,
-                        lblTotal,
-                        lblRestante));
+        
+//aca borre lo que dijo la ia
 
-        tfCant0.textProperty().addListener((obs, oldValue, newValue)
-                -> VentaTotalManager.actualizarTotales(
-                        contLineas,
-                        contPagadores,
-                        lblTotal,
-                        lblRestante));
         Node okBtn = dialog.getDialogPane().lookupButton(okType);
         okBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(
@@ -243,8 +247,6 @@ public class AgregarDialogBuilder {
                         },
                         cbCliente.getEditor().textProperty(),
                         contLineas.getChildren(),
-                        cbProd0.valueProperty(),
-                        tfCant0.textProperty(),
                         tgTipoCliente.selectedToggleProperty()
                 )
         );
