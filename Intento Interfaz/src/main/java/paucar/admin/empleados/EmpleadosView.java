@@ -27,6 +27,7 @@ public class EmpleadosView extends BorderPane {
         titulo.getStyleClass().add("administracion-de-empresasclientes");
         panel = new TablaEmpleados("Empleados");
         lista = panel.getLista();
+        lista.setPlaceholder(new Label("No hay empleados ingresados para mostrar."));
 
         cargarDatos();
 

@@ -74,6 +74,10 @@ public class VentanaPagoDeudas {
         TableView<Venta> tablaSemana2 = new TableView<>();
         TableView<Venta> tablaSemana3 = new TableView<>();
         TableView<Venta> tablaSemana4 = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana1);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana2);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana3);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana4);
 
         tablaSemana1.getColumns().add(crearColumnaCheck());
         tablaSemana2.getColumns().add(crearColumnaCheck());

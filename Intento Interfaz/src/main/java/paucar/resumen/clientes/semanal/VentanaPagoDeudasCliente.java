@@ -54,6 +54,7 @@ public class VentanaPagoDeudasCliente {
         PasswordField txtPass = new PasswordField();/*Campo de texto para ingresar contraseña*/
 
         TableView<Venta> tablaDeudas = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaDeudas);
 
         TableColumn<Venta, Boolean> colCheck = new TableColumn<>("Seleccionar");
         colCheck.setSortable(false);

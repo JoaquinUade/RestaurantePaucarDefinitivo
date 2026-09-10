@@ -34,6 +34,8 @@ public class StockView extends BorderPane {
     private Stock stockSeleccionado;
     private final GastosVariablesService gastosVariablesService;
     private final HBox contenedorCategorias = new HBox(Responsive.pe(20));
+    private final Label mensajeSinDatos = new Label(
+            "No hay stocks ingresados para mostrar en este período.");
     private DatePicker filtroFecha;
     private Label lblFecha = new Label();
     private final Consumer<Stock> onSelect;
@@ -133,6 +135,7 @@ public class StockView extends BorderPane {
         Region spacerBottom = new Region();
         HBox.setHgrow(spacerBottom, Priority.ALWAYS);
         contenedorCategorias.setPadding(Responsive.insets(15));
+        mensajeSinDatos.setStyle("-fx-font-size: 16px; -fx-text-fill: #6b7280;");
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
         scroll.getStyleClass().add("scroll-pane");
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -172,6 +175,11 @@ public class StockView extends BorderPane {
                 && s.getFecha().getMonth() == fechaSeleccionada.getMonth()
                 && s.getFecha().getYear() == fechaSeleccionada.getYear())
                 .toList();
+
+        if (stocks.isEmpty()) {
+            contenedorCategorias.getChildren().add(mensajeSinDatos);
+            return;
+        }
 
         for (Stock s : stocks) {
             System.out.println(

@@ -20,6 +20,7 @@ public class TablaSemanalIndividual extends VBox {
     public TablaSemanalIndividual(List<GastosIndividuales> gastos, Consumer<GastosIndividuales> onSelect) {
 
         TableView<GastosIndividuales> tabla = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         Locale localeAR = Locale.forLanguageTag("es-AR");
         // ✅ FECHA (día/mes)

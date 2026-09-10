@@ -43,6 +43,10 @@ public class TablaSemanalDebe {
         tablaSemana2 = new TableView<>();
         tablaSemana3 = new TableView<>();
         tablaSemana4 = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana1);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana2);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana3);
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaSemana4);
 
         contenedor = new VBox(Responsive.pe(10));
 
@@ -273,6 +277,7 @@ ajustarAltura(tablaSemana4);
     public void mostrarVentanaPago() {
 
         TableView<Venta> tablaCompleta = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tablaCompleta);
 
         tablaCompleta.getItems().addAll(tablaSemana1.getItems());
         tablaCompleta.getItems().addAll(tablaSemana2.getItems());

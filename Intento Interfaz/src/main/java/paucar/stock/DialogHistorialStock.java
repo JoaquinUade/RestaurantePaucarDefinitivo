@@ -93,6 +93,7 @@ public class DialogHistorialStock {
 
         TableView<HistorialStock> tabla
                 = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
 
         TableColumn<HistorialStock, String> colFecha
                 = new TableColumn<>("Fecha");

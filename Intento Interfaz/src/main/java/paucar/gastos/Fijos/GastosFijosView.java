@@ -26,6 +26,8 @@ public class GastosFijosView extends VBox {
     private final GastosFijosService service;
     private final EmpleadoService empleadoService;
     private final VBox contenedor = new VBox(Responsive.pe(15));
+    private final Label mensajeSinDatos = new Label(
+            "No hay gastos fijos ingresados para mostrar en este período.");
     private final DatePicker filtroFecha;
     private GastosFijos gastoSeleccionado;
 
@@ -115,13 +117,16 @@ public class GastosFijosView extends VBox {
 
         // ✅ CONTENEDOR
         contenedor.setPadding(Responsive.insets(15));
+        mensajeSinDatos.setStyle("-fx-font-size: 16px; -fx-text-fill: #6b7280;");
         ScrollPane scroll = new ScrollPane(contenedor);
         scroll.setFitToWidth(true);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
 
         // ✅ FONDO (igual que tu otra vista)
         VBox fondo = new VBox(Responsive.pe(15));
         fondo.getStyleClass().add("fondo-rojo");
         fondo.setPadding(Responsive.insets(15));
+        VBox.setVgrow(fondo, Priority.ALWAYS);
 
         fondo.getChildren().addAll(filaSuperior, scroll, barraBotones);
 
@@ -145,6 +150,10 @@ public class GastosFijosView extends VBox {
                     && g.getFecha().getYear() == fechaFiltro.getYear()
                     )
                     .toList();
+        }
+        if (gastos.isEmpty()) {
+            contenedor.getChildren().add(mensajeSinDatos);
+            return;
         }
 // ✅ separar listas
         List<GastosFijos> personales = gastos.stream()

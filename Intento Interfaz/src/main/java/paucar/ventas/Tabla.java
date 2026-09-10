@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
@@ -90,7 +91,8 @@ public class Tabla extends VBox {
         });
 
         VBox.setVgrow(tabla, Priority.ALWAYS);
-        getChildren().addAll(tabla, btnEditar, btnEliminar);
+        HBox barraBotones = new HBox(Responsive.pe(8), btnEditar, btnEliminar);
+        getChildren().addAll(tabla, barraBotones);
     }
 
     private List<TableColumn<Venta, ?>> crearColumnas() {

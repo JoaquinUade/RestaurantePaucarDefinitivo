@@ -29,6 +29,8 @@ public class GastosVariablesView extends VBox {
     private DatePicker filtroFecha;
 
     private final HBox contenedorCategorias = new HBox(Responsive.pe(20));
+    private final Label mensajeSinDatos = new Label(
+            "No hay gastos variables ingresados para mostrar en este período.");
 
     public GastosVariablesView(GastosVariablesService service, CategoriasGastosService catService) {
         this.service = service;
@@ -63,6 +65,7 @@ public class GastosVariablesView extends VBox {
         HBox barraBotones = crearBarraBotones();
         barraBotones.setPadding(Responsive.insets(0));
         contenedorCategorias.setPadding(Responsive.insets(15));
+        mensajeSinDatos.setStyle("-fx-font-size: 16px; -fx-text-fill: #6b7280;");
 
         ScrollPane scroll = new ScrollPane(contenedorCategorias);
         scroll.getStyleClass().add("scroll-pane");
@@ -160,6 +163,11 @@ public class GastosVariablesView extends VBox {
                     .filter(g -> g.getFecha().getMonth() == fechaFiltro.getMonth()
                     && g.getFecha().getYear() == fechaFiltro.getYear())
                     .toList();
+        }
+
+        if (gastos.isEmpty()) {
+            contenedorCategorias.getChildren().add(mensajeSinDatos);
+            return;
         }
 
         Map<String, List<GastosVariables>> porCategoria = gastos.stream()

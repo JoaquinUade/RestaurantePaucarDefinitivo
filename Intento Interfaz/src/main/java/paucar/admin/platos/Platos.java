@@ -161,6 +161,14 @@ public class Platos extends BorderPane {
     private void construirCategorias() {
         gridCategorias.getChildren().clear();/*Borra todos los nodos del GridPane para volver a cargarlos */
 
+        var productos = adminService.obtenerProductosAdmin();
+        if (productos.isEmpty()) {
+            Label mensaje = new Label("No hay platos ingresados para mostrar.");
+            mensaje.setStyle("-fx-font-size: 16px; -fx-text-fill: #6b7280;");
+            gridCategorias.add(mensaje, 0, 0, 3, 1);
+            return;
+        }
+
         Categoria[] categorias = Categoria.values();/*obtiene todas las categorías del enum 
                                                     automáticamente y lo guarda en la variable categorias*/
 
@@ -179,7 +187,7 @@ public class Platos extends BorderPane {
                                     la siguiente fila (0,0,0,1,1,1,...)*/
 
             gridCategorias.add(TablaProductosCategoria.crearTablaPorCategoria(categorias[i]
-                .getDescripcion(),categorias[i], adminService.obtenerProductosAdmin(),
+                .getDescripcion(),categorias[i], productos,
                 (filaNodo, producto) -> {
 
             if (filaSeleccionada != null) {

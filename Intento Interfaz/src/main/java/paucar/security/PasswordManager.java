@@ -11,7 +11,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 public final class PasswordManager {
 
     private static final String CLAVE_HASH = "admin.password.hash";
-    private static final String PIN_RECUPERACION = "1234";
     private static final int MAX_INTENTOS_PIN = 5;
     private static final long BLOQUEO_PIN_MS = 5 * 60 * 1000L;
 
@@ -21,6 +20,7 @@ public final class PasswordManager {
             .directory("../../")
             .ignoreIfMissing()
             .load();
+    private static final String PIN_RECUPERACION = DOTENV.get("RECOVERY_PIN");
 
     private static int intentosPinFallidos;
     private static long pinBloqueadoHasta;
@@ -60,6 +60,10 @@ public final class PasswordManager {
     /** Restablece con el PIN y bloquea el PIN tras cinco fallos por 5 minutos. */
     public static synchronized String restablecerConPin(String pin,
             String nueva, String confirmacion) {
+        if (PIN_RECUPERACION == null || PIN_RECUPERACION.isBlank()) {
+            return "No está configurado el PIN de recuperación.";
+        }
+
         long ahora = System.currentTimeMillis();
         if (ahora < pinBloqueadoHasta) {
             long minutos = Math.max(1,
@@ -112,7 +116,8 @@ public final class PasswordManager {
     }
 
     private static boolean coincidePin(String pin) {
-        return pin != null && MessageDigest.isEqual(
+        return pin != null && PIN_RECUPERACION != null
+                && MessageDigest.isEqual(
                 pin.getBytes(StandardCharsets.UTF_8),
                 PIN_RECUPERACION.getBytes(StandardCharsets.UTF_8));
     }

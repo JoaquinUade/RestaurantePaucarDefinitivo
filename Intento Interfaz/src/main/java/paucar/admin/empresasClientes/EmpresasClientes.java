@@ -50,6 +50,8 @@ private final Resumen resumen;
         listaClientes = panelClientes.getLista();/*Obtené la lista interna del panel de clientes y
                                                   guardala en listaClientes para poder llenarla */
         listaEmpresas = panelEmpresas.getLista();
+        listaClientes.setPlaceholder(new Label("No hay clientes ingresados para mostrar."));
+        listaEmpresas.setPlaceholder(new Label("No hay empresas ingresadas para mostrar."));
 
         cargarDatos();/*Traé los clientes y empresas desde el servicio y mostralos en las listas */
 

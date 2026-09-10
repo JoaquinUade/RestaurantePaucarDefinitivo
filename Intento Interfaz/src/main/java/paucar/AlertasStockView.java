@@ -8,6 +8,7 @@ import java.util.List;
 import com.uade.tpo.demo.entity.Stock;
 
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import paucar.service.StockService;
@@ -39,6 +40,14 @@ public class AlertasStockView extends ScrollPane {
 
         List<Stock> alertas
                 = stockService.obtenerFaltantes();
+
+        if (alertas.isEmpty()) {
+            Label mensajeSinAlertas = new Label(
+                    "Aún no hay alertas: todos los productos tienen stock suficiente.");
+            mensajeSinAlertas.setStyle("-fx-font-size: 16px; -fx-text-fill: #cbd5e1;");
+            contenedor.getChildren().add(mensajeSinAlertas);
+            return;
+        }
 
         for (Stock stock : alertas) {
 

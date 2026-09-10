@@ -33,6 +33,7 @@ public class TablaSemanalDebeCliente {
     public TablaSemanalDebeCliente(VentasBackend backend) {
         this.backend = backend;
         this.tabla = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(this.tabla);
 
         definirColumnas();
     }

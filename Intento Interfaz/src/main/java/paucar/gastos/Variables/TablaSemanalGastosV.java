@@ -21,6 +21,7 @@ public class TablaSemanalGastosV extends VBox {
         public TablaSemanalGastosV(List<GastosVariables> gastos, Consumer<GastosVariables> onSelect) {
 
                 TableView<GastosVariables> tabla = new TableView<>();
+                paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
                 tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
                 Locale localeAR = Locale.forLanguageTag("es-AR");
                 // ✅ FECHA (día/mes)

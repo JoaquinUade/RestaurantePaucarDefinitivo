@@ -25,6 +25,7 @@ public class TablaSemanalCliente {
     public TablaSemanalCliente(VentasBackend backend) {
         this.backend = backend;
         this.tabla = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(this.tabla);
         definirColumnas();
     }
 

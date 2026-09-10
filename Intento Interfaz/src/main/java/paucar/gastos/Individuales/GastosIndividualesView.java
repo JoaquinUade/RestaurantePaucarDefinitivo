@@ -29,6 +29,8 @@ public class GastosIndividualesView extends VBox {
     private final EmpleadoService empleadoService;
 
     private final HBox contenedor = new HBox(Responsive.pe(20));
+    private final Label mensajeSinDatos = new Label(
+            "No hay gastos individuales ingresados para mostrar en este período.");
 
     public GastosIndividualesView(GastosIndividualesService service,
             EmpleadoService empleadoService) {
@@ -62,6 +64,7 @@ public class GastosIndividualesView extends VBox {
         HBox barraBotones = crearBarraBotones();
         barraBotones.setPadding(Responsive.insets(0));
         contenedor.setPadding(Responsive.insets(15));
+        mensajeSinDatos.setStyle("-fx-font-size: 16px; -fx-text-fill: #6b7280;");
 
         ScrollPane scroll = new ScrollPane(contenedor);
         scroll.getStyleClass().add("scroll-pane");
@@ -163,6 +166,10 @@ public class GastosIndividualesView extends VBox {
                     && g.getFecha().getYear() == fechaFiltro.getYear()
                     )
                     .toList();
+        }
+        if (gastos.isEmpty()) {
+            contenedor.getChildren().add(mensajeSinDatos);
+            return;
         }
         Map<String, List<GastosIndividuales>> porEmpleado = gastos.stream()
                 .collect(Collectors.groupingBy(g -> g.getEmpleado().getNombre()));

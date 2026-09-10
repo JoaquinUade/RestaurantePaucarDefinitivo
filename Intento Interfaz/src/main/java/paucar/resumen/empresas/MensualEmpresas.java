@@ -27,6 +27,9 @@ public class MensualEmpresas extends BorderPane {
     private final VentasBackend backend;
 
     private final TableView<VentaResumenDiarioDTO> tabla = new TableView<>();
+    {
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
+    }
     private final ObservableList<VentaResumenDiarioDTO> datos = FXCollections.observableArrayList();
     private final BorderPane footerTotal = new BorderPane();
     private ComboBox<String> comboEmpresa;

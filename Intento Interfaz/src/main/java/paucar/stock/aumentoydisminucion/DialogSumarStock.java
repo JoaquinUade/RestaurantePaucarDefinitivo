@@ -48,6 +48,7 @@ public class DialogSumarStock {
 
         TableView<GastosVariables> tabla
                 = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
         List<GastosVariables> filtrados = gastos.stream()
                 .filter(g
                         -> g.getCategoria() != null

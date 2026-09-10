@@ -33,6 +33,7 @@ public class TablaHistorialStock extends VBox {
             LocalDate fechaSeleccionada, Consumer<Stock> onSelect) {
 
         TableView<Stock> tabla = new TableView<>();
+        paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
 
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);

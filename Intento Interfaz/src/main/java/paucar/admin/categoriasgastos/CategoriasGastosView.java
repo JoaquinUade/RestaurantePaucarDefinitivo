@@ -30,6 +30,7 @@ public class CategoriasGastosView extends BorderPane {
 
         panel = new TablaCategoriasGastos("Categorías");
         lista = panel.getLista();
+        lista.setPlaceholder(new Label("No hay categorías de gastos ingresadas para mostrar."));
 
         cargarDatos();
 
