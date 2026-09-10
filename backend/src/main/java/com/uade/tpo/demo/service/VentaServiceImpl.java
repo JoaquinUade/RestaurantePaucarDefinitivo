@@ -112,9 +112,8 @@ public class VentaServiceImpl implements VentaService {
         } else {
             venta.setFecha(LocalDateTime.now());
         }
-        venta.setDia(LocalDate.now().getDayOfWeek()
-                .getDisplayName(TextStyle.FULL,
-                        new Locale("es", "ES")));
+        venta.setDia(venta.getFecha().toLocalDate().getDayOfWeek()
+        .getDisplayName(TextStyle.FULL, new Locale("es", "ES")));
 
         Venta ventaGuardada = ventaRepository.save(venta);
 
