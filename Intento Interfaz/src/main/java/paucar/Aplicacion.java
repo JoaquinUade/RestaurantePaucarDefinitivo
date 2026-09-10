@@ -113,16 +113,19 @@ public class Aplicacion extends Application {
         root.setLeft(menuScroll);
         root.setCenter(contenido);
 
-        vistaResumen
-                = new Resumen(
-                        backend,
-                        new ExcelExportService(
-                                backend,
-                                services.pagos,
-                                services.stock,
-                                services.gastosFijos,
-                                services.gastosVariables,
-                                services.gastosIndividuales));
+        vistaResumen = new Resumen(
+        backend,
+        new ExcelExportService(
+                backend,
+                services.pagos,
+                services.stock,
+                services.gastosFijos,
+                services.gastosVariables,
+                services.gastosIndividuales),
+        services.gastosVariables,
+        services.gastosFijos,
+        services.gastosIndividuales
+);
 
         vistaVentas
                 = new Ventas(vistaResumen);

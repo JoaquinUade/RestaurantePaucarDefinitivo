@@ -1,10 +1,9 @@
 package paucar.resumen.empresas;
 
-
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
@@ -12,12 +11,15 @@ import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.VentasBackend;
-import paucar.shared.FechaUtils;
+import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 
 public class MensualEmpresas extends BorderPane {
@@ -41,6 +43,7 @@ public class MensualEmpresas extends BorderPane {
         this.mes = mes;
 
         tabla.setItems(datos);
+        tabla.setEditable(false);
 
         cargarEmpresas();
 
@@ -65,7 +68,19 @@ public class MensualEmpresas extends BorderPane {
         topBar.setSpacing(Responsive.pe(10)); // (por si después agregás más cosas)
 
         setTop(topBar);
-        setCenter(tabla);
+        VBox contenedorTabla = new VBox(tabla);
+
+        contenedorTabla.setPadding(
+                new Insets(15, Responsive.px(20), 15, Responsive.px(20))
+        );
+
+        VBox.setVgrow(
+                tabla,
+                javafx.scene.layout.Priority.ALWAYS
+        );
+
+        setCenter(contenedorTabla);
+
         setBottom(footerTotal);
 
         footerTotal.getStyleClass().add("footer-total");
@@ -73,15 +88,15 @@ public class MensualEmpresas extends BorderPane {
 
     private void cargarEmpresas() {
 
-    var lista = backend.obtenerClientesPorTipo(
-            TipoCliente.EMPRESA);
+        var lista = backend.obtenerClientesPorTipo(
+                TipoCliente.EMPRESA);
 
-    System.out.println("========== EMPRESAS RESUMEN ==========");
+        System.out.println("========== EMPRESAS RESUMEN ==========");
 
-    lista.forEach(System.out::println);
+        lista.forEach(System.out::println);
 
-    empresas.setAll(lista);
-}
+        empresas.setAll(lista);
+    }
 
     private ComboBox<String> crearComboEmpresas(
             javafx.collections.transformation.FilteredList<String> empresasFiltradas) {
@@ -94,26 +109,26 @@ public class MensualEmpresas extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, old, txt) -> {
 
-    if (updating.get()) {
-        return;
-    }
+            if (updating.get()) {
+                return;
+            }
 
-    if (cb.getValue() != null
-            && txt.equals(cb.getValue())) {
-        return;
-    }
+            if (cb.getValue() != null
+                    && txt.equals(cb.getValue())) {
+                return;
+            }
 
-    String filtro = (txt == null ? "" : txt.trim().toLowerCase());
+            String filtro = (txt == null ? "" : txt.trim().toLowerCase());
 
-    empresasFiltradas.setPredicate(emp ->
-            emp != null
-            && (filtro.isEmpty()
-            || emp.toLowerCase().contains(filtro)));
+            empresasFiltradas.setPredicate(emp
+                    -> emp != null
+                    && (filtro.isEmpty()
+                    || emp.toLowerCase().contains(filtro)));
 
-    if (!cb.isShowing() && !filtro.isEmpty()) {
-        cb.show();
-    }
-});
+            if (!cb.isShowing() && !filtro.isEmpty()) {
+                cb.show();
+            }
+        });
 
         cb.setButtonCell(new javafx.scene.control.ListCell<>() {
             @Override
@@ -192,9 +207,17 @@ public class MensualEmpresas extends BorderPane {
 
                 } else if (fecha == null) {
                     setText("TOTAL MES");
+                    setStyle("celda-fecha");
 
                 } else {
-                    setText(FechaUtils.fechaMes(fecha));
+                    setText(String.format(
+                            "%02d-%s",
+                            fecha.getDayOfMonth(),
+                            fecha.getMonth().getDisplayName(
+                                    TextStyle.FULL,
+                                    LocaleUtils.ES_AR)
+                    ));
+                    getStyleClass().clear();
                 }
             }
         });
@@ -297,10 +320,6 @@ public class MensualEmpresas extends BorderPane {
 
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
 
-        // ✅ ajustes visuales
-        grid.setHgap(Responsive.pe(5));
-        grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
         for (TableColumn<?, ?> columna : tabla.getColumns()) {
 
             javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
@@ -356,8 +375,8 @@ public class MensualEmpresas extends BorderPane {
                             && v.getCliente().getTipoCliente() == TipoCliente.EMPRESA
                             && empresaSeleccionada.equals(v.getCliente().getNombre())) {
 
-                        BigDecimal monto = (BigDecimal) v.getMonto();
-                        TipoDePago tipo = (TipoDePago) v.getEstado();
+                        BigDecimal monto = v.getMonto();
+                        TipoDePago tipo = v.getEstado();
 
                         switch (tipo) {
                             case EFECTIVO ->
@@ -408,15 +427,15 @@ public class MensualEmpresas extends BorderPane {
 
     public void refrescar() {
 
-    String seleccionado = comboEmpresa.getValue();
-System.out.println("REFRESCAR EMPRESAS");
-    cargarEmpresas();
+        String seleccionado = comboEmpresa.getValue();
+        System.out.println("REFRESCAR EMPRESAS");
+        cargarEmpresas();
 
-    if (seleccionado != null
-            && empresas.contains(seleccionado)) {
+        if (seleccionado != null
+                && empresas.contains(seleccionado)) {
 
-        comboEmpresa.setValue(seleccionado);
+            comboEmpresa.setValue(seleccionado);
+        }
     }
-}
 
 }

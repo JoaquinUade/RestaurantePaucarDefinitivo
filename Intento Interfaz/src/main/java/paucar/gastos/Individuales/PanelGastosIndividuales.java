@@ -15,10 +15,12 @@ import javafx.scene.layout.VBox;
 
 public class PanelGastosIndividuales extends VBox {
 
-    public PanelGastosIndividuales(String nombre, List<GastosIndividuales> gastos,
-                                   Consumer<GastosIndividuales> onSelect) {
+    public PanelGastosIndividuales(
+            String nombreEmpleado,
+            List<GastosIndividuales> gastos,
+            Consumer<GastosIndividuales> onSelect) {
 
-        Label titulo = new Label(nombre);
+        Label titulo = new Label(nombreEmpleado);
         titulo.getStyleClass().add("card-header");
         titulo.setMaxWidth(Double.MAX_VALUE);
 
@@ -30,5 +32,11 @@ public class PanelGastosIndividuales extends VBox {
                 }));
 
         getChildren().add(titulo);
+
+        porSemana.values().forEach(lista -> {
+            getChildren().add(
+                    new TablaSemanalIndividual(lista, onSelect)
+            );
+        });
     }
 }

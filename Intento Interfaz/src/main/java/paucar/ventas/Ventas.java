@@ -1,7 +1,6 @@
 package paucar.ventas;
 
 
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +16,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -27,6 +25,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import paucar.config.Responsive;
 import paucar.resumen.Resumen;
 import paucar.resumen.empresas.semanal.TablaSemanalDebe;
 import paucar.service.ClientesService;

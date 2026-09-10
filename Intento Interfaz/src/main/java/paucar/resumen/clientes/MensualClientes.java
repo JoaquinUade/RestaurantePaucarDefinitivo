@@ -1,10 +1,9 @@
 package paucar.resumen.clientes;
 
-
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoDePago;
@@ -12,12 +11,15 @@ import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.VentasBackend;
-import paucar.shared.FechaUtils;
+import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 
 public class MensualClientes extends BorderPane {
@@ -42,6 +44,7 @@ public class MensualClientes extends BorderPane {
         this.mes = mes;
 
         tabla.setItems(datos);
+        tabla.setEditable(false);
 
         cargarClientes();
 
@@ -66,7 +69,15 @@ public class MensualClientes extends BorderPane {
         topBar.setSpacing(Responsive.pe(10));
 
         setTop(topBar);
-        setCenter(tabla);
+        VBox contenedorTabla = new VBox(tabla);
+
+        contenedorTabla.setPadding(
+                new Insets(15, Responsive.px(20), 15, Responsive.px(20))
+        );
+
+        VBox.setVgrow(tabla, javafx.scene.layout.Priority.ALWAYS);
+
+        setCenter(contenedorTabla);
         setBottom(footerTotal);
 
         footerTotal.getStyleClass().add("footer-total");
@@ -90,26 +101,26 @@ public class MensualClientes extends BorderPane {
 
         cb.getEditor().textProperty().addListener((obs, old, txt) -> {
 
-    if (updating.get()) {
-        return;
-    }
+            if (updating.get()) {
+                return;
+            }
 
-    if (cb.getValue() != null
-            && txt.equals(cb.getValue())) {
-        return;
-    }
+            if (cb.getValue() != null
+                    && txt.equals(cb.getValue())) {
+                return;
+            }
 
-    String filtro = (txt == null ? "" : txt.trim().toLowerCase());
+            String filtro = (txt == null ? "" : txt.trim().toLowerCase());
 
-    filtradas.setPredicate(item ->
-            item != null
-            && (filtro.isEmpty()
-            || item.toLowerCase().contains(filtro)));
+            filtradas.setPredicate(item
+                    -> item != null
+                    && (filtro.isEmpty()
+                    || item.toLowerCase().contains(filtro)));
 
-    if (!cb.isShowing() && !filtro.isEmpty()) {
-        cb.show();
-    }
-});
+            if (!cb.isShowing() && !filtro.isEmpty()) {
+                cb.show();
+            }
+        });
 
         cb.setButtonCell(new javafx.scene.control.ListCell<>() {
             @Override
@@ -169,6 +180,7 @@ public class MensualClientes extends BorderPane {
         tabla.getColumns().add(colMonto("Transferencia", d -> d.getTransferencia()));
         tabla.getColumns().add(colMonto("Mercado Pago", d -> d.getMercadoPago()));
         tabla.getColumns().add(colMonto("Efectivo", d -> d.getEfectivo()));
+        
     }
 
     private TableColumn<VentaResumenDiarioDTO, LocalDate> colFecha() {
@@ -189,8 +201,16 @@ public class MensualClientes extends BorderPane {
                     setText(null);
                 } else if (fecha == null) {
                     setText("TOTAL MES");
+                    setStyle("celda-fecha");
                 } else {
-                    setText(FechaUtils.fechaMes(fecha));
+                    setText(String.format(
+                            "%02d-%s",
+                            fecha.getDayOfMonth(),
+                            fecha.getMonth().getDisplayName(
+                                    TextStyle.FULL,
+                                    LocaleUtils.ES_AR)
+                    ));
+                    getStyleClass().clear();
                 }
             }
         });
@@ -289,9 +309,6 @@ public class MensualClientes extends BorderPane {
 
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
 
-        grid.setHgap(Responsive.pe(5));
-        grid.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
         for (TableColumn<?, ?> columna : tabla.getColumns()) {
 
             javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
@@ -313,6 +330,7 @@ public class MensualClientes extends BorderPane {
         totalPagado.setTextFill(t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0
                 ? javafx.scene.paint.Color.GREEN
                 : javafx.scene.paint.Color.BLACK);
+        
         grid.add(totalPagado, 3, 0);
 
         grid.add(new javafx.scene.control.Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);
@@ -399,14 +417,14 @@ public class MensualClientes extends BorderPane {
 
     public void refrescar() {
 
-    String seleccionado = comboCliente.getValue();
+        String seleccionado = comboCliente.getValue();
 
-    cargarClientes();
+        cargarClientes();
 
-    if (seleccionado != null
-            && clientes.contains(seleccionado)) {
+        if (seleccionado != null
+                && clientes.contains(seleccionado)) {
 
-        comboCliente.setValue(seleccionado);
+            comboCliente.setValue(seleccionado);
+        }
     }
-}
 }

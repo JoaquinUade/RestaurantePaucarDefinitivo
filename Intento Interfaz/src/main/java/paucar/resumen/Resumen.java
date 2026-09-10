@@ -1,7 +1,5 @@
 package paucar.resumen;
 
-
-import paucar.config.Responsive;
 import java.io.File;
 import java.time.LocalDate;
 
@@ -16,6 +14,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import paucar.config.Responsive;
 import paucar.resumen.clientes.MensualClientes;
 import paucar.resumen.clientes.semanal.SemanalClientes;
 import paucar.resumen.empresas.MensualEmpresas;
@@ -23,6 +22,9 @@ import paucar.resumen.empresas.semanal.SemanalEmpresas;
 import paucar.resumen.general.MensualGeneral;
 import paucar.resumen.general.SemanalGeneral;
 import paucar.service.ExcelExportService;
+import paucar.service.GastosFijosService;
+import paucar.service.GastosIndividualesService;
+import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
 
 public class Resumen extends BorderPane {
@@ -57,27 +59,28 @@ public class Resumen extends BorderPane {
     private MensualGeneral vistaMensualGeneral;
     private SemanalGeneral vistaSemanalGeneral;
 
+    private GastosVariablesService gastosVariablesService;
+    private GastosFijosService gastosFijosService;
+    private GastosIndividualesService gastosIndividualesService;
+
     private final ComboBox<String> tipoResumen = new ComboBox<>();
 
     private final Button btnExcel = new Button("Generar Excel");
 
-    public Resumen(VentasBackend backend, ExcelExportService excelExportService) {
+    public Resumen(
+            VentasBackend backend,
+            ExcelExportService excelExportService, GastosVariablesService gastosVariablesService,
+            GastosFijosService gastosFijosService, GastosIndividualesService gastosIndividualesService) {
+
         this.backend = backend;
         this.excelExportService = excelExportService;
+        this.gastosVariablesService = gastosVariablesService;
+        this.gastosFijosService = gastosFijosService;
+        this.gastosIndividualesService = gastosIndividualesService;
 
-        setPadding(Responsive.insets(16));/*
-                                    * agrega un padding de 16 pixeles a todo el borde
-                                    * de la pestaña Resumen, arriba abajo y los costados
-         */
-
-        initFiltros();/* inicializa los filtros */
-
-        setTop(crearBarraFiltros());/* crea la barra de filtros */
-
-        setCenter(contenedorResultado);/*
-                                        * establece el centro del BorderPane como el contenedorResultado,
-                                        * que es donde se mostrará el resumen mensual o semanal
-         */
+        initFiltros();
+        setTop(crearBarraFiltros());
+        setCenter(contenedorResultado);
     }
 
     private void initFiltros() {
@@ -104,12 +107,17 @@ public class Resumen extends BorderPane {
     private Node crearBarraFiltros() {
 
         Button btnVer = new Button("Ver");/* crea un botón "Ver" */
-
+        btnVer.setPadding(
+                Responsive.insets(8, 16, 8, 16)
+        );
         btnVer.setOnAction(e -> aplicarFiltros());/*
                                                    * cuando se hace click en el botón "Ver", se llama al método
                                                    * aplicarFiltros() para mostrar el resumen
                                                    * correspondiente según los filtros seleccionados
          */
+        btnExcel.setPadding(
+                Responsive.insets(8, 16, 8, 16)
+        );
 
         btnExcel.getStyleClass().add("btn-agregar");
         btnExcel.setOnAction(e -> exportarExcel());
@@ -122,17 +130,28 @@ public class Resumen extends BorderPane {
                 tipoResumen,
                 btnVer,
                 btnExcel);/* crea un contenedor horizontal con los filtros */
+        btnVer.setOnAction(e -> aplicarFiltros());
 
+        HBox.setMargin(
+                btnVer,
+                new Insets(0, 15, 0, 5)
+        );
+
+        HBox.setMargin(
+                btnExcel,
+                new Insets(0, 5, 0, 15)
+        );
+      
         barraFiltros.setAlignment(Pos.CENTER_LEFT);/* alinea los elementos a la izquierda */
-        barraFiltros.setPadding(Responsive.insets(0, 0, 10, 0));/* agrega un padding de 10 pixeles al fondo */
+        barraFiltros.setPadding(Responsive.insets(10, 10, 10, 10));/* agrega un padding de 10 pixeles al fondo */
 
         return barraFiltros;/* retorna la barra de filtros */
     }
 
     public void actualizarDatos() {
-System.out.println("ACTUALIZAR DATOS");
+        System.out.println("ACTUALIZAR DATOS");
         if (vistaMensualClientes != null) {
-            
+
             vistaMensualClientes.refrescar();
         }
 
@@ -148,11 +167,11 @@ System.out.println("ACTUALIZAR DATOS");
         if (vistaSemanalEmpresas != null) {
             vistaSemanalEmpresas.refrescar();
         }
-        if(vistaMensualGeneral != null){
+        if (vistaMensualGeneral != null) {
             vistaMensualGeneral.refrescar();
         }
-        if(vistaSemanalGeneral != null){
-vistaSemanalGeneral.refrescar();
+        if (vistaSemanalGeneral != null) {
+            vistaSemanalGeneral.refrescar();
 
         }
     }
@@ -172,8 +191,15 @@ vistaSemanalGeneral.refrescar();
                 switch (tipo) {
                     case "General" -> {
                         if (vistaMensualGeneral == null) {
-                            vistaMensualGeneral
-                                    = new MensualGeneral(backend, anio, mes);
+                            vistaMensualGeneral = new MensualGeneral(
+                                    backend,
+                                    gastosVariablesService,
+                                    gastosFijosService,
+                                    gastosIndividualesService,
+                                    anio,
+                                    mes);
+                        } else {
+                            vistaMensualGeneral.refrescar();
                         }
 
                         contenedorResultado.setCenter(vistaMensualGeneral);
@@ -274,7 +300,7 @@ vistaSemanalGeneral.refrescar();
                 exito.setHeaderText(null);
                 exito.setContentText(
                         "El Excel se generó correctamente en:\n"
-                                + destino.getAbsolutePath());
+                        + destino.getAbsolutePath());
                 exito.showAndWait();
             } else {
                 Alert error = new Alert(Alert.AlertType.ERROR);

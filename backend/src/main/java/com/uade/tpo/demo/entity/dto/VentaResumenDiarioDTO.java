@@ -1,9 +1,10 @@
 package com.uade.tpo.demo.entity.dto;
 
-import java.time.LocalDate;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class VentaResumenDiarioDTO {
+
     private LocalDate fecha;
     private String dia;  // Campo nuevo
     private BigDecimal ventaTotal;
@@ -14,33 +15,30 @@ public class VentaResumenDiarioDTO {
     private BigDecimal debito;
     private BigDecimal credito;
     private BigDecimal deudaPagada; // Nuevo campo para DEUDA_PAGADA
+    private BigDecimal gastosVariables;
+    private BigDecimal gastosFijos;
+    private BigDecimal gastosIndividuales;
 
     // Constructores existentes...
-    public VentaResumenDiarioDTO() {
-        this.ventaTotal = BigDecimal.ZERO;
-        this.transferencia = BigDecimal.ZERO;
-        this.debe = BigDecimal.ZERO;
-        this.efectivo = BigDecimal.ZERO;
-        this.mercadoPago = BigDecimal.ZERO;
-        this.debito = BigDecimal.ZERO;
-        this.credito = BigDecimal.ZERO;
-        this.deudaPagada = BigDecimal.ZERO;
-    }
+   public VentaResumenDiarioDTO(LocalDate fecha) {
 
-    public VentaResumenDiarioDTO(LocalDate fecha) {
-        this.fecha = fecha;
-        this.ventaTotal = BigDecimal.ZERO;
-        this.transferencia = BigDecimal.ZERO;
-        this.debe = BigDecimal.ZERO;
-        this.efectivo = BigDecimal.ZERO;
-        this.mercadoPago = BigDecimal.ZERO;
-        this.debito = BigDecimal.ZERO;
-        this.credito = BigDecimal.ZERO;
-        this.deudaPagada = BigDecimal.ZERO;
-    }
+    this.fecha = fecha;
+
+    this.ventaTotal = BigDecimal.ZERO;
+    this.transferencia = BigDecimal.ZERO;
+    this.debe = BigDecimal.ZERO;
+    this.efectivo = BigDecimal.ZERO;
+    this.mercadoPago = BigDecimal.ZERO;
+    this.debito = BigDecimal.ZERO;
+    this.credito = BigDecimal.ZERO;
+    this.deudaPagada = BigDecimal.ZERO;
+
+    this.gastosVariables = BigDecimal.ZERO;
+    this.gastosFijos = BigDecimal.ZERO;
+    this.gastosIndividuales = BigDecimal.ZERO;
+}
 
     // GETTERS Y SETTERS PARA TODOS LOS CAMPOS (incluyendo dia)
-    
     public LocalDate getFecha() {
         return fecha;
     }
@@ -49,7 +47,6 @@ public class VentaResumenDiarioDTO {
         this.fecha = fecha;
     }
 
-    
     public String getDia() {
         return dia;
     }
@@ -120,5 +117,29 @@ public class VentaResumenDiarioDTO {
 
     public void setDeudaPagada(BigDecimal deudaPagada) {
         this.deudaPagada = deudaPagada;
+    }
+
+    public BigDecimal getGastosVariables() {
+        return gastosVariables;
+    }
+
+    public void setGastosVariables(BigDecimal gastosVariables) {
+        this.gastosVariables = gastosVariables;
+    }
+
+    public BigDecimal getGastosFijos() {
+        return gastosFijos;
+    }
+
+    public void setGastosFijos(BigDecimal gastosFijos) {
+        this.gastosFijos = gastosFijos;
+    }
+
+    public BigDecimal getGastosIndividuales() {
+        return gastosIndividuales;
+    }
+
+    public void setGastosIndividuales(BigDecimal gastosIndividuales) {
+        this.gastosIndividuales = gastosIndividuales;
     }
 }

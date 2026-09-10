@@ -12,6 +12,7 @@ import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -19,6 +20,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
+import paucar.service.GastosFijosService;
+import paucar.service.GastosIndividualesService;
+import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
 import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
@@ -26,6 +32,9 @@ import paucar.shared.MonedaUtils;
 public class MensualGeneral extends BorderPane {
 
     private final VentasBackend ventasBackend;/*variable que guarda la instancia del backend de ventas */
+    private final GastosVariablesService gastosVariablesService;
+    private final GastosFijosService gastosFijosService;
+    private final GastosIndividualesService gastosIndividualesService;
 
     private int anio;
     private int mes;
@@ -37,8 +46,19 @@ public class MensualGeneral extends BorderPane {
 
     private final ObservableList<VentaResumenDiarioDTO> RenglonResumenDiario = FXCollections.observableArrayList();/*variable que guarda la lista observable de los datos resumidos diarios */
 
-    public MensualGeneral(VentasBackend backend, int anio, int mes) {
+    public MensualGeneral(
+            VentasBackend backend,
+            GastosVariablesService gastosVariablesService,
+            GastosFijosService gastosFijosService,
+            GastosIndividualesService gastosIndividualesService,
+            int anio,
+            int mes) {
+
         this.ventasBackend = backend;
+        this.gastosVariablesService = gastosVariablesService;
+        this.gastosFijosService = gastosFijosService;
+        this.gastosIndividualesService = gastosIndividualesService;
+
         this.anio = anio;
         this.mes = mes;
 
@@ -52,11 +72,17 @@ public class MensualGeneral extends BorderPane {
         titulo.getStyleClass().add("titulo-xl");/*agrega la clase CSS "titulo-xl" al título para aplicar estilos específicos a esa etiqueta */
 
         setTop(titulo);
-        setCenter(tabla);
 
-        footerTotal.getStyleClass().add("footer-total");/*agrega la clase CSS "footer-total" al pie de
-                                                           página para aplicar estilos específicos a esa
-                                                           sección */
+        VBox contenedorTabla = new VBox(tabla);
+
+        contenedorTabla.setPadding(
+                new Insets(15, Responsive.px(20), 15, Responsive.px(20))
+        );
+        VBox.setVgrow(tabla, javafx.scene.layout.Priority.ALWAYS);
+        setCenter(contenedorTabla);
+
+        footerTotal.getStyleClass().add("footer-total");
+
         setBottom(footerTotal);
 
         cargarMes(anio, mes);
@@ -69,6 +95,9 @@ public class MensualGeneral extends BorderPane {
 
         LocalDate fecha = LocalDate.of(anio, mes, 1);/*variable que guarda la fecha del primer
                                                                 día del mes a cargar */
+        var gastosVariables = gastosVariablesService.obtenerTodos();
+        var gastosFijos = gastosFijosService.obtenerTodos();
+        var gastosIndividuales = gastosIndividualesService.obtenerTodos();
 
         while (fecha.getMonthValue() == mes) {/*si la fecha actual sigue siendo del mes a cargar, se
                                              ejecuta el bloque de código para agregar los datos del día a 
@@ -80,33 +109,74 @@ public class MensualGeneral extends BorderPane {
 
                 var ventasDelDia = ventasBackend.cargarVentasDelDia(fecha);/*variable que guarda la lista de ventas de un día */
 
-                for (var v : ventasDelDia) {/*recorre cada venta del día */
+                for (var v : ventasDelDia) {
+
                     BigDecimal monto = v.getMonto();
                     TipoDePago tipo = v.getEstado();
-                    switch (tipo) {/*segun el tipo de pago */
+
+                    switch (tipo) {
+
                         case EFECTIVO ->
-                            ResumenDelDia.setEfectivo(ResumenDelDia.getEfectivo().add(monto));/*si es efectivo, se acumula el monto en el campo de efectivo del resumen del día */
+                            ResumenDelDia.setEfectivo(
+                                    ResumenDelDia.getEfectivo().add(monto));
+
                         case DEBITO ->
-                            ResumenDelDia.setDebito(ResumenDelDia.getDebito().add(monto));/*si es débito, se acumula el monto en el campo de débito del resumen del día */
+                            ResumenDelDia.setDebito(
+                                    ResumenDelDia.getDebito().add(monto));
+
                         case CREDITO ->
-                            ResumenDelDia.setCredito(ResumenDelDia.getCredito().add(monto));/*si es crédito, se acumula el monto en el campo de crédito del resumen del día */
+                            ResumenDelDia.setCredito(
+                                    ResumenDelDia.getCredito().add(monto));
+
                         case TRANSFERENCIA ->
-                            ResumenDelDia.setTransferencia(ResumenDelDia.getTransferencia().add(monto));/*si es transferencia, se acumula el monto en el campo de transferencia
-                                                                                                 del resumen del día */
+                            ResumenDelDia.setTransferencia(
+                                    ResumenDelDia.getTransferencia().add(monto));
+
                         case MERCADO_PAGO ->
-                            ResumenDelDia.setMercadoPago(ResumenDelDia.getMercadoPago().add(monto));/*si es mercado pago, se acumula el monto en el campo de mercado pago del
-                                                                                             resumen del día */
+                            ResumenDelDia.setMercadoPago(
+                                    ResumenDelDia.getMercadoPago().add(monto));
+
                         case DEBE ->
-                            ResumenDelDia.setDebe(ResumenDelDia.getDebe().add(monto));/*si es debe, se acumula el monto en el campo de debe del resumen del día */
+                            ResumenDelDia.setDebe(
+                                    ResumenDelDia.getDebe().add(monto));
+
                         case DEUDA_PAGADA ->
-                            ResumenDelDia.setDeudaPagada(ResumenDelDia.getDeudaPagada().add(monto));
+                            ResumenDelDia.setDeudaPagada(
+                                    ResumenDelDia.getDeudaPagada().add(monto));
                     }
+
                     if (tipo != TipoDePago.DEBE) {
-                        ResumenDelDia.setVentaTotal(ResumenDelDia.getVentaTotal().add(monto));/*si no es debe, se acumula el monto en el campo de venta total del resumen
-                                                                                       del día */
+                        ResumenDelDia.setVentaTotal(
+                                ResumenDelDia.getVentaTotal().add(monto));
                     }
                 }
+                for (var g : gastosVariables) {
 
+                    if (fecha.equals(g.getFecha())) {
+
+                        ResumenDelDia.setGastosVariables(
+                                ResumenDelDia.getGastosVariables()
+                                        .add(g.getMonto()));
+                    }
+                }
+                for (var g : gastosFijos) {
+
+                    if (fecha.equals(g.getFecha())) {
+
+                        ResumenDelDia.setGastosFijos(
+                                ResumenDelDia.getGastosFijos()
+                                        .add(g.getMonto()));
+                    }
+                }
+                for (var g : gastosIndividuales) {
+
+                    if (fecha.equals(g.getFecha())) {
+
+                        ResumenDelDia.setGastosIndividuales(
+                                ResumenDelDia.getGastosIndividuales()
+                                        .add(g.getMonto()));
+                    }
+                }
                 RenglonResumenDiario.add(ResumenDelDia);/*Agrega el resumen del día a la lista, haciendo que
                                                     luego se muestre como un renglón más en la tabla con
                                                     todos los datos*/
@@ -115,28 +185,53 @@ public class MensualGeneral extends BorderPane {
         }
         VentaResumenDiarioDTO TotalMensual = new VentaResumenDiarioDTO(null);/*variable que guarda el resumen total del mes */
 
-        for (VentaResumenDiarioDTO d : RenglonResumenDiario) {/*recorre cada resumen diario */
-            TotalMensual.setVentaTotal(TotalMensual.getVentaTotal().add(d.getVentaTotal()));/*acumula el total de ventas del mes sumando el
-                                                                                         total de cada día */
+        for (VentaResumenDiarioDTO d : RenglonResumenDiario) {
 
-            TotalMensual.setDebe(TotalMensual.getDebe().add(d.getDebe()));/*acumula el total de deudas del mes sumando el total de cada día */
+            TotalMensual.setGastosFijos(
+                    TotalMensual.getGastosFijos().add(d.getGastosFijos()));
 
-            TotalMensual.setDeudaPagada(TotalMensual.getDeudaPagada().add(d.getDeudaPagada()));
+            TotalMensual.setGastosVariables(
+                    TotalMensual.getGastosVariables().add(d.getGastosVariables()));
 
-            TotalMensual.setDebito(TotalMensual.getDebito().add(d.getDebito()));/*acumula el total de débitos del mes sumando el total de
-                                                                             cada día */
+            TotalMensual.setGastosIndividuales(
+                    TotalMensual.getGastosIndividuales().add(d.getGastosIndividuales()));
 
-            TotalMensual.setCredito(TotalMensual.getCredito().add(d.getCredito()));/*acumula el total de créditos del mes sumando el total de
-                                                                                cada día */
-            TotalMensual.setTransferencia(TotalMensual.getTransferencia().add(d.getTransferencia()));/*acumula el total de transferencias del
-                                                                                                  mes sumando el total de cada día */
+            TotalMensual.setVentaTotal(
+                    TotalMensual.getVentaTotal().add(d.getVentaTotal()));
 
-            TotalMensual.setMercadoPago(TotalMensual.getMercadoPago().add(d.getMercadoPago()));/*acumula el total de pagos en Mercado Pago del
-                                                                                            mes sumando el total de cada día */
+            TotalMensual.setDebe(
+                    TotalMensual.getDebe().add(d.getDebe()));
 
-            TotalMensual.setEfectivo(TotalMensual.getEfectivo().add(d.getEfectivo()));/*acumula el total de pagos en efectivo del mes sumando
-                                                                                   el total de cada día */
+            TotalMensual.setDeudaPagada(
+                    TotalMensual.getDeudaPagada().add(d.getDeudaPagada()));
+
+            TotalMensual.setDebito(
+                    TotalMensual.getDebito().add(d.getDebito()));
+
+            TotalMensual.setCredito(
+                    TotalMensual.getCredito().add(d.getCredito()));
+
+            TotalMensual.setTransferencia(
+                    TotalMensual.getTransferencia().add(d.getTransferencia()));
+
+            TotalMensual.setMercadoPago(
+                    TotalMensual.getMercadoPago().add(d.getMercadoPago()));
+
+            TotalMensual.setEfectivo(
+                    TotalMensual.getEfectivo().add(d.getEfectivo()));
         }
+        BigDecimal totalGastos
+                = TotalMensual.getGastosFijos()
+                        .add(TotalMensual.getGastosVariables())
+                        .add(TotalMensual.getGastosIndividuales());
+
+        BigDecimal totalNeto
+                = TotalMensual.getVentaTotal()
+                        .subtract(TotalMensual.getDebe())
+                        .subtract(totalGastos);
+
+        TotalMensual.setVentaTotal(totalNeto);
+
         RenderTotalMensual(TotalMensual);/*Muestra en la interfaz el resumen total del mes*/
     }
 
@@ -144,24 +239,26 @@ public class MensualGeneral extends BorderPane {
                                                                         de la tabla y qué información del 
                                                                         resumen diario va en cada columna*/
         return List.of(
-                colFecha(),/*columna que muestra la fecha del día */
-                colMonto("V. Total", dto -> dto.getVentaTotal()),/*columna que muestra el total de
-                                                                        ventas del día, usando el método
-                                                                        getVentaTotal del resumen diario */
+                colFecha(),
+                colMonto("V. Total", dto -> dto.getVentaTotal()),
                 colDebe(),
                 colDeudaPagada("Deuda Pagada", dto -> dto.getDeudaPagada()),
-                colMonto("Débito", dto -> dto.getDebito()),/*columna que muestra el total de débitos
-                                                                   del día */
-                colMonto("Crédito", dto -> dto.getCredito()),/*columna que muestra el total de
-                                                                     créditos del día */
-                colMonto("Transferencia", dto -> dto.getTransferencia()),/*columna que muestra el
-                                                                                total de transferencias del
-                                                                                día */
-                colMonto("Mercado Pago", dto -> dto.getMercadoPago()),/*columna que muestra el total
-                                                                             de pagos en Mercado Pago del
-                                                                             día */
-                colMonto("Efectivo", dto -> dto.getEfectivo())/*columna que muestra el total de
-                                                                      pagos en efectivo del día */
+                colMonto("Débito",
+                        dto -> dto.getDebito()),
+                colMonto("Crédito",
+                        dto -> dto.getCredito()),
+                colMonto("Transferencia",
+                        dto -> dto.getTransferencia()),
+                colMonto("Mercado Pago",
+                        dto -> dto.getMercadoPago()),
+                colMonto("Efectivo",
+                        dto -> dto.getEfectivo()),
+                colMonto("G. Fijos",
+                        dto -> dto.getGastosFijos()),
+                colMonto("G. Variables",
+                        dto -> dto.getGastosVariables()),
+                colMonto("G. Individuales",
+                        dto -> dto.getGastosIndividuales())
         );
     }
 
@@ -305,66 +402,93 @@ public class MensualGeneral extends BorderPane {
 
     private void RenderTotalMensual(VentaResumenDiarioDTO t) {
 
-        GridPane grid = new GridPane();/*crea un GridPane para organizar los totales del mes en una fila
-                                       con varias columnas mostrando el total con cada tipo de pago (total
-                                       de ventas, total de debe, total de débito, etc)*/
+        GridPane grid = new GridPane();
 
-        for (TableColumn<?, ?> columna : tabla.getColumns()) {/*recorre todas las columnas de la tabla*/
-
-            ColumnConstraints configuracionColumna = new ColumnConstraints();/*crea una nueva columna para
-                                                                             el GridPane*/
-            configuracionColumna.prefWidthProperty().bind(columna.widthProperty());/* enlaza el ancho de
-                                                                                  la columna totales con el
-                                                                                  ancho de la columna de la
-                                                                                  tabla */
-            grid.getColumnConstraints().add(configuracionColumna);/* agrega la configuración de la columna
-                                                                  al GridPane */
+        for (TableColumn<?, ?> columna : tabla.getColumns()) {
+            ColumnConstraints configuracionColumna = new ColumnConstraints();
+            configuracionColumna.prefWidthProperty().bind(columna.widthProperty());
+            grid.getColumnConstraints().add(configuracionColumna);
         }
 
-        grid.add(new Label("TOTAL MES"), 0, 0);/* agrega un label con el texto
-                                                                           "TOTAL MES" en la primera
-                                                                           columna y primera fila del
-                                                                           GridPane */
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getVentaTotal())), 1, 0);/* agrega un label con el total de ventas en la
-                                                                                          segunda columna y primera fila del GridPane */
+        grid.add(new Label("TOTAL MES"), 0, 0);
 
+        grid.add(
+                new Label(
+                        MonedaUtils.formatearMoneda(
+                                t.getVentaTotal())),
+                1, 0);
 
-        Label totalDebe = new Label(MonedaUtils.formatearMoneda(t.getDebe()));/* crea un label con el total de debe del
-                                                                mes para mostrarlo en la fila de totales */
-        Label totalDeudaPagada = new Label(MonedaUtils.formatearMoneda(t.getDeudaPagada()));
+        Label totalDebe = new Label(
+                MonedaUtils.formatearMoneda(
+                        t.getDebe()));
+
+        Label totalDeudaPagada = new Label(
+                MonedaUtils.formatearMoneda(
+                        t.getDeudaPagada()));
+
+        if (t.getDebe().compareTo(BigDecimal.ZERO) > 0) {
+            totalDebe.setTextFill(javafx.scene.paint.Color.RED);
+        }
 
         if (t.getDeudaPagada().compareTo(BigDecimal.ZERO) > 0) {
             totalDeudaPagada.setTextFill(javafx.scene.paint.Color.GREEN);
-        } else {
-            totalDeudaPagada.setTextFill(javafx.scene.paint.Color.BLACK);
         }
 
-        if (t.getDebe().compareTo(BigDecimal.ZERO) > 0) {/*si el total de debe es mayor a 0*/
+        Label totalGastosFijos = new Label(
+                MonedaUtils.formatearMoneda(
+                        t.getGastosFijos()));
 
-            totalDebe.setTextFill(javafx.scene.paint.Color.RED);/* establece el color del texto en rojo */
-        } else {/*sino */
-            totalDebe.setTextFill(javafx.scene.paint.Color.BLACK);/* establece el color del texto en negro */
+        Label totalGastosVariables = new Label(
+                MonedaUtils.formatearMoneda(
+                        t.getGastosVariables()));
+
+        Label totalGastosIndividuales = new Label(
+                MonedaUtils.formatearMoneda(
+                        t.getGastosIndividuales()));
+
+        if (t.getGastosFijos().compareTo(BigDecimal.ZERO) > 0) {
+            totalGastosFijos.setTextFill(javafx.scene.paint.Color.RED);
         }
 
-        grid.add(totalDebe, 2, 0);/* agrega el label con el total de debe en la
-                                                        tercera columna y primera fila del GridPane */
+        if (t.getGastosVariables().compareTo(BigDecimal.ZERO) > 0) {
+            totalGastosVariables.setTextFill(javafx.scene.paint.Color.RED);
+        }
+
+        if (t.getGastosIndividuales().compareTo(BigDecimal.ZERO) > 0) {
+            totalGastosIndividuales.setTextFill(javafx.scene.paint.Color.RED);
+        }
+
+        // Fecha
+        grid.add(totalDebe, 2, 0);
         grid.add(totalDeudaPagada, 3, 0);
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getDebito())), 4, 0);/* agrega un label con el total de débitos en la
-                                                                                          cuarta columna y primera fila del GridPane */
 
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getCredito())), 5, 0);/* agrega un label con el total de créditos en la
-                                                                                          quinta columna y primera fila del GridPane */
+        // Débito, Crédito, Transferencia, MP, Efectivo
+        grid.add(
+                new Label(MonedaUtils.formatearMoneda(t.getDebito())),
+                4, 0);
 
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getTransferencia())), 6, 0);/* agrega un label con el total de transferencias en la
-                                                                                          sexta columna y primera fila del GridPane */
+        grid.add(
+                new Label(MonedaUtils.formatearMoneda(t.getCredito())),
+                5, 0);
 
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getMercadoPago())), 7, 0);/* agrega un label con el total de pagos por Mercado Pago en la
-                                                                                          séptima columna y primera fila del GridPane */
+        grid.add(
+                new Label(MonedaUtils.formatearMoneda(t.getTransferencia())),
+                6, 0);
 
-        grid.add(new Label(MonedaUtils.formatearMoneda(t.getEfectivo())), 8, 0);/* agrega un label con el total de efectivo en la
-                                                                                          octava columna y primera fila del GridPane */
+        grid.add(
+                new Label(MonedaUtils.formatearMoneda(t.getMercadoPago())),
+                7, 0);
 
-        footerTotal.setCenter(grid);/* agrega el GridPane al centro del pie de página de los totales */
+        grid.add(
+                new Label(MonedaUtils.formatearMoneda(t.getEfectivo())),
+                8, 0);
+
+        // Gastos
+        grid.add(totalGastosFijos, 9, 0);
+        grid.add(totalGastosVariables, 10, 0);
+        grid.add(totalGastosIndividuales, 11, 0);
+
+        footerTotal.setCenter(grid);
     }
 
     public void actualizarMes(int anio, int mes) {
