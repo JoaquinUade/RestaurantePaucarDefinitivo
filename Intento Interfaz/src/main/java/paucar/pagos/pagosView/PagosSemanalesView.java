@@ -1,7 +1,5 @@
 package paucar.pagos.pagosView;
 
-
-import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,7 +10,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
+import paucar.pagos.DialogPagos;
 import paucar.pagos.TablaPagos;
+import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
 public class PagosSemanalesView extends BorderPane {
@@ -25,28 +26,93 @@ public class PagosSemanalesView extends BorderPane {
     private final TablaPagos tablaSemana4;
 
     private LocalDate fecha = LocalDate.now();
+private final ClientesService clientesService;
 
-    public PagosSemanalesView(PagosService service) {
+    public PagosSemanalesView(PagosService service, ClientesService clientesService) {
 
         this.service = service;
+        this.clientesService = clientesService;
 
         tablaSemana1 = new TablaPagos(
-                null,
+                pago -> {
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+
+                    if (nuevo != null) {
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
+                },
                 this::recargar,
                 service);
 
         tablaSemana2 = new TablaPagos(
-                null,
+                pago -> {
+
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+                    if (nuevo != null) {
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
+                },
                 this::recargar,
                 service);
 
         tablaSemana3 = new TablaPagos(
-                null,
+                pago -> {
+
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+                    if (nuevo != null) {
+
+                        service.modificar(pago.getId(), nuevo);
+
+                        recargar();
+
+                    }
+
+                },
                 this::recargar,
                 service);
 
         tablaSemana4 = new TablaPagos(
-                null,
+                pago -> {
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+                    if (nuevo != null) {
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
+                },
                 this::recargar,
                 service);
         Label lbl1 = new Label("Semana 1 (1-7)");
@@ -123,24 +189,25 @@ public class PagosSemanalesView extends BorderPane {
 
         recargar();
     }
+
     public PagoEmpresa getSeleccionado() {
 
-    if (tablaSemana1.getSeleccionado() != null) {
-        return tablaSemana1.getSeleccionado();
-    }
+        if (tablaSemana1.getSeleccionado() != null) {
+            return tablaSemana1.getSeleccionado();
+        }
 
-    if (tablaSemana2.getSeleccionado() != null) {
-        return tablaSemana2.getSeleccionado();
-    }
+        if (tablaSemana2.getSeleccionado() != null) {
+            return tablaSemana2.getSeleccionado();
+        }
 
-    if (tablaSemana3.getSeleccionado() != null) {
-        return tablaSemana3.getSeleccionado();
-    }
+        if (tablaSemana3.getSeleccionado() != null) {
+            return tablaSemana3.getSeleccionado();
+        }
 
-    if (tablaSemana4.getSeleccionado() != null) {
-        return tablaSemana4.getSeleccionado();
-    }
+        if (tablaSemana4.getSeleccionado() != null) {
+            return tablaSemana4.getSeleccionado();
+        }
 
-    return null;
-}
+        return null;
+    }
 }

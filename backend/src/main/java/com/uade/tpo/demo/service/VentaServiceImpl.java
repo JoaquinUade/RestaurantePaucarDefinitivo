@@ -136,10 +136,24 @@ public class VentaServiceImpl implements VentaService {
                 existing.setMonto(venta.getMonto());
             }
             if (venta.getEstado() != null) {
+                boolean seEstaPagandoUnaDeuda = existing.getEstado() == TipoDePago.DEBE
+                        && venta.getEstado() != TipoDePago.DEBE;
+
                 existing.setEstado(venta.getEstado());
+
+                // La fecha de pago pertenece al momento en que la deuda se cancela,
+                // independientemente de la pantalla desde la que se cambie el estado.
+                // No se modifica para ventas que nunca estuvieron en DEBE, ni al
+                // recalcular las tablas semanales de clientes/empresas.
+                if (seEstaPagandoUnaDeuda) {
+                    existing.setFechaPago(LocalDateTime.now());
+                }
             }
             if (venta.getObservaciones() != null) {
                 existing.setObservaciones(venta.getObservaciones());
+            }
+            if (venta.getConsumidor() != null) {
+                existing.setConsumidor(venta.getConsumidor());
             }
             // fecha y id no se actualizan aquí
             return ventaRepository.save(existing);
@@ -147,32 +161,32 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-public void borrarVenta(Long id) {
+    public void borrarVenta(Long id) {
 
-    Venta venta = ventaRepository.findById(id)
-            .orElseThrow(() ->
-                    new RuntimeException("Venta no encontrada"));
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(()
+                        -> new RuntimeException("Venta no encontrada"));
 
-    Cliente cliente = venta.getCliente();
+        Cliente cliente = venta.getCliente();
 
-    ventaRepository.delete(venta);
+        ventaRepository.delete(venta);
 
-    List<PagoEmpresa> pagos =
-            pagoEmpresaRepository.obtenerTodosPorEmpresa(
-                    cliente.getIdCliente());
+        List<PagoEmpresa> pagos
+                = pagoEmpresaRepository.obtenerTodosPorEmpresa(
+                        cliente.getIdCliente());
 
-    for (PagoEmpresa pago : pagos) {
+        for (PagoEmpresa pago : pagos) {
 
-        BigDecimal nuevoTotal = calcularTotalPago(
-                cliente,
-                pago.getTipoPeriodicidad(),
-                pago.getFecha());
+            BigDecimal nuevoTotal = calcularTotalPago(
+                    cliente,
+                    pago.getTipoPeriodicidad(),
+                    pago.getFecha());
 
-        pago.setMonto(nuevoTotal);
+            pago.setMonto(nuevoTotal);
 
-        pagoEmpresaRepository.save(pago);
+            pagoEmpresaRepository.save(pago);
+        }
     }
-}
 
     @Override
     public List<Venta> filtrarPorMes(int mes, int anio) {

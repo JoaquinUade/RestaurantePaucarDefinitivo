@@ -21,6 +21,7 @@ import paucar.resumen.empresas.MensualEmpresas;
 import paucar.resumen.empresas.semanal.SemanalEmpresas;
 import paucar.resumen.general.MensualGeneral;
 import paucar.resumen.general.SemanalGeneral;
+import paucar.service.ClientesService;
 import paucar.service.ExcelExportService;
 import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
@@ -30,6 +31,7 @@ import paucar.service.VentasBackend;
 public class Resumen extends BorderPane {
 
     private final VentasBackend backend;
+    private final ClientesService clientesService;
     private final ExcelExportService excelExportService;
     // filtros
     private final ComboBox<String> ResumenTipo = new ComboBox<>();/*
@@ -59,9 +61,9 @@ public class Resumen extends BorderPane {
     private MensualGeneral vistaMensualGeneral;
     private SemanalGeneral vistaSemanalGeneral;
 
-    private GastosVariablesService gastosVariablesService;
-    private GastosFijosService gastosFijosService;
-    private GastosIndividualesService gastosIndividualesService;
+    private final GastosVariablesService gastosVariablesService;
+    private final GastosFijosService gastosFijosService;
+    private final GastosIndividualesService gastosIndividualesService;
 
     private final ComboBox<String> tipoResumen = new ComboBox<>();
 
@@ -69,10 +71,12 @@ public class Resumen extends BorderPane {
 
     public Resumen(
             VentasBackend backend,
+            ClientesService clientesService,
             ExcelExportService excelExportService, GastosVariablesService gastosVariablesService,
             GastosFijosService gastosFijosService, GastosIndividualesService gastosIndividualesService) {
 
         this.backend = backend;
+        this.clientesService = clientesService;
         this.excelExportService = excelExportService;
         this.gastosVariablesService = gastosVariablesService;
         this.gastosFijosService = gastosFijosService;
@@ -224,7 +228,7 @@ public class Resumen extends BorderPane {
                     case "General" -> {
                         if (vistaSemanalGeneral == null) {
                             vistaSemanalGeneral
-                                    = new SemanalGeneral(backend, fecha);
+                                    = new SemanalGeneral(backend, clientesService, fecha);
                         }
                         contenedorResultado.setCenter(vistaSemanalGeneral);
                     }

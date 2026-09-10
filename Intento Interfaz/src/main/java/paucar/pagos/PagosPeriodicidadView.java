@@ -1,7 +1,6 @@
 package paucar.pagos;
 
 
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,11 +8,11 @@ import java.util.List;
 import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
 import paucar.shared.FechaUtils;
@@ -42,7 +41,7 @@ public class PagosPeriodicidadView extends BorderPane {
 
         tabla = new TablaPagos(
                 pago -> {
-
+System.out.println("ENTRO AL CALLBACK");
                     List<String> empresas
                     = clientesService.obtenerNombresPagables();
 

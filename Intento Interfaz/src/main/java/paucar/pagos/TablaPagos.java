@@ -31,8 +31,7 @@ public class TablaPagos extends VBox {
         tabla = new TableView<>();
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        
-
+System.out.println("onSelect recibido = " + onSelect);
         // Empresa
         TableColumn<PagoEmpresa, String> colEmpresa
                 = new TableColumn<>("Empresa");
@@ -79,10 +78,14 @@ public class TablaPagos extends VBox {
 
             {
                 btn.setOnAction(e -> {
-
+                    System.out.println("CLICK");
                     PagoEmpresa pago = getTableRow().getItem();
+                    System.out.println(pago);
+                    System.out.println("pago = " + pago);
+                    System.out.println("onSelect = " + onSelect);
 
                     if (pago != null && onSelect != null) {
+                        System.out.println("VOY A EJECUTAR CALLBACK");
                         onSelect.accept(pago);
                     }
                 });
@@ -286,9 +289,9 @@ public class TablaPagos extends VBox {
         double alturaFila = 28;
 
         tabla.setPrefHeight(
-        Responsive.pe(alturaCabecera)
-        + (filas * Responsive.pe(alturaFila))
-        + Responsive.pe(55));
+                Responsive.pe(alturaCabecera)
+                + (filas * Responsive.pe(alturaFila))
+                + Responsive.pe(55));
     }
 
     public PagoEmpresa getSeleccionado() {

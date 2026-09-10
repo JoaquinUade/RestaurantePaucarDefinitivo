@@ -1,14 +1,12 @@
 package paucar.pagos;
 
 
-import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -19,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.pagos.pagosView.PagosQuincenalesView;
 import paucar.pagos.pagosView.PagosSemanalesView;
 import paucar.service.ClientesService;
@@ -211,7 +210,7 @@ public class PagosView extends BorderPane {
 
                 if (vistaSemanal == null) {
 
-                    vistaSemanal = new PagosSemanalesView(service);
+                    vistaSemanal = new PagosSemanalesView(service, clientesService);
 
                 }
 
@@ -223,7 +222,7 @@ public class PagosView extends BorderPane {
             case "Quincenal" -> {
 
                 if (vistaQuincenal == null) {
-                    vistaQuincenal = new PagosQuincenalesView(service);
+                    vistaQuincenal = new PagosQuincenalesView(service, clientesService);
                 }
 
                 contenedorResultado.setCenter(vistaQuincenal);

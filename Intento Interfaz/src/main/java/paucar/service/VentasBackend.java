@@ -1,4 +1,5 @@
 package paucar.service;
+
 import paucar.config.HttpCompartido;
 
 import java.math.BigDecimal;
@@ -270,7 +271,7 @@ public class VentasBackend {
                         }
 
                         Venta ventaLeida = new Venta();
-                        
+
                         Cliente cliente = new Cliente();
 
                         cliente.setIdCliente(idCliente);
@@ -426,28 +427,47 @@ public class VentasBackend {
 
     public boolean actualizarEstadoVenta(Long idVenta, TipoDePago estado) {
         try {
-            var bodyMap = new java.util.HashMap<String, Object>();/*crea un nuevo HashMap llamado bodyMap que se usará para construir el cuerpo de la solicitud PATCH*/
-            bodyMap.put("estado", estado);/*Guarda en el mapa bodyMap el valor de la variable estado usando "estado" como nombre del dato */
 
-            String bodyJson = TraductorJSON.writeValueAsString(bodyMap);/*Convierte el mapa bodyMap a una cadena JSON y lo guarda en la variable bodyJson*/
+            var bodyMap = new java.util.HashMap<String, Object>();
+
+            bodyMap.put("estado", estado);
+
+            // Solo guardar fecha cuando deja de ser deuda
+            if (estado != TipoDePago.DEBE
+                    && estado != TipoDePago.DEUDA_PAGADA) {
+
+                bodyMap.put(
+                        "fechaPago",
+                        LocalDateTime.now());
+            }
+
+            String bodyJson
+                    = TraductorJSON.writeValueAsString(bodyMap);
+
+            System.out.println(bodyJson);
 
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/ventas/" + idVenta))
-                    .header("Content-Type", "application/json")/*Especifica el tipo de contenido de la solicitud como JSON*/
-                    .method("PATCH", HttpRequest.BodyPublishers.ofString(bodyJson))/*Especifica el método de la solicitud como PATCH(osea para
-                                                                                       modificar solo una parte de los datos que ya existen) y el
-                                                                                       cuerpo de la solicitud como una cadena JSON*/
+                    .header("Content-Type", "application/json")
+                    .method(
+                            "PATCH",
+                            HttpRequest.BodyPublishers.ofString(bodyJson))
                     .build();
 
-            var response = http.send(request, HttpResponse.BodyHandlers.ofString());/*Envía la solicitud HTTP y espera la respuesta del servidor,
-                                                                                especifica que el cuerpo de la respuesta sea un string*/
+            var response
+                    = http.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString());
 
-            return response.statusCode() >= 200 && response.statusCode() < 300;/*Si el código de estado de la respuesta está en el rango de 200 a 
-                                                                            299, significa que la actualización fue exitosa, sino devuelve false*/
-
+            return response.statusCode() >= 200
+                    && response.statusCode() < 300;
 
         } catch (java.io.IOException | InterruptedException e) {
-            System.err.println("Error actualizando estado de venta: " + e.getMessage());
+
+            System.err.println(
+                    "Error actualizando estado de venta: "
+                    + e.getMessage());
+
             return false;
         }
     }
@@ -600,5 +620,135 @@ public class VentasBackend {
         System.out.println("=================================");
 
         return total;
+    }
+
+    public boolean actualizarConsumidor(
+            Long idVenta,
+            String consumidor) {
+
+        try {
+
+            var bodyMap
+                    = new java.util.HashMap<String, Object>();
+
+            bodyMap.put("consumidor", consumidor);
+
+            String bodyJson
+                    = TraductorJSON.writeValueAsString(bodyMap);
+
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(
+                            BASE_URL + "/ventas/" + idVenta))
+                    .header(
+                            "Content-Type",
+                            "application/json")
+                    .method(
+                            "PATCH",
+                            HttpRequest.BodyPublishers
+                                    .ofString(bodyJson))
+                    .build();
+
+            var response = http.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofString());
+
+            System.out.println(
+                    "[PATCH consumidor] status="
+                    + response.statusCode());
+
+            System.out.println(
+                    "[PATCH consumidor] body="
+                    + response.body());
+
+            return response.statusCode() >= 200
+                    && response.statusCode() < 300;
+
+        } catch (java.io.IOException
+                | InterruptedException e) {
+
+            System.err.println(
+                    "Error actualizando consumidor: "
+                    + e.getMessage());
+
+            return false;
+        }
+    }
+
+    public boolean actualizarVenta(Venta venta) {
+
+        try {
+
+            var bodyMap
+                    = new java.util.HashMap<String, Object>();
+
+            bodyMap.put(
+                    "cliente",
+                    venta.getCliente());
+
+            bodyMap.put(
+                    "descripcion",
+                    venta.getDescripcion());
+
+            bodyMap.put(
+                    "monto",
+                    venta.getMonto());
+
+            bodyMap.put(
+                    "estado",
+                    venta.getEstado());
+
+            bodyMap.put(
+                    "observaciones",
+                    venta.getObservaciones());
+
+            bodyMap.put(
+                    "consumidor",
+                    venta.getConsumidor());
+
+            String bodyJson
+                    = TraductorJSON.writeValueAsString(
+                            bodyMap);
+
+            var request
+                    = HttpRequest.newBuilder()
+                            .uri(
+                                    URI.create(
+                                            BASE_URL
+                                            + "/ventas/"
+                                            + venta.getIdVenta()))
+                            .header(
+                                    "Content-Type",
+                                    "application/json")
+                            .method(
+                                    "PATCH",
+                                    HttpRequest.BodyPublishers
+                                            .ofString(bodyJson))
+                            .build();
+
+            var response
+                    = http.send(
+                            request,
+                            HttpResponse.BodyHandlers
+                                    .ofString());
+
+            System.out.println(
+                    "[PATCH venta] status="
+                    + response.statusCode());
+
+            System.out.println(
+                    "[PATCH venta] body="
+                    + response.body());
+
+            return response.statusCode() >= 200
+                    && response.statusCode() < 300;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Error actualizando venta: "
+                    + e.getMessage());
+
+            return false;
+        }
     }
 }

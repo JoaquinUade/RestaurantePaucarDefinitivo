@@ -1,7 +1,5 @@
 package paucar.resumen.general;
 
-
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -15,7 +13,6 @@ import com.uade.tpo.demo.entity.dto.VentaResumenDiarioDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -27,6 +24,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
+import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
 import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
@@ -39,13 +38,18 @@ public class SemanalGeneral extends BorderPane {
     private final ObservableList<VentaResumenDiarioDTO> filaTotalSemana = FXCollections.observableArrayList();
 
     private final VentasBackend backend;
+    private final ClientesService clientesService;
+
     private final VBox contenido = new VBox(Responsive.pe(8));/*contenedor vertical en el que pondremos los
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
     private final LocalDate fechaBase;
-    public SemanalGeneral(VentasBackend backend, LocalDate fechaBase) {
+
+    public SemanalGeneral(VentasBackend backend, ClientesService clientesService, LocalDate fechaBase) {
         this.backend = backend;
+        this.clientesService = clientesService;
         this.fechaBase = fechaBase;
+
         initUI();
 
         LocalDate lunes = obtenerLunes(fechaBase);
@@ -181,10 +185,14 @@ public class SemanalGeneral extends BorderPane {
             }
         }
 
-        Tabla tabla = new Tabla(filas, LocaleUtils.ES_AR,
-                null, null);/*Creá una tabla nueva que muestre estas ventas,
-                                                         usando formato argentino, sin acciones especiales
-                                                         ni configuraciones extra */
+        Tabla tabla = new Tabla(
+                filas,
+                LocaleUtils.ES_AR,
+                null,
+                null,
+                backend,
+                clientesService
+        );
         tabla.setSoloLectura(true);/*Establece que la tabla sea de solo lectura asi evitar
                                                 cualquier modificacion*/
 

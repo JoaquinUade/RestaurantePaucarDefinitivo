@@ -5,20 +5,39 @@ import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
 import javafx.scene.layout.BorderPane;
+import paucar.pagos.DialogPagos;
 import paucar.pagos.TablaPagos;
+import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
 public class PagosConsumoView extends BorderPane {
 
     private final PagosService service;
     private final TablaPagos tabla;
-
-    public PagosConsumoView(PagosService service) {
+private final ClientesService clientesService;
+    public PagosConsumoView(PagosService service, ClientesService clientesService) {
 
         this.service = service;
+        this.clientesService = clientesService;
 
         tabla = new TablaPagos(
-    null,
+    pago -> {
+
+        List<String> empresas =
+                clientesService.obtenerNombresPagables();
+
+        PagoEmpresa nuevo =
+                DialogPagos.mostrarEditar(
+                        empresas,
+                        clientesService,
+                        null,
+                        pago);
+
+        if (nuevo != null) {
+            service.modificar(pago.getId(), nuevo);
+            recargar();
+        }
+    },
     this::recargar,
     service
 );

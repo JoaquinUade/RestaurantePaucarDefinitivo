@@ -1,7 +1,5 @@
 package paucar.pagos.pagosView;
 
-
-import paucar.config.Responsive;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
@@ -11,7 +9,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
+import paucar.pagos.DialogPagos;
 import paucar.pagos.TablaPagos;
+import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
 public class PagosQuincenalesView extends BorderPane {
@@ -20,18 +21,50 @@ public class PagosQuincenalesView extends BorderPane {
 
     private final TablaPagos tablaQuincena1;
     private final TablaPagos tablaQuincena2;
+    private final ClientesService clientesService;
 
-    public PagosQuincenalesView(PagosService service) {
+    public PagosQuincenalesView(PagosService service, ClientesService clientesService) {
 
         this.service = service;
+        this.clientesService = clientesService;
 
         tablaQuincena1 = new TablaPagos(
-                null,
+                pago -> {
+
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+                    if (nuevo != null) {
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
+                },
                 this::recargar,
                 service);
 
         tablaQuincena2 = new TablaPagos(
-                null,
+                pago -> {
+
+                    List<String> empresas
+                    = clientesService.obtenerNombresPagables();
+
+                    PagoEmpresa nuevo
+                    = DialogPagos.mostrarEditar(
+                            empresas,
+                            clientesService,
+                            null,
+                            pago);
+                    if (nuevo != null) {
+
+                        service.modificar(pago.getId(), nuevo);
+                        recargar();
+                    }
+                },
                 this::recargar,
                 service);
 

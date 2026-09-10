@@ -115,6 +115,7 @@ public class Aplicacion extends Application {
 
         vistaResumen = new Resumen(
         backend,
+        clientesService,
         new ExcelExportService(
                 backend,
                 services.pagos,

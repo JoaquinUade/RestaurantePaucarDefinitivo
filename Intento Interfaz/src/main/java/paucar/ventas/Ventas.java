@@ -1,6 +1,5 @@
 package paucar.ventas;
 
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.CompletableFuture;
@@ -105,7 +104,12 @@ public final class Ventas extends BorderPane {
                 RenglonDeLaTabla,
                 LocaleUtils.ES_AR,
                 fila -> eliminarVentaDesdeBackend(fila),
-                (fila, nuevoEstado) -> actualizarEstadoEnBackend(fila, nuevoEstado)
+                (fila, nuevoEstado)
+                -> actualizarEstadoEnBackend(
+                        fila,
+                        nuevoEstado),
+                        backend,
+                clientesService
         );
         return pane; // o pane.asNode() si tu clase expone ese método
     }
