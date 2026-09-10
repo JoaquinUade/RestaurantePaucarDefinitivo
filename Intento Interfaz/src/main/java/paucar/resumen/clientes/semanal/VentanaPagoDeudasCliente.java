@@ -1,7 +1,6 @@
 package paucar.resumen.clientes.semanal;
 
 
-import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import com.uade.tpo.demo.entity.TipoDePago;
 import com.uade.tpo.demo.entity.Venta;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -25,6 +23,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import paucar.config.Responsive;
 import paucar.security.PasswordManager;
 import paucar.security.SesionPassword;
 import paucar.service.VentasBackend;

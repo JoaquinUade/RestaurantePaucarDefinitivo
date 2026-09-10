@@ -1,14 +1,12 @@
 package paucar.stock;
 
 
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -20,6 +18,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.security.PasswordManager;
 import paucar.security.SesionPassword;
 import paucar.stock.aumentoydisminucion.TablaItemsComprados;

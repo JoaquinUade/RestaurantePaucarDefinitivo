@@ -1,7 +1,6 @@
 package paucar.stock;
 
 
-import paucar.config.Responsive;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +14,6 @@ import com.uade.tpo.demo.entity.Stock;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import paucar.config.Responsive;
 import paucar.service.StockService;
 
 public class DialogHistorialStock {

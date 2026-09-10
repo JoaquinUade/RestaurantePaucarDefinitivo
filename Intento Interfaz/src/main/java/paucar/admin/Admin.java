@@ -1,8 +1,14 @@
 package paucar.admin;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +23,7 @@ import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 import paucar.service.EmpleadoService;
+import paucar.security.PasswordManager;
 
 public class Admin extends BorderPane {
 
@@ -56,6 +63,7 @@ public class Admin extends BorderPane {
         Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/empresas clientes.png");
         Button btnCategoriasGastos = crearTarjeta(" CATEGORIAS DE\n GASTOS VARIABLES", "/img/gastos variables.png");
         Button btnEmpleados = crearTarjeta("EMPLEADOS", "/img/empleado.png");
+        Button btnSeguridad = crearTarjeta("SEGURIDAD\nCONTRASEÑA", "/img/empleado.png");
 
         btnPlatos.setOnAction(click -> {
             marcarActivo(btnPlatos, btnEmpresasClientes, btnCategoriasGastos, btnEmpleados);
@@ -77,11 +85,71 @@ public class Admin extends BorderPane {
             setCenter(new EmpleadosView(empleadoService));
         });
 
+        btnSeguridad.setOnAction(click -> mostrarDialogoSeguridad());
+
         grid.add(btnPlatos, 0, 0);
         grid.add(btnEmpresasClientes, 1, 0);
         grid.add(btnCategoriasGastos, 2, 0);
         grid.add(btnEmpleados, 3, 0);
+        grid.add(btnSeguridad, 0, 1);
         setCenter(grid);
+    }
+
+    private void mostrarDialogoSeguridad() {
+        Dialog<ButtonType> dialogo = new Dialog<>();
+        dialogo.setTitle("Seguridad");
+        dialogo.setHeaderText("Cambiar contraseña");
+
+        ButtonType cambiar = new ButtonType("Cambiar contraseña",
+                ButtonBar.ButtonData.OK_DONE);
+        ButtonType restablecer = new ButtonType("Restablecer con PIN",
+                ButtonBar.ButtonData.OTHER);
+        dialogo.getDialogPane().getButtonTypes().addAll(cambiar, restablecer,
+                ButtonType.CANCEL);
+
+        PasswordField actual = new PasswordField();
+        PasswordField nueva = new PasswordField();
+        PasswordField confirmacion = new PasswordField();
+        PasswordField pin = new PasswordField();
+        actual.setPromptText("Para cambio normal");
+        nueva.setPromptText("Mínimo 8 caracteres: letra y número");
+        confirmacion.setPromptText("Repetí la nueva contraseña");
+        pin.setPromptText("Solo si olvidaste la contraseña");
+
+        GridPane formulario = new GridPane();
+        formulario.setHgap(10);
+        formulario.setVgap(10);
+        formulario.add(new Label("Contraseña actual:"), 0, 0);
+        formulario.add(actual, 1, 0);
+        formulario.add(new Label("Nueva contraseña:"), 0, 1);
+        formulario.add(nueva, 1, 1);
+        formulario.add(new Label("Confirmación:"), 0, 2);
+        formulario.add(confirmacion, 1, 2);
+        formulario.add(new Label("PIN de recuperación:"), 0, 3);
+        formulario.add(pin, 1, 3);
+        formulario.add(new Label("Si olvidaste la contraseña, ingresá el PIN y elegí “Restablecer con PIN”."),
+                0, 4, 2, 1);
+
+        dialogo.getDialogPane().setContent(formulario);
+        dialogo.showAndWait().ifPresent(opcion -> {
+            String error = null;
+            if (opcion == cambiar) {
+                error = PasswordManager.cambiarConContrasenaActual(
+                        actual.getText(), nueva.getText(), confirmacion.getText());
+            } else if (opcion == restablecer) {
+                error = PasswordManager.restablecerConPin(
+                        pin.getText(), nueva.getText(), confirmacion.getText());
+            } else {
+                return;
+            }
+
+            if (error == null) {
+                new Alert(Alert.AlertType.INFORMATION,
+                        "La contraseña se actualizó correctamente.").showAndWait();
+            } else {
+                new Alert(Alert.AlertType.ERROR, error).showAndWait();
+            }
+        });
     }
 
     private Button crearTarjeta(String titulo, String rutaIcono) {

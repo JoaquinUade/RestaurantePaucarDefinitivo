@@ -119,7 +119,8 @@ public class ExcelExportService {
                     = resumenPorDia(ventasDelMes);
 
             hojaResumenSemanal(libro, ventasDelMes);
-            hojaResumenMensual(libro, anio, mes, resumenDiario);
+            hojaResumenMensual(libro, anio, mes, resumenDiario,
+                    gastosFijos, gastosVariables, gastosIndividuales);
             hojaResumenEmpresas(libro, empresas, ventasDelMes);
             hojaVentasDelMes(libro, anio, mes, ventasDelMes);
             hojaPagosDelMes(libro, pagosDelMes);
@@ -262,6 +263,9 @@ public class ExcelExportService {
         destino.setTransferencia(destino.getTransferencia().add(parcial.getTransferencia()));
         destino.setMercadoPago(destino.getMercadoPago().add(parcial.getMercadoPago()));
         destino.setEfectivo(destino.getEfectivo().add(parcial.getEfectivo()));
+        destino.setGastosFijos(destino.getGastosFijos().add(parcial.getGastosFijos()));
+        destino.setGastosVariables(destino.getGastosVariables().add(parcial.getGastosVariables()));
+        destino.setGastosIndividuales(destino.getGastosIndividuales().add(parcial.getGastosIndividuales()));
     }
 
     private String diaSemana(LocalDate fecha) {
@@ -340,6 +344,15 @@ public class ExcelExportService {
         return cs;
     }
 
+    private CellStyle estiloMonedaRoja(Workbook wb, boolean total) {
+        CellStyle cs = estiloMoneda(wb, total);
+        Font fuente = wb.createFont();
+        fuente.setColor(IndexedColors.RED.getIndex());
+        fuente.setBold(total);
+        cs.setFont(fuente);
+        return cs;
+    }
+
     private CellStyle estiloTexto(Workbook wb, boolean total) {
         CellStyle cs = wb.createCellStyle();
         cs.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -361,23 +374,23 @@ public class ExcelExportService {
     private void escribirFilaResumen(Sheet sh, int filaId,
             LocalDate fecha, VentaResumenDiarioDTO r,
             CellStyle estiloTexto, CellStyle estiloMoneda, boolean total) {
+        CellStyle estiloDescuento = estiloMonedaRoja(sh.getWorkbook(), total);
         Row fila = sh.createRow(filaId);
         Cell c0 = fila.createCell(0);
         c0.setCellValue(total ? "TOTAL" : formatearFecha(fecha));
         c0.setCellStyle(estiloTexto);
 
-        Cell c1 = fila.createCell(1);
-        c1.setCellValue(total ? "" : diaSemana(fecha));
-        c1.setCellStyle(estiloTexto);
-
-        celdaMoneda(fila, 2, r.getVentaTotal(), estiloMoneda);
-        celdaMoneda(fila, 3, r.getEfectivo(), estiloMoneda);
+        celdaMoneda(fila, 1, r.getVentaTotal(), estiloMoneda);
+        celdaMoneda(fila, 2, r.getDebe(), estiloDescuento);
+        celdaMoneda(fila, 3, r.getDeudaPagada(), estiloMoneda);
         celdaMoneda(fila, 4, r.getDebito(), estiloMoneda);
         celdaMoneda(fila, 5, r.getCredito(), estiloMoneda);
         celdaMoneda(fila, 6, r.getTransferencia(), estiloMoneda);
         celdaMoneda(fila, 7, r.getMercadoPago(), estiloMoneda);
-        celdaMoneda(fila, 8, r.getDebe(), estiloMoneda);
-        celdaMoneda(fila, 9, r.getDeudaPagada(), estiloMoneda);
+        celdaMoneda(fila, 8, r.getEfectivo(), estiloMoneda);
+        celdaMoneda(fila, 9, r.getGastosFijos(), estiloDescuento);
+        celdaMoneda(fila, 10, r.getGastosVariables(), estiloDescuento);
+        celdaMoneda(fila, 11, r.getGastosIndividuales(), estiloDescuento);
     }
 
     private void escribirFilaEmpresa(Sheet sh, int filaId,
@@ -565,11 +578,14 @@ public class ExcelExportService {
     }
 
     private void hojaResumenMensual(Workbook wb, int anio, int mes,
-            Map<LocalDate, VentaResumenDiarioDTO> resumenDiario) {
+            Map<LocalDate, VentaResumenDiarioDTO> resumenDiario,
+            List<GastosFijos> gastosFijos,
+            List<GastosVariables> gastosVariables,
+            List<GastosIndividuales> gastosIndividuales) {
         Sheet sh = wb.createSheet("Resumen Mensual");
-        String[] columnas = {"Fecha", "Día", "Venta Total", "Efectivo",
-            "Débito", "Crédito", "Transferencia",
-            "Mercado Pago", "Debe", "Deuda Pagada"};
+        String[] columnas = {"Fecha", "V. Total", "Debe", "Deuda Pagada",
+            "Débito", "Crédito", "Transferencia", "Mercado Pago",
+            "Efectivo", "G. Fijos", "G. Variables", "G. Individuales"};
         String mesTexto = LocalDate.of(anio, mes, 1)
                 .getMonth().getDisplayName(TextStyle.FULL, ES_AR);
         escribirTituloYCabecera(wb, sh,
@@ -586,6 +602,8 @@ public class ExcelExportService {
             if (esDiaHabil(fecha)) {
                 VentaResumenDiarioDTO r = resumenDiario.getOrDefault(
                         fecha, new VentaResumenDiarioDTO(fecha));
+                acumularGastosDelDia(r, fecha, gastosFijos, gastosVariables,
+                        gastosIndividuales);
                 sumarResumen(total, r);
                 escribirFilaResumen(sh, fila, fecha, r,
                         estiloTexto, estiloMoneda, false);
@@ -593,6 +611,13 @@ public class ExcelExportService {
             }
             fecha = fecha.plusDays(1);
         }
+
+        BigDecimal totalGastos = total.getGastosFijos()
+                .add(total.getGastosVariables())
+                .add(total.getGastosIndividuales());
+        total.setVentaTotal(total.getVentaTotal()
+                .subtract(total.getDebe())
+                .subtract(totalGastos));
 
         escribirFilaResumen(sh, fila, null, total,
                 estiloTexto(wb, true), estiloMoneda(wb, true), true);
@@ -603,6 +628,27 @@ public class ExcelExportService {
             sh.setColumnWidth(i, 13 * 256);
         }
         sh.createFreezePane(0, 2);
+    }
+
+    private void acumularGastosDelDia(VentaResumenDiarioDTO resumen,
+            LocalDate fecha, List<GastosFijos> gastosFijos,
+            List<GastosVariables> gastosVariables,
+            List<GastosIndividuales> gastosIndividuales) {
+        for (GastosFijos gasto : gastosFijos) {
+            if (fecha.equals(gasto.getFecha())) {
+                resumen.setGastosFijos(resumen.getGastosFijos().add(gasto.getMonto()));
+            }
+        }
+        for (GastosVariables gasto : gastosVariables) {
+            if (fecha.equals(gasto.getFecha())) {
+                resumen.setGastosVariables(resumen.getGastosVariables().add(gasto.getMonto()));
+            }
+        }
+        for (GastosIndividuales gasto : gastosIndividuales) {
+            if (fecha.equals(gasto.getFecha())) {
+                resumen.setGastosIndividuales(resumen.getGastosIndividuales().add(gasto.getMonto()));
+            }
+        }
     }
 
     private void hojaResumenEmpresas(

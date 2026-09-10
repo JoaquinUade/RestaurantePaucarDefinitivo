@@ -59,6 +59,7 @@ public class Tabla extends VBox {
 
         tabla.setEditable(true);
         tabla.setItems(items);
+        tabla.setPlaceholder(new Label("No hay ventas ingresadas para mostrar."));
         tabla.getColumns().setAll(crearColumnas());
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN

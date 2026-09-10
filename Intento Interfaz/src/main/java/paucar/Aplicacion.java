@@ -2,7 +2,15 @@ package paucar;
 
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,9 +20,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import paucar.admin.Admin;
 import paucar.componentes.MenuLateral;
 import paucar.config.CssLoader;
+import paucar.config.HttpCompartido;
 import paucar.config.Responsive;
 import paucar.config.ServiceContainer;
 import paucar.gastos.Gastos;
@@ -34,6 +44,8 @@ public class Aplicacion extends Application {
     private Gastos vistaGastos;
     private StockView vistaStock;
     private PagosView vistaPagos;
+    private Label estadoConexion;
+    private Timeline verificadorConexion;
 
     private static final String API_BASE
             = "http://localhost:4002/api";
@@ -47,6 +59,8 @@ public class Aplicacion extends Application {
         Responsive.inicializar();
 
         BorderPane root = new BorderPane();
+
+        configurarEstadoConexion(root);
 
         Scene scene = new Scene(
                 root,
@@ -275,6 +289,54 @@ public class Aplicacion extends Application {
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
+    }
+
+    private void configurarEstadoConexion(BorderPane root) {
+        estadoConexion = new Label("Verificando conexión con el servidor...");
+        estadoConexion.setStyle("-fx-padding: 8 16; -fx-font-size: 12px;"
+                + "-fx-background-color: #f3f4f6; -fx-text-fill: #374151;");
+        estadoConexion.setVisible(false);
+        estadoConexion.setManaged(false);
+        root.setBottom(estadoConexion);
+
+        verificarConexion();
+
+        verificadorConexion = new Timeline(new KeyFrame(
+                Duration.seconds(10), e -> verificarConexion()));
+        verificadorConexion.setCycleCount(Timeline.INDEFINITE);
+        verificadorConexion.play();
+    }
+
+    private void verificarConexion() {
+        String healthUrl = API_BASE.replace("/api", "") + "/actuator/health";
+
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(healthUrl))
+                        .timeout(java.time.Duration.ofSeconds(3))
+                        .GET()
+                        .build();
+
+                HttpResponse<Void> response = HttpCompartido.getHttpClient()
+                        .send(request, HttpResponse.BodyHandlers.discarding());
+                return response.statusCode() == 200;
+            } catch (Exception ignored) {
+                return false;
+            }
+        }).thenAccept(conectado -> Platform.runLater(() -> {
+            if (conectado) {
+                estadoConexion.setVisible(false);
+                estadoConexion.setManaged(false);
+            } else {
+                estadoConexion.setText("⚠ No se pudo conectar con el servidor. "
+                        + "Iniciá el backend antes de cargar o consultar datos.");
+                estadoConexion.setStyle("-fx-padding: 8 16; -fx-font-size: 12px;"
+                        + "-fx-background-color: #fef2f2; -fx-text-fill: #b91c1c;");
+                estadoConexion.setVisible(true);
+                estadoConexion.setManaged(true);
+            }
+        }));
     }
 
     private void limpiarActivos(MenuLateral menu) {

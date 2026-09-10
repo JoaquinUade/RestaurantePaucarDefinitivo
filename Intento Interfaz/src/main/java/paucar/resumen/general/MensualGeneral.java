@@ -44,6 +44,9 @@ public class MensualGeneral extends BorderPane {
 
     private final BorderPane footerTotal = new BorderPane();/*variable que guarda el pie de página con el total */
 
+    private final Label mensajeSinDatos = new Label(
+            "No hay datos ingresados para mostrar en este mes.");
+
     private final ObservableList<VentaResumenDiarioDTO> RenglonResumenDiario = FXCollections.observableArrayList();/*variable que guarda la lista observable de los datos resumidos diarios */
 
     public MensualGeneral(
@@ -73,7 +76,11 @@ public class MensualGeneral extends BorderPane {
 
         setTop(titulo);
 
-        VBox contenedorTabla = new VBox(tabla);
+        mensajeSinDatos.setStyle("-fx-padding: 8 0; -fx-text-fill: #6b7280;");
+        mensajeSinDatos.setVisible(false);
+        mensajeSinDatos.setManaged(false);
+
+        VBox contenedorTabla = new VBox(mensajeSinDatos, tabla);
 
         contenedorTabla.setPadding(
                 new Insets(15, Responsive.px(20), 15, Responsive.px(20))
@@ -232,7 +239,28 @@ public class MensualGeneral extends BorderPane {
 
         TotalMensual.setVentaTotal(totalNeto);
 
+        actualizarMensajeSinDatos();
         RenderTotalMensual(TotalMensual);/*Muestra en la interfaz el resumen total del mes*/
+    }
+
+    private void actualizarMensajeSinDatos() {
+        boolean hayDatos = RenglonResumenDiario.stream().anyMatch(this::tieneImportes);
+        mensajeSinDatos.setVisible(!hayDatos);
+        mensajeSinDatos.setManaged(!hayDatos);
+    }
+
+    private boolean tieneImportes(VentaResumenDiarioDTO resumen) {
+        return resumen.getVentaTotal().signum() != 0
+                || resumen.getDebe().signum() != 0
+                || resumen.getDeudaPagada().signum() != 0
+                || resumen.getDebito().signum() != 0
+                || resumen.getCredito().signum() != 0
+                || resumen.getTransferencia().signum() != 0
+                || resumen.getMercadoPago().signum() != 0
+                || resumen.getEfectivo().signum() != 0
+                || resumen.getGastosFijos().signum() != 0
+                || resumen.getGastosVariables().signum() != 0
+                || resumen.getGastosIndividuales().signum() != 0;
     }
 
     private List<TableColumn<VentaResumenDiarioDTO, ?>> crearColumnas() {/*Este método define las columnas
