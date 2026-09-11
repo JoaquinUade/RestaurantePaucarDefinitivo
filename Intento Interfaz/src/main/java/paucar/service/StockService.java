@@ -33,6 +33,27 @@ public class StockService {
         this.mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
+    public HistorialStock editarHistorial(Long id, HistorialStock cambios) {
+        try {
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/historial/" + id))
+                    .header("Content-Type", "application/json")
+                    .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(cambios)))
+                    .build();
+            var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IllegalStateException("No se pudo guardar el movimiento (HTTP "
+                        + response.statusCode() + "). " + response.body());
+            }
+            return mapper.readValue(response.body(), HistorialStock.class);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Se interrumpió el guardado", e);
+        } catch (IOException e) {
+            throw new IllegalStateException("No se pudo comunicar con el servidor", e);
+        }
+    }
+
     // OBTENER TODOS
     public List<Stock> obtenerTodos() {
 

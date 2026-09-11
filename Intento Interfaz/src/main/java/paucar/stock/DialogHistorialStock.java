@@ -1,6 +1,5 @@
 package paucar.stock;
 
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -32,7 +31,10 @@ public class DialogHistorialStock {
 
     public static void mostrar(
             Stock stock,
-            List<HistorialStock> historial, List<GastosVariables> gastos, StockService stockService) {
+            List<HistorialStock> historial,
+            List<GastosVariables> gastos,
+            StockService stockService,
+            LocalDate fechaSeleccionada) {
 
         Stage ventana = new Stage();
 
@@ -43,16 +45,55 @@ public class DialogHistorialStock {
                 "Historial - "
                 + stock.getNombreProducto());
 
+        VBox root = new VBox(Responsive.pe(15));
+        root.setPadding(Responsive.insets(20));
+        Runnable[] actualizar = new Runnable[1];
+        List<HistorialStock> registros = new java.util.ArrayList<>(historial);
+        actualizar[0] = () -> llenarSemanas(
+                root,
+                registros,
+                gastos,
+                stockService,
+                actualizar[0],
+                fechaSeleccionada);
+        actualizar[0].run();
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        ventana.setScene(new Scene(scrollPane, Responsive.px(1200), Responsive.py(600)));
+        ventana.showAndWait();
+    }
+
+    private static void llenarSemanas(
+            VBox root,
+            List<HistorialStock> historial,
+            List<GastosVariables> gastos,
+            StockService stockService,
+            Runnable actualizar,
+            LocalDate fechaSeleccionada) {
+        root.getChildren().clear();
+        Label tituloMes = new Label(
+                fechaSeleccionada.getMonth().toString()
+                + " "
+                + fechaSeleccionada.getYear());
+
+        tituloMes.setStyle(
+                "-fx-font-size: 24px;"
+                + "-fx-font-weight: bold;"
+        );
+
+        root.getChildren().add(tituloMes);
+        List<HistorialStock> historialMes = historial.stream()
+                .filter(h
+                        -> h.getFecha().getMonth() == fechaSeleccionada.getMonth()
+                && h.getFecha().getYear() == fechaSeleccionada.getYear())
+                .toList();
         Map<LocalDate, List<HistorialStock>> historialPorSemana
-                = historial.stream()
+                = historialMes.stream()
                         .collect(Collectors.groupingBy(
                                 h -> h.getFecha().with(DayOfWeek.MONDAY),
                                 TreeMap::new,
                                 Collectors.toList()));
 
-        VBox root = new VBox(Responsive.pe(15));
-        root.setPadding(
-                Responsive.insets(20));
         int semana = 1;
 
         for (Map.Entry<LocalDate, List<HistorialStock>> entry
@@ -68,7 +109,13 @@ public class DialogHistorialStock {
             TableView<HistorialStock> tabla
                     = crearTabla(
                             entry.getValue(),
-                            gastos, stockService);
+                            gastos, stockService, () -> {
+                                List<HistorialStock> nuevos = stockService.obtenerHistorialPorStock(
+                                        historial.get(0).getStock().getIdStock());
+                                historial.clear();
+                                historial.addAll(nuevos);
+                                actualizar.run();
+                            });
 
             root.getChildren().addAll(
                     titulo,
@@ -77,19 +124,10 @@ public class DialogHistorialStock {
             semana++;
         }
 
-        ScrollPane scrollPane = new ScrollPane(root);
-        scrollPane.setFitToWidth(true);
-
-        Scene scene
-                = new Scene(scrollPane,
-                Responsive.px(1200), Responsive.py(600));
-
-        ventana.setScene(scene);
-        ventana.showAndWait();
     }
 
     private static TableView<HistorialStock> crearTabla(
-            List<HistorialStock> historial, List<GastosVariables> gastos, StockService stockService) {
+            List<HistorialStock> historial, List<GastosVariables> gastos, StockService stockService, Runnable actualizar) {
 
         TableView<HistorialStock> tabla
                 = new TableView<>();
@@ -214,14 +252,11 @@ public class DialogHistorialStock {
 
                     HistorialStock editado
                             = DialogHistorialEditar
-                                    .mostrarEditar(registro, gastos);
+                                    .mostrarEditar(registro, gastos, stockService);
 
                     if (editado != null) {
 
-                        getTableView().refresh();
-
-                        System.out.println(
-                                "Registro editado");
+                        actualizar.run();
                     }
                 });
 

@@ -33,6 +33,56 @@ public class StockServiceImpl implements StockService {
     private HistorialStockRepository historialStockRepository;
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
+    public HistorialStock editarMovimientoHistorial(Long id, HistorialStock cambios) {
+        if (cambios.getFecha() == null || cambios.getMovimiento() == null) {
+            throw new IllegalArgumentException("La fecha y el movimiento son obligatorios");
+        }
+        HistorialStock registro = historialStockRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Movimiento no encontrado"));
+        Stock stock = registro.getStock();
+        List<HistorialStock> anteriores = historialStockRepository
+                .findByStock_IdStockOrderByFechaAscIdAsc(stock.getIdStock());
+        BigDecimal saldoInicial = anteriores.isEmpty() ? BigDecimal.ZERO
+                : anteriores.get(0).getCantidad().subtract(anteriores.get(0).getMovimiento());
+        GastosVariables previo = registro.getGastoVariable();
+        Long idPrevio = previo == null ? null : previo.getIdGastoVariable();
+        Long idNuevo = cambios.getGastoVariable() == null ? null
+                : cambios.getGastoVariable().getIdGastoVariable();
+        if (!java.util.Objects.equals(idPrevio, idNuevo)) {
+            GastosVariables nuevo = idNuevo == null ? null : gastosVariablesRepository.findById(idNuevo)
+                    .orElseThrow(() -> new IllegalArgumentException("Gasto no encontrado"));
+            if (nuevo != null && Boolean.TRUE.equals(nuevo.getCargadoEnStock())) {
+                throw new IllegalArgumentException("El gasto ya fue cargado al stock");
+            }
+            if (previo != null) {
+                previo.setStock(null);
+                previo.setCargadoEnStock(false);
+                gastosVariablesRepository.save(previo);
+            }
+            if (nuevo != null) {
+                nuevo.setStock(stock);
+                nuevo.setCargadoEnStock(true);
+                gastosVariablesRepository.save(nuevo);
+            }
+            registro.setGastoVariable(nuevo);
+        }
+        registro.setFecha(cambios.getFecha());
+        registro.setMovimiento(cambios.getMovimiento());
+        historialStockRepository.saveAndFlush(registro);
+        BigDecimal saldo = saldoInicial;
+        for (HistorialStock movimiento : historialStockRepository
+                .findByStock_IdStockOrderByFechaAscIdAsc(stock.getIdStock())) {
+            saldo = saldo.add(movimiento.getMovimiento());
+            movimiento.setCantidad(saldo);
+            historialStockRepository.save(movimiento);
+        }
+        stock.setCantidad(saldo);
+        stockRepository.save(stock);
+        return registro;
+    }
+
+    @Override
     public Stock agregarProductoAStock(StockRequest request) {
         if (request.getCategoriaId() == null) {
             throw new IllegalArgumentException("La categoria es obligatoria");
@@ -323,8 +373,9 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Stock restarStock(
-            Long idStock,
-            BigDecimal cantidadARestar) {
+        Long idStock,
+        BigDecimal cantidadARestar,
+        LocalDate fecha) {
 
         Stock stock = stockRepository.findById(idStock)
                 .orElseThrow(()
@@ -349,7 +400,7 @@ public class StockServiceImpl implements StockService {
 
         historial.setStock(stock);
 
-        historial.setFecha(LocalDate.now());
+        historial.setFecha(fecha);
 
         historial.setMovimiento(
                 cantidadARestar.negate()

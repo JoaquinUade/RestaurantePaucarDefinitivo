@@ -33,6 +33,8 @@ public interface StockService {
 
     Stock sumarStock(Long idStock, BigDecimal cantidad, LocalDate fecha, Long idGastoVariable);
 
-    Stock restarStock(Long idStock, BigDecimal cantidad);
+    Stock restarStock(Long idStock, BigDecimal cantidadARestar, LocalDate fecha);
+    HistorialStock editarMovimientoHistorial(Long id, HistorialStock cambios);
+
     void eliminarMovimientoHistorial(Long idHistorial);
 }

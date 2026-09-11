@@ -219,7 +219,13 @@ public class TablaHistorialStock extends VBox {
 
                     DialogHistorialStock.mostrar(
                             stock,
-                            historial, gastosVariablesService.obtenerTodos(), stockService);
+                            historial, gastosVariablesService.obtenerTodos(), stockService, fechaSeleccionada);
+                    Stock actualizado = stockService.obtenerPorId(stock.getIdStock());
+                    if (actualizado != null) {
+                        stock.setCantidad(actualizado.getCantidad());
+                        getTableView().refresh();
+                    }
+
                 });
             }
 

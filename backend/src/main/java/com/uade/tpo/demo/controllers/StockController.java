@@ -100,15 +100,25 @@ public class StockController {
     @PatchMapping("/{id}/restar")
 public ResponseEntity<Stock> restarStock(
         @PathVariable Long id,
-        @RequestParam BigDecimal cantidad) {
+        @RequestParam BigDecimal cantidad,
+        @RequestParam LocalDate fecha) {
 
     return ResponseEntity.ok(
             stockService.restarStock(
                     id,
-                    cantidad
+                    cantidad, fecha
             )
     );
 }
+@PutMapping("/historial/{id}")
+public ResponseEntity<?> editarHistorial(@PathVariable Long id, @RequestBody HistorialStock cambios) {
+    try {
+        return ResponseEntity.ok(stockService.editarMovimientoHistorial(id, cambios));
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
 @DeleteMapping("/historial/{id}")
 public ResponseEntity<Void> eliminarHistorial(
         @PathVariable Long id) {

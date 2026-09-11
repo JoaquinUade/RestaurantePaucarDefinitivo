@@ -26,7 +26,7 @@ import paucar.stock.aumentoydisminucion.TablaItemsComprados;
 public class DialogHistorialEditar {
 
     public static HistorialStock mostrarEditar(
-            HistorialStock historial, List<GastosVariables> gastos) {
+            HistorialStock historial, List<GastosVariables> gastos, paucar.service.StockService stockService) {
 
         Dialog<HistorialStock> dialog
                 = new Dialog<>();
@@ -60,12 +60,14 @@ public class DialogHistorialEditar {
                                 .stripTrailingZeros()
                                 .toPlainString());
 
+        txtCantidad.setEditable(false);
+
         VBox datosBox = new VBox(Responsive.pe(10),
                 new Label("Fecha"),
                 dateFecha,
                 new Label("Movimiento"),
                 txtMovimiento,
-                new Label("Cantidad"),
+                new Label("Stock (calculado automáticamente)"),
                 txtCantidad
         );
 
@@ -117,40 +119,26 @@ public class DialogHistorialEditar {
         dialog.getDialogPane()
                 .setContent(form);
 
-        dialog.setResultConverter(btn -> {
-
-            if (btn == btnGuardar) {
-
-                try {
-
-                    historial.setFecha(
-                            dateFecha.getValue());
-
-                    historial.setMovimiento(
-                            new BigDecimal(
-                                    txtMovimiento.getText()));
-
-                    historial.setCantidad(
-                            new BigDecimal(
-                                    txtCantidad.getText()));
-
-                    historial.setGastoVariable(
-                            tabla.getSelectionModel()
-                                    .getSelectedItem());
-
-                    return historial;
-
-                } catch (Exception e) {
-
-                    new Alert(
-                            Alert.AlertType.ERROR,
-                            "Datos inválidos")
-                            .showAndWait();
+        final HistorialStock[] guardado = {null};
+        dialog.getDialogPane().lookupButton(btnGuardar).addEventFilter(
+                javafx.event.ActionEvent.ACTION, event -> {
+            try {
+                dateFecha.commitValue();
+                if (dateFecha.getValue() == null) {
+                    throw new IllegalArgumentException("Ingresá una fecha válida");
                 }
+                HistorialStock cambios = new HistorialStock();
+                cambios.setFecha(dateFecha.getValue());
+                cambios.setMovimiento(new BigDecimal(txtMovimiento.getText().trim()));
+                cambios.setGastoVariable(tabla.getSelectionModel().getSelectedItem());
+                guardado[0] = stockService.editarHistorial(historial.getId(), cambios);
+            } catch (Exception e) {
+                event.consume();
+                new Alert(Alert.AlertType.ERROR, e.getMessage() == null
+                        ? "Datos inválidos" : e.getMessage()).showAndWait();
             }
-
-            return null;
         });
+        dialog.setResultConverter(btn -> btn == btnGuardar ? guardado[0] : null);
 
         return dialog.showAndWait()
                 .orElse(null);
