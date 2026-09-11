@@ -1,13 +1,11 @@
 package paucar.admin.empresasClientes;
 
 
-import paucar.config.Responsive;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
 

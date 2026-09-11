@@ -1,7 +1,6 @@
 package paucar.resumen.empresas;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 
@@ -365,9 +364,6 @@ public class MensualEmpresas extends BorderPane {
 
         while (fecha.getMonthValue() == mes) {
 
-            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY
-                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
-
                 VentaResumenDiarioDTO resumen = new VentaResumenDiarioDTO(fecha);
 
                 var ventas = backend.cargarVentasDelDia(fecha);
@@ -405,7 +401,7 @@ public class MensualEmpresas extends BorderPane {
                 }
 
                 datos.add(resumen);
-            }
+            
 
             fecha = fecha.plusDays(1);
 

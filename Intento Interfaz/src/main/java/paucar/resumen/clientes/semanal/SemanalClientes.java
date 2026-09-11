@@ -1,7 +1,6 @@
 package paucar.resumen.clientes.semanal;
 
 
-import paucar.config.Responsive;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,7 +9,6 @@ import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.Venta;
 
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 

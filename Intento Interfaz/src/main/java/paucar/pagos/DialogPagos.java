@@ -1,7 +1,6 @@
 package paucar.pagos;
 
 
-import paucar.config.Responsive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,7 +11,6 @@ import com.uade.tpo.demo.entity.EstadoPago;
 import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -24,6 +22,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.security.PasswordManager;
 import paucar.security.SesionPassword;
 import paucar.service.ClientesService;

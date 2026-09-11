@@ -111,6 +111,11 @@ public class ClientesService {
             return;
         }
         try {
+            Long existente = obtenerClienteIdPorNombre(nombre, tipoCli);
+            if (existente != null) {
+                this.venta.setIdCliente(existente);
+                return;
+            }
             var payload = TraductorJSON.createObjectNode()
                     .put("nombre", nombre.trim())
                     .put("tipoCliente", tipoCli.name());

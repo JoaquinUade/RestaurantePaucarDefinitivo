@@ -1,14 +1,12 @@
 package paucar.gastos.Fijos;
 
 
-import paucar.config.Responsive;
 import java.time.LocalDate;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.Empleado;
 import com.uade.tpo.demo.entity.dto.GastoFijoRequest;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -18,11 +16,12 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.PasswordField; // 👈 ESTE TE FALTA
-import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField; // 👈 ESTE TE FALTA
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import paucar.config.Responsive;
 import paucar.security.PasswordManager;
 import paucar.security.SesionPassword;
 

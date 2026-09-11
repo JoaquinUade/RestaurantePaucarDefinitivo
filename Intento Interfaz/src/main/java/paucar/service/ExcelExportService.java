@@ -3,7 +3,6 @@ package paucar.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -279,11 +278,6 @@ public class ExcelExportService {
 
     private String formatearFecha(LocalDate fecha) {
         return fecha == null ? "" : fecha.format(FORMATO_FECHA);
-    }
-
-    private boolean esDiaHabil(LocalDate fecha) {
-        DayOfWeek d = fecha.getDayOfWeek();
-        return d != DayOfWeek.SATURDAY && d != DayOfWeek.SUNDAY;
     }
 
 // ============================================================
@@ -599,18 +593,22 @@ public class ExcelExportService {
         int fila = 2;
 
         while (fecha.getMonthValue() == mes) {
-            if (esDiaHabil(fecha)) {
-                VentaResumenDiarioDTO r = resumenDiario.getOrDefault(
-                        fecha, new VentaResumenDiarioDTO(fecha));
-                acumularGastosDelDia(r, fecha, gastosFijos, gastosVariables,
-                        gastosIndividuales);
-                sumarResumen(total, r);
-                escribirFilaResumen(sh, fila, fecha, r,
-                        estiloTexto, estiloMoneda, false);
-                fila++;
-            }
-            fecha = fecha.plusDays(1);
-        }
+
+    VentaResumenDiarioDTO r = resumenDiario.getOrDefault(
+            fecha, new VentaResumenDiarioDTO(fecha));
+
+    acumularGastosDelDia(r, fecha, gastosFijos,
+            gastosVariables, gastosIndividuales);
+
+    sumarResumen(total, r);
+
+    escribirFilaResumen(sh, fila, fecha, r,
+            estiloTexto, estiloMoneda, false);
+
+    fila++;
+
+    fecha = fecha.plusDays(1);
+}
 
         BigDecimal totalGastos = total.getGastosFijos()
                 .add(total.getGastosVariables())

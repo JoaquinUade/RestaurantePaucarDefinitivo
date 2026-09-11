@@ -32,7 +32,8 @@ public class TablaPagos extends VBox {
         paucar.shared.TablaUtils.configurarMensajeSinDatos(tabla);
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-System.out.println("onSelect recibido = " + onSelect);
+
+        
         // Empresa
         TableColumn<PagoEmpresa, String> colEmpresa
                 = new TableColumn<>("Empresa");

@@ -1,7 +1,6 @@
 package paucar.resumen.general;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -109,8 +108,7 @@ public class MensualGeneral extends BorderPane {
         while (fecha.getMonthValue() == mes) {/*si la fecha actual sigue siendo del mes a cargar, se
                                              ejecuta el bloque de código para agregar los datos del día a 
                                              la tabla */
-            if (fecha.getDayOfWeek() != DayOfWeek.SATURDAY
-                    && fecha.getDayOfWeek() != DayOfWeek.SUNDAY) {
+           
                 VentaResumenDiarioDTO ResumenDelDia = new VentaResumenDiarioDTO(fecha);/*variable que guarda el resumen de las ventas de un día, donde
                                                                                    cada monto ya está acumulado por tipo de pago y por total*/
 
@@ -187,7 +185,7 @@ public class MensualGeneral extends BorderPane {
                 RenglonResumenDiario.add(ResumenDelDia);/*Agrega el resumen del día a la lista, haciendo que
                                                     luego se muestre como un renglón más en la tabla con
                                                     todos los datos*/
-            }
+            
             fecha = fecha.plusDays(1);/*avanza a la siguiente fecha */
         }
         VentaResumenDiarioDTO TotalMensual = new VentaResumenDiarioDTO(null);/*variable que guarda el resumen total del mes */

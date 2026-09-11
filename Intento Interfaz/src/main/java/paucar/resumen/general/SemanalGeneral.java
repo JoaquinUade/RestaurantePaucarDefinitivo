@@ -95,7 +95,7 @@ public class SemanalGeneral extends BorderPane {
 
         actualizarTotalSemana(lunes);/*Actualiza el total de la semana*/
 
-        for (int i = 0; i < 5; i++) {/*for que da 5 vueltas, una por cada día de la semana */
+        for (int i = 0; i < 7; i++) {/*for que da 7 vueltas, una por cada día de la semana */
 
             LocalDate dia = lunes.plusDays(i);/*Calcula una fecha sumando i días al lunes y la guarda en la
                                           variable dia */

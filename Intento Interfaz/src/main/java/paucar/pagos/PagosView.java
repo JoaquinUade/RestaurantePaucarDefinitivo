@@ -38,8 +38,8 @@ public class PagosView extends BorderPane {
     private PagosQuincenalesView vistaQuincenal;
     private PagosPeriodicidadView vistaConsumo;
 
-    private final ComboBox<String> comboPeriodicidad
-            = new ComboBox<>();
+    private final ComboBox<String> comboPeriodicidad = new ComboBox<>();
+    
 
     private final BorderPane contenedorResultado
             = new BorderPane();
@@ -53,6 +53,8 @@ public class PagosView extends BorderPane {
         Label titulo = new Label("Pagos");
         titulo.getStyleClass().add("titulo-xl-blanco");
 
+        
+        comboPeriodicidad.getStyleClass().add("combo-agregar");
         filtroFecha = new DatePicker(LocalDate.now());
         filtroFecha.getStyleClass().add("date-agregar");
         filtroFecha.setOnAction(e -> recargar());
@@ -68,6 +70,7 @@ public class PagosView extends BorderPane {
         btnEliminar.setOnAction(e -> eliminar());
 
         Button btnFiltrar = new Button("Filtrar");
+        btnFiltrar.getStyleClass().add("btn-filtrar");
         btnFiltrar.setOnAction(e -> aplicarFiltro());
 
         Region spacer = new Region();
