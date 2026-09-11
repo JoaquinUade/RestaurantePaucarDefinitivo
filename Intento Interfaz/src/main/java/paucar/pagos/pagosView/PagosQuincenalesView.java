@@ -1,6 +1,7 @@
 package paucar.pagos.pagosView;
 
 import java.util.List;
+import java.time.LocalDate;
 
 import com.uade.tpo.demo.entity.PagoEmpresa;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
@@ -18,6 +19,7 @@ import paucar.service.PagosService;
 public class PagosQuincenalesView extends BorderPane {
 
     private final PagosService service;
+    private LocalDate fecha = LocalDate.now();
 
     private final TablaPagos tablaQuincena1;
     private final TablaPagos tablaQuincena2;
@@ -91,10 +93,18 @@ public class PagosQuincenalesView extends BorderPane {
         recargar();
     }
 
+    public void actualizarFecha(LocalDate fecha) {
+        this.fecha = fecha;
+        recargar();
+    }
+
     public void recargar() {
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()
+                .filter(p -> p.getFecha() != null
+                        && p.getFecha().getYear() == fecha.getYear()
+                        && p.getFecha().getMonth() == fecha.getMonth())
                 .filter(p -> p.getTipoPeriodicidad() == TipoPeriodicidad.QUINCENAL)
                 .toList();
 

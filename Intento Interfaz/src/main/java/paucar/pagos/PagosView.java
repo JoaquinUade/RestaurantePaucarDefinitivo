@@ -189,6 +189,10 @@ public class PagosView extends BorderPane {
     }
 
     private void aplicarFiltro() {
+        if (filtroFecha.getValue() == null || comboPeriodicidad.getValue() == null) {
+            contenedorResultado.setCenter(null);
+            return;
+        }
 
         switch (comboPeriodicidad.getValue()) {
 
@@ -225,6 +229,7 @@ public class PagosView extends BorderPane {
                     vistaQuincenal = new PagosQuincenalesView(service, clientesService);
                 }
 
+                vistaQuincenal.actualizarFecha(filtroFecha.getValue());
                 contenedorResultado.setCenter(vistaQuincenal);
             }
 

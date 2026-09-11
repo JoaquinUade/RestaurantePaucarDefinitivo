@@ -149,6 +149,9 @@ private final ClientesService clientesService;
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()
+                .filter(p -> p.getFecha() != null
+                        && p.getFecha().getYear() == fecha.getYear()
+                        && p.getFecha().getMonth() == fecha.getMonth())
                 .filter(p
                         -> p.getTipoPeriodicidad()
                 == TipoPeriodicidad.SEMANAL)

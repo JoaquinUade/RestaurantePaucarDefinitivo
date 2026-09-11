@@ -19,11 +19,11 @@ import paucar.admin.empresasClientes.EmpresasClientes;
 import paucar.admin.platos.Platos;
 import paucar.config.Responsive;
 import paucar.resumen.Resumen;
+import paucar.security.PasswordManager;
 import paucar.service.AdminService;
 import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 import paucar.service.EmpleadoService;
-import paucar.security.PasswordManager;
 
 public class Admin extends BorderPane {
 
@@ -57,7 +57,8 @@ public class Admin extends BorderPane {
 
         grid.setPadding(Responsive.insets(40));/* Establece el relleno del GridPane */
         grid.setHgap(Responsive.pe(20));
-
+        grid.setVgap(Responsive.pe(20));
+        
         Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
                                                                                        platos*/
         Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/empresas clientes.png");
