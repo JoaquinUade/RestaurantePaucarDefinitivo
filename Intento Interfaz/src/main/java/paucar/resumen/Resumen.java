@@ -127,6 +127,8 @@ public class Resumen extends BorderPane {
         btnExcel.setOnAction(e -> exportarExcel());
 
         pickerFecha.setOnAction(e -> aplicarFiltros());
+        ResumenTipo.setOnAction(e -> aplicarFiltros());
+        tipoResumen.setOnAction(e -> aplicarFiltros());
 
         HBox barraFiltros = new HBox(Responsive.pe(10),
                 ResumenTipo,
@@ -186,6 +188,11 @@ public class Resumen extends BorderPane {
         String tipo = tipoResumen.getValue(); // General o Empresas
         LocalDate fecha = pickerFecha.getValue();
 
+        if (fecha == null || periodo == null || tipo == null) {
+            contenedorResultado.setCenter(null);
+            return;
+        }
+
         switch (periodo) {
 
             case "Mensual" -> {
@@ -203,7 +210,7 @@ public class Resumen extends BorderPane {
                                     anio,
                                     mes);
                         } else {
-                            vistaMensualGeneral.refrescar();
+                            vistaMensualGeneral.actualizarFecha(fecha);
                         }
 
                         contenedorResultado.setCenter(vistaMensualGeneral);
@@ -211,12 +218,16 @@ public class Resumen extends BorderPane {
                     case "Empresas" -> {
                         if (vistaMensualEmpresas == null) {
                             vistaMensualEmpresas = new MensualEmpresas(backend, anio, mes);
+                        } else {
+                            vistaMensualEmpresas.actualizarFecha(fecha);
                         }
                         contenedorResultado.setCenter(vistaMensualEmpresas);
                     }
                     case "Clientes" -> {
                         if (vistaMensualClientes == null) {
                             vistaMensualClientes = new MensualClientes(backend, anio, mes);
+                        } else {
+                            vistaMensualClientes.actualizarFecha(fecha);
                         }
                         contenedorResultado.setCenter(vistaMensualClientes);
                     }
@@ -229,6 +240,8 @@ public class Resumen extends BorderPane {
                         if (vistaSemanalGeneral == null) {
                             vistaSemanalGeneral
                                     = new SemanalGeneral(backend, clientesService, fecha);
+                        } else {
+                            vistaSemanalGeneral.actualizarFecha(fecha);
                         }
                         contenedorResultado.setCenter(vistaSemanalGeneral);
                     }

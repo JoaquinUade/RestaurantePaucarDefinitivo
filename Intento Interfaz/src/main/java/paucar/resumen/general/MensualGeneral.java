@@ -526,6 +526,12 @@ public class MensualGeneral extends BorderPane {
         cargarMes(anio, mes);
     }
 
+    public void actualizarFecha(LocalDate fecha) {
+        this.anio = fecha.getYear();
+        this.mes = fecha.getMonthValue();
+        cargarMes(anio, mes);
+    }
+
     public void refrescar() {
         cargarMes(anio, mes);
     }

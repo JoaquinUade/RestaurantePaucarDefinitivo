@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
@@ -60,7 +59,6 @@ public class Tabla extends VBox {
 
         tabla.setEditable(true);
         tabla.setItems(items);
-        tabla.setPlaceholder(new Label("No hay ventas ingresadas para mostrar."));
         tabla.getColumns().setAll(crearColumnas());
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
@@ -91,8 +89,7 @@ public class Tabla extends VBox {
         });
 
         VBox.setVgrow(tabla, Priority.ALWAYS);
-        HBox barraBotones = new HBox(Responsive.pe(8), btnEditar, btnEliminar);
-        getChildren().addAll(tabla, barraBotones);
+        getChildren().addAll(tabla, btnEditar, btnEliminar);
     }
 
     private List<TableColumn<Venta, ?>> crearColumnas() {

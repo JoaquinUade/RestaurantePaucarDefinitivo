@@ -43,7 +43,7 @@ public class SemanalGeneral extends BorderPane {
     private final VBox contenido = new VBox(Responsive.pe(8));/*contenedor vertical en el que pondremos los
                                                        bloques que representan la tabla y la fecha de
                                                        ese dia */
-    private final LocalDate fechaBase;
+    private LocalDate fechaBase;
 
     public SemanalGeneral(VentasBackend backend, ClientesService clientesService, LocalDate fechaBase) {
         this.backend = backend;
@@ -380,6 +380,11 @@ public class SemanalGeneral extends BorderPane {
 
         col.setSortable(false);/*desactiva la opción de ordenar la tabla*/
         return col;/*retorna la columna configurada */
+    }
+
+    public void actualizarFecha(LocalDate fecha) {
+        this.fechaBase = fecha;
+        refrescar();
     }
 
     public void refrescar() {

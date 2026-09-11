@@ -37,8 +37,8 @@ public class MensualEmpresas extends BorderPane {
     private final ObservableList<String> empresas
             = FXCollections.observableArrayList();
 
-    private final int anio;
-    private final int mes;
+    private int anio;
+    private int mes;
 
     public MensualEmpresas(VentasBackend backend, int anio, int mes) {
         this.backend = backend;
@@ -426,6 +426,12 @@ public class MensualEmpresas extends BorderPane {
         }
 
         RenderTotalMensual(total);
+    }
+
+    public void actualizarFecha(LocalDate fecha) {
+        this.anio = fecha.getYear();
+        this.mes = fecha.getMonthValue();
+        cargarMes();
     }
 
     public void refrescar() {
