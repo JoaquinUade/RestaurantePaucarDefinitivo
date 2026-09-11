@@ -7,6 +7,9 @@ import com.uade.tpo.demo.entity.TipoDePago;
 import com.uade.tpo.demo.entity.dto.VentaRequest;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
@@ -201,6 +204,26 @@ contLineas.getChildren().add(
         
 //aca borre lo que dijo la ia
 
+        // Observar también los campos de cada fila, no solo altas y bajas.
+        ObservableList<Node> productosObservados = FXCollections.observableArrayList(n -> {
+            HBox fila = (HBox) n;
+            ComboBox<?> producto = (ComboBox<?>) fila.getChildren().get(0);
+            TextField cantidad = (TextField) fila.getChildren().get(1);
+            return new Observable[]{producto.valueProperty(), cantidad.textProperty()};
+        });
+        productosObservados.setAll(contLineas.getChildren());
+        contLineas.getChildren().addListener((ListChangeListener<Node>) cambio ->
+                productosObservados.setAll(contLineas.getChildren()));
+
+        ObservableList<Node> pagadoresObservados = FXCollections.observableArrayList(n -> {
+            HBox fila = (HBox) n;
+            TextField monto = (TextField) fila.getChildren().get(1);
+            return new Observable[]{monto.textProperty()};
+        });
+        pagadoresObservados.setAll(contPagadores.getChildren());
+        contPagadores.getChildren().addListener((ListChangeListener<Node>) cambio ->
+                pagadoresObservados.setAll(contPagadores.getChildren()));
+
         Node okBtn = dialog.getDialogPane().lookupButton(okType);
         okBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(
@@ -248,7 +271,10 @@ contLineas.getChildren().add(
                             return invalido || (total - pagado) > 0;
                         },
                         cbCliente.getEditor().textProperty(),
-                        contLineas.getChildren(),
+                        cbCliente.valueProperty(),
+                        clientes,
+                        productosObservados,
+                        pagadoresObservados,
                         tgTipoCliente.selectedToggleProperty()
                 )
         );

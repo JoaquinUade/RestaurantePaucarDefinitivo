@@ -60,7 +60,10 @@ public final class ProductoLinea {
         fila.setAlignment(Pos.CENTER_LEFT);
 
         btnDelete.setOnAction(
-                e -> contLineas.getChildren().remove(fila));
+                e -> {
+                    contLineas.getChildren().remove(fila);
+                    recalcular.run();
+                });
 
         return fila;
     }
