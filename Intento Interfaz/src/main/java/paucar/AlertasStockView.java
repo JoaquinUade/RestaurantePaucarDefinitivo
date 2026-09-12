@@ -7,13 +7,12 @@ import java.util.List;
 
 import com.uade.tpo.demo.entity.Stock;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import paucar.service.StockService;
 
-public class AlertasStockView extends ScrollPane {
+public final class AlertasStockView extends ScrollPane {
 
     private final VBox contenedor;
 
@@ -32,7 +31,7 @@ public class AlertasStockView extends ScrollPane {
         setContent(contenedor);
         setFitToWidth(true);
         contenedor.setStyle("""
-    -fx-background-color: #0f172a; 
+    -fx-background-color: #0f172a;
 """);
     }
 

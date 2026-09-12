@@ -10,7 +10,7 @@ import paucar.pagos.TablaPagos;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
-public class PagosConsumoView extends BorderPane {
+public final class PagosConsumoView extends BorderPane {
 
     private final PagosService service;
     private final TablaPagos tabla;
@@ -24,12 +24,12 @@ private final ClientesService clientesService;
     pago -> {
 
         List<String> empresas =
-                clientesService.obtenerNombresPagables();
+                this.clientesService.obtenerNombresPagables();
 
         PagoEmpresa nuevo =
                 DialogPagos.mostrarEditar(
                         empresas,
-                        clientesService,
+                        this.clientesService,
                         null,
                         pago);
 
@@ -48,7 +48,7 @@ private final ClientesService clientesService;
         recargar();
     }
 
-    public void recargar() {
+    public final void recargar() {
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()

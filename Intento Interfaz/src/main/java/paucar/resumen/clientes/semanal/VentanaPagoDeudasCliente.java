@@ -125,7 +125,7 @@ public class VentanaPagoDeudasCliente {
                 = new TableColumn<>("Observaciones");/*crea la columna observaciones */
 
         colObs.setCellValueFactory(fila
-                -> new SimpleObjectProperty<>((String) fila.getValue().getObservaciones())
+                -> new SimpleObjectProperty<>(fila.getValue().getObservaciones())
         );
 
         colObs.setCellFactory(tc -> new TableCell<>() {

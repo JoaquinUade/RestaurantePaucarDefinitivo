@@ -18,7 +18,7 @@ import paucar.service.PagosService;
 import paucar.shared.FechaUtils;
 import paucar.shared.MonedaUtils;
 
-public class PagosPeriodicidadView extends BorderPane {
+public final class PagosPeriodicidadView extends BorderPane {
 
     private final PagosService service;
     private final ClientesService clientesService;
@@ -43,11 +43,11 @@ public class PagosPeriodicidadView extends BorderPane {
                 pago -> {
 System.out.println("ENTRO AL CALLBACK");
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
 
@@ -70,7 +70,7 @@ System.out.println("ENTRO AL CALLBACK");
         recargar();
     }
 
-    public void recargar() {
+    public final void recargar() {
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()
@@ -88,7 +88,7 @@ System.out.println("ENTRO AL CALLBACK");
                 .map(p -> p.getMonto() == null
                 ? BigDecimal.ZERO
                 : p.getMonto())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         BigDecimal totalDebe = pagos.stream()
                 .filter(p -> p.getEstado() != null
@@ -96,7 +96,7 @@ System.out.println("ENTRO AL CALLBACK");
                 .map(p -> p.getMonto() == null
                 ? BigDecimal.ZERO
                 : p.getMonto())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         lblTotal.setStyle(
                 "-fx-text-fill: white;"

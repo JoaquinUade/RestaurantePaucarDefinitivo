@@ -2,6 +2,7 @@ package paucar.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +51,7 @@ public class ExcelExportService {
 
     private static final String FORMATO_MONEDA = "$#,##0.00";
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final Locale ES_AR = new Locale("es", "ES");
+    private static final Locale ES_AR = Locale.of("es", "ES");
 
     private final VentasBackend ventasBackend;
     private final PagosService pagosService;
@@ -121,7 +122,7 @@ public class ExcelExportService {
             hojaResumenMensual(libro, anio, mes, resumenDiario,
                     gastosFijos, gastosVariables, gastosIndividuales);
             hojaResumenEmpresas(libro, empresas, ventasDelMes);
-            hojaVentasDelMes(libro, anio, mes, ventasDelMes);
+            hojaVentasDelMes(libro, ventasDelMes);
             hojaPagosDelMes(libro, pagosDelMes);
             hojaStock(libro, stocks);
             hojaMovimientosStock(libro, movimientosStock);
@@ -135,16 +136,15 @@ public class ExcelExportService {
 
             return true;
 
-        } catch (Exception e) {
+        } catch (IOException | IllegalArgumentException e) {
             System.err.println("Error generando el Excel: " + e.getMessage());
-            e.printStackTrace();
             return false;
 
         } finally {
             if (libro != null) {
                 try {
                     libro.close();
-                } catch (Exception ignorado) {
+                } catch (IOException ignorado) {
                     // no hacer nada
                 }
             }
@@ -164,7 +164,12 @@ public class ExcelExportService {
                 resultado.add(p);
             }
         }
-        resultado.sort(Comparator.comparing(PagoEmpresa::getFecha));
+        resultado.sort(
+                Comparator.comparing(
+                        (PagoEmpresa p) -> p.getFecha(),
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                )
+        );
         return resultado;
     }
 
@@ -180,14 +185,16 @@ public class ExcelExportService {
     }
 
     private boolean perteneceAlMes(Object item, int anio, int mes) {
-        LocalDate fecha = null;
-        if (item instanceof GastosFijos g) {
-            fecha = g.getFecha();
-        } else if (item instanceof GastosVariables g) {
-            fecha = g.getFecha();
-        } else if (item instanceof GastosIndividuales g) {
-            fecha = g.getFecha();
-        }
+        LocalDate fecha = switch (item) {
+            case GastosFijos g ->
+                g.getFecha();
+            case GastosVariables g ->
+                g.getFecha();
+            case GastosIndividuales g ->
+                g.getFecha();
+            default ->
+                null;
+        };
         return fecha != null
                 && fecha.getYear() == anio
                 && fecha.getMonthValue() == mes;
@@ -387,23 +394,6 @@ public class ExcelExportService {
         celdaMoneda(fila, 11, r.getGastosIndividuales(), estiloDescuento);
     }
 
-    private void escribirFilaEmpresa(Sheet sh, int filaId,
-            String empresa, VentaResumenDiarioDTO r,
-            CellStyle estiloTexto, CellStyle estiloMoneda) {
-        Row fila = sh.createRow(filaId);
-        Cell c0 = fila.createCell(0);
-        c0.setCellValue(empresa);
-        c0.setCellStyle(estiloTexto);
-        celdaMoneda(fila, 1, r.getVentaTotal(), estiloMoneda);
-        celdaMoneda(fila, 2, r.getEfectivo(), estiloMoneda);
-        celdaMoneda(fila, 3, r.getDebito(), estiloMoneda);
-        celdaMoneda(fila, 4, r.getCredito(), estiloMoneda);
-        celdaMoneda(fila, 5, r.getTransferencia(), estiloMoneda);
-        celdaMoneda(fila, 6, r.getMercadoPago(), estiloMoneda);
-        celdaMoneda(fila, 7, r.getDebe(), estiloMoneda);
-        celdaMoneda(fila, 8, r.getDeudaPagada(), estiloMoneda);
-    }
-
     private void celdaMoneda(Row fila, int col, BigDecimal valor,
             CellStyle estilo) {
         Cell c = fila.createCell(col);
@@ -470,7 +460,12 @@ public class ExcelExportService {
 
         List<Venta> ordenadas = ventas.stream()
                 .filter(v -> v.getFecha() != null)
-                .sorted(Comparator.comparing(Venta::getFecha))
+                .sorted(
+                        Comparator.comparing(
+                                v -> v.getFecha(),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                )
                 .toList();
 
         int fila = 2;
@@ -594,21 +589,21 @@ public class ExcelExportService {
 
         while (fecha.getMonthValue() == mes) {
 
-    VentaResumenDiarioDTO r = resumenDiario.getOrDefault(
-            fecha, new VentaResumenDiarioDTO(fecha));
+            VentaResumenDiarioDTO r = resumenDiario.getOrDefault(
+                    fecha, new VentaResumenDiarioDTO(fecha));
 
-    acumularGastosDelDia(r, fecha, gastosFijos,
-            gastosVariables, gastosIndividuales);
+            acumularGastosDelDia(r, fecha, gastosFijos,
+                    gastosVariables, gastosIndividuales);
 
-    sumarResumen(total, r);
+            sumarResumen(total, r);
 
-    escribirFilaResumen(sh, fila, fecha, r,
-            estiloTexto, estiloMoneda, false);
+            escribirFilaResumen(sh, fila, fecha, r,
+                    estiloTexto, estiloMoneda, false);
 
-    fila++;
+            fila++;
 
-    fecha = fecha.plusDays(1);
-}
+            fecha = fecha.plusDays(1);
+        }
 
         BigDecimal totalGastos = total.getGastosFijos()
                 .add(total.getGastosVariables())
@@ -691,7 +686,12 @@ public class ExcelExportService {
                             -> v.getCliente() != null
                     && empresa.equalsIgnoreCase(
                             v.getCliente().getNombre()))
-                    .sorted(Comparator.comparing(Venta::getFecha))
+                    .sorted(
+                            Comparator.comparing(
+                                    (Venta v) -> v.getFecha(),
+                                    Comparator.nullsLast(Comparator.naturalOrder())
+                            )
+                    )
                     .toList();
 
             for (Venta v : ventasEmpresa) {
@@ -794,7 +794,7 @@ public class ExcelExportService {
         sh.createFreezePane(0, 2);
     }
 
-    private void hojaVentasDelMes(Workbook wb, int anio, int mes,
+    private void hojaVentasDelMes(Workbook wb,
             List<Venta> ventas) {
         Sheet sh = wb.createSheet("Ventas del Mes");
         String[] columnas = {"Fecha", "Cliente", "Tipo", "Descripción",
@@ -806,7 +806,12 @@ public class ExcelExportService {
 
         List<Venta> ordenadas = ventas.stream()
                 .filter(v -> v.getFecha() != null)
-                .sorted(Comparator.comparing(Venta::getFecha))
+                .sorted(
+                        Comparator.comparing(
+                                (Venta v) -> v.getFecha(),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                )
                 .toList();
 
         int fila = 2;
@@ -913,119 +918,119 @@ public class ExcelExportService {
 
     private void hojaStock(Workbook wb, List<Stock> stocks) {
 
-    Sheet sh = wb.createSheet("Stock");
+        Sheet sh = wb.createSheet("Stock");
 
-    String[] columnas = {
-        "Producto",
-        "Categoría",
-        "Cantidad Actual",
-        "Unidad",
-        "Stock Mínimo",
-        "Estado",
-        "Última Actualización"
-    };
+        String[] columnas = {
+            "Producto",
+            "Categoría",
+            "Cantidad Actual",
+            "Unidad",
+            "Stock Mínimo",
+            "Estado",
+            "Última Actualización"
+        };
 
-    escribirTituloYCabecera(
-            wb,
-            sh,
-            "Stock Actual",
-            columnas);
+        escribirTituloYCabecera(
+                wb,
+                sh,
+                "Stock Actual",
+                columnas);
 
-    CellStyle estiloTexto = estiloTexto(wb, false);
+        CellStyle estiloTexto = estiloTexto(wb, false);
 
-    CellStyle estiloNumero = wb.createCellStyle();
-    estiloNumero.setDataFormat(
-            wb.createDataFormat().getFormat("#,##0.00"));
-    estiloNumero.setAlignment(HorizontalAlignment.RIGHT);
-    estiloNumero.setVerticalAlignment(VerticalAlignment.CENTER);
-    estiloNumero.setBorderBottom(BorderStyle.THIN);
-    estiloNumero.setBorderTop(BorderStyle.THIN);
-    estiloNumero.setBorderLeft(BorderStyle.THIN);
-    estiloNumero.setBorderRight(BorderStyle.THIN);
+        CellStyle estiloNumero = wb.createCellStyle();
+        estiloNumero.setDataFormat(
+                wb.createDataFormat().getFormat("#,##0.00"));
+        estiloNumero.setAlignment(HorizontalAlignment.RIGHT);
+        estiloNumero.setVerticalAlignment(VerticalAlignment.CENTER);
+        estiloNumero.setBorderBottom(BorderStyle.THIN);
+        estiloNumero.setBorderTop(BorderStyle.THIN);
+        estiloNumero.setBorderLeft(BorderStyle.THIN);
+        estiloNumero.setBorderRight(BorderStyle.THIN);
 
-    int fila = 2;
+        int fila = 2;
 
-    for (Stock s : stocks) {
+        for (Stock s : stocks) {
 
-        Row r = sh.createRow(fila++);
+            Row r = sh.createRow(fila++);
 
-        setTexto(
-                r,
-                0,
-                s.getNombreProducto(),
-                estiloTexto);
+            setTexto(
+                    r,
+                    0,
+                    s.getNombreProducto(),
+                    estiloTexto);
 
-        String categoria = s.getCategoriaGastoVariable() != null
-                ? s.getCategoriaGastoVariable().getNombre()
-                : "";
+            String categoria = s.getCategoriaGastoVariable() != null
+                    ? s.getCategoriaGastoVariable().getNombre()
+                    : "";
 
-        setTexto(
-                r,
-                1,
-                categoria,
-                estiloTexto);
+            setTexto(
+                    r,
+                    1,
+                    categoria,
+                    estiloTexto);
 
-        ponerNumero(
-                r,
-                2,
-                s.getCantidad(),
-                estiloNumero);
+            ponerNumero(
+                    r,
+                    2,
+                    s.getCantidad(),
+                    estiloNumero);
 
-        setTexto(
-                r,
-                3,
-                s.getUnidadCantidad(),
-                estiloTexto);
+            setTexto(
+                    r,
+                    3,
+                    s.getUnidadCantidad(),
+                    estiloTexto);
 
-        ponerNumero(
-                r,
-                4,
-                s.getStockMinimo(),
-                estiloNumero);
+            ponerNumero(
+                    r,
+                    4,
+                    s.getStockMinimo(),
+                    estiloNumero);
 
-        BigDecimal cantidad = s.getCantidad() == null
-                ? BigDecimal.ZERO
-                : s.getCantidad();
+            BigDecimal cantidad = s.getCantidad() == null
+                    ? BigDecimal.ZERO
+                    : s.getCantidad();
 
-        BigDecimal minimo = s.getStockMinimo() == null
-                ? BigDecimal.ZERO
-                : s.getStockMinimo();
+            BigDecimal minimo = s.getStockMinimo() == null
+                    ? BigDecimal.ZERO
+                    : s.getStockMinimo();
 
-        String estado;
+            String estado;
 
-        if (cantidad.compareTo(BigDecimal.ZERO) == 0) {
-            estado = "SIN STOCK";
-        } else if (cantidad.compareTo(minimo) <= 0) {
-            estado = "BAJO STOCK";
-        } else {
-            estado = "OK";
+            if (cantidad.compareTo(BigDecimal.ZERO) == 0) {
+                estado = "SIN STOCK";
+            } else if (cantidad.compareTo(minimo) <= 0) {
+                estado = "BAJO STOCK";
+            } else {
+                estado = "OK";
+            }
+
+            setTexto(
+                    r,
+                    5,
+                    estado,
+                    estiloTexto);
+
+            setTexto(
+                    r,
+                    6,
+                    s.getFecha() == null
+                    ? ""
+                    : s.getFecha().format(FORMATO_FECHA),
+                    estiloTexto);
         }
 
-        setTexto(
-                r,
-                5,
-                estado,
-                estiloTexto);
+        sh.setColumnWidth(0, 30 * 256);
+        sh.setColumnWidth(1, 20 * 256);
+        sh.setColumnWidth(2, 15 * 256);
+        sh.setColumnWidth(3, 12 * 256);
+        sh.setColumnWidth(4, 15 * 256);
+        sh.setColumnWidth(5, 15 * 256);
+        sh.setColumnWidth(6, 18 * 256);
 
-        setTexto(
-                r,
-                6,
-                s.getFecha() == null
-                ? ""
-                : s.getFecha().format(FORMATO_FECHA),
-                estiloTexto);
+        sh.createFreezePane(0, 2);
     }
-
-    sh.setColumnWidth(0, 30 * 256);
-    sh.setColumnWidth(1, 20 * 256);
-    sh.setColumnWidth(2, 15 * 256);
-    sh.setColumnWidth(3, 12 * 256);
-    sh.setColumnWidth(4, 15 * 256);
-    sh.setColumnWidth(5, 15 * 256);
-    sh.setColumnWidth(6, 18 * 256);
-
-    sh.createFreezePane(0, 2);
-}
 
     private void ponerNumero(Row fila, int col, BigDecimal valor,
             CellStyle estilo) {
@@ -1035,119 +1040,123 @@ public class ExcelExportService {
     }
 
     private void hojaMovimientosStock(
-        Workbook wb,
-        List<HistorialStock> movimientos) {
+            Workbook wb,
+            List<HistorialStock> movimientos) {
 
-    Sheet sh = wb.createSheet("Movimientos Stock");
+        Sheet sh = wb.createSheet("Movimientos Stock");
 
-    String[] columnas = {
-        "Fecha",
-        "Movimiento",
-        "Cantidad",
-        "Unidad",
-        "Descripción"
-    };
+        String[] columnas = {
+            "Fecha",
+            "Movimiento",
+            "Cantidad",
+            "Unidad",
+            "Descripción"
+        };
 
-    escribirTituloYCabecera(
-            wb,
-            sh,
-            "Historial de Movimientos por Producto",
-            columnas);
+        escribirTituloYCabecera(
+                wb,
+                sh,
+                "Historial de Movimientos por Producto",
+                columnas);
 
-    CellStyle estiloTexto = estiloTexto(wb, false);
+        CellStyle estiloTexto = estiloTexto(wb, false);
 
-    CellStyle estiloNumero = wb.createCellStyle();
-    estiloNumero.setDataFormat(
-            wb.createDataFormat().getFormat("#,##0.00"));
-    estiloNumero.setAlignment(HorizontalAlignment.RIGHT);
-    estiloNumero.setVerticalAlignment(VerticalAlignment.CENTER);
-    estiloNumero.setBorderBottom(BorderStyle.THIN);
-    estiloNumero.setBorderTop(BorderStyle.THIN);
-    estiloNumero.setBorderLeft(BorderStyle.THIN);
-    estiloNumero.setBorderRight(BorderStyle.THIN);
+        CellStyle estiloNumero = wb.createCellStyle();
+        estiloNumero.setDataFormat(
+                wb.createDataFormat().getFormat("#,##0.00"));
+        estiloNumero.setAlignment(HorizontalAlignment.RIGHT);
+        estiloNumero.setVerticalAlignment(VerticalAlignment.CENTER);
+        estiloNumero.setBorderBottom(BorderStyle.THIN);
+        estiloNumero.setBorderTop(BorderStyle.THIN);
+        estiloNumero.setBorderLeft(BorderStyle.THIN);
+        estiloNumero.setBorderRight(BorderStyle.THIN);
 
-    List<String> productos = movimientos.stream()
-            .filter(h -> h.getStock() != null)
-            .map(h -> h.getStock().getNombreProducto())
-            .distinct()
-            .sorted()
-            .toList();
-
-    int fila = 2;
-
-    for (String producto : productos) {
-
-        Row encabezado = sh.createRow(fila++);
-
-        Cell c = encabezado.createCell(0);
-        c.setCellValue("PRODUCTO: " + producto);
-        c.setCellStyle(estiloTexto(wb, true));
-
-        List<HistorialStock> listaProducto = movimientos.stream()
+        List<String> productos = movimientos.stream()
                 .filter(h -> h.getStock() != null)
-                .filter(h ->
-                        producto.equals(
-                                h.getStock().getNombreProducto()))
-                .sorted(Comparator.comparing(
-                        HistorialStock::getFecha))
+                .map(h -> h.getStock().getNombreProducto())
+                .distinct()
+                .sorted()
                 .toList();
 
-        for (HistorialStock h : listaProducto) {
+        int fila = 2;
 
-            Row r = sh.createRow(fila++);
+        for (String producto : productos) {
 
-            setTexto(
-                    r,
-                    0,
-                    h.getFecha() == null
-                            ? ""
-                            : h.getFecha().format(FORMATO_FECHA),
-                    estiloTexto);
+            Row encabezado = sh.createRow(fila++);
 
-            setTexto(
-                    r,
-                    1,
-                    h.getMovimiento() == null
-                            ? ""
-                            : h.getMovimiento().toPlainString(),
-                    estiloTexto);
+            Cell c = encabezado.createCell(0);
+            c.setCellValue("PRODUCTO: " + producto);
+            c.setCellStyle(estiloTexto(wb, true));
 
-            ponerNumero(
-                    r,
-                    2,
-                    h.getCantidad(),
-                    estiloNumero);
+            List<HistorialStock> listaProducto = movimientos.stream()
+                    .filter(h -> h.getStock() != null)
+                    .filter(h
+                            -> producto.equals(
+                            h.getStock().getNombreProducto()))
+                    .sorted(
+                            Comparator.comparing(
+                                    (HistorialStock h) -> h.getFecha(),
+                                    Comparator.nullsLast(Comparator.naturalOrder())
+                            )
+                    )
+                    .toList();
 
-            setTexto(
-                    r,
-                    3,
-                    h.getStock() != null
-                            ? h.getStock().getUnidadCantidad()
-                            : "",
-                    estiloTexto);
+            for (HistorialStock h : listaProducto) {
 
-            String detalle = h.getGastoVariable() != null
-                    ? h.getGastoVariable().getProducto()
-                    : "";
+                Row r = sh.createRow(fila++);
 
-            setTexto(
-                    r,
-                    4,
-                    detalle,
-                    estiloTexto);
+                setTexto(
+                        r,
+                        0,
+                        h.getFecha() == null
+                        ? ""
+                        : h.getFecha().format(FORMATO_FECHA),
+                        estiloTexto);
+
+                setTexto(
+                        r,
+                        1,
+                        h.getMovimiento() == null
+                        ? ""
+                        : h.getMovimiento().toPlainString(),
+                        estiloTexto);
+
+                ponerNumero(
+                        r,
+                        2,
+                        h.getCantidad(),
+                        estiloNumero);
+
+                setTexto(
+                        r,
+                        3,
+                        h.getStock() != null
+                        ? h.getStock().getUnidadCantidad()
+                        : "",
+                        estiloTexto);
+
+                String detalle = h.getGastoVariable() != null
+                        ? h.getGastoVariable().getProducto()
+                        : "";
+
+                setTexto(
+                        r,
+                        4,
+                        detalle,
+                        estiloTexto);
+            }
+
+            fila++;
         }
 
-        fila++;
+        sh.setColumnWidth(0, 15 * 256); // Fecha
+        sh.setColumnWidth(1, 18 * 256); // Movimiento
+        sh.setColumnWidth(2, 15 * 256); // Cantidad
+        sh.setColumnWidth(3, 12 * 256); // Unidad
+        sh.setColumnWidth(4, 45 * 256); // Descripción
+
+        sh.createFreezePane(0, 2);
     }
-
-    sh.setColumnWidth(0, 15 * 256); // Fecha
-    sh.setColumnWidth(1, 18 * 256); // Movimiento
-    sh.setColumnWidth(2, 15 * 256); // Cantidad
-    sh.setColumnWidth(3, 12 * 256); // Unidad
-    sh.setColumnWidth(4, 45 * 256); // Descripción
-
-    sh.createFreezePane(0, 2);
-}
 
     private void hojaGastosFijos(Workbook wb, List<GastosFijos> gastos) {
         Sheet sh = wb.createSheet("Gastos Fijos");
@@ -1159,7 +1168,12 @@ public class ExcelExportService {
         CellStyle estiloMoneda = estiloMoneda(wb, false);
 
         List<GastosFijos> ordenados = gastos.stream()
-                .sorted(Comparator.comparing(GastosFijos::getFecha))
+                .sorted(
+                        Comparator.comparing(
+                                (GastosFijos g) -> g.getFecha(),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                )
                 .toList();
 
         int fila = 2;
@@ -1212,7 +1226,12 @@ public class ExcelExportService {
         estiloNumero.setBorderRight(BorderStyle.THIN);
 
         List<GastosVariables> ordenados = gastos.stream()
-                .sorted(Comparator.comparing(GastosVariables::getFecha))
+                .sorted(
+                        Comparator.comparing(
+                                (GastosVariables g) -> g.getFecha(),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                )
                 .toList();
 
         int fila = 2;
@@ -1260,7 +1279,12 @@ public class ExcelExportService {
         CellStyle estiloMoneda = estiloMoneda(wb, false);
 
         List<GastosIndividuales> ordenados = gastos.stream()
-                .sorted(Comparator.comparing(GastosIndividuales::getFecha))
+                .sorted(
+                        Comparator.comparing(
+                                (GastosIndividuales g) -> g.getFecha(),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                )
                 .toList();
 
         int fila = 2;

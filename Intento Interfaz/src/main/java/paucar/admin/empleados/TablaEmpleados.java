@@ -4,14 +4,13 @@ package paucar.admin.empleados;
 import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.Empleado;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class TablaEmpleados extends VBox {
+public final class TablaEmpleados extends VBox {
     private final ListView<Empleado> lista;
 
     public TablaEmpleados(String tituloTexto) {

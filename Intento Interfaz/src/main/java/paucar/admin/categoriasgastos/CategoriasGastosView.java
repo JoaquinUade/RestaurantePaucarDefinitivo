@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import paucar.config.Responsive;
 import paucar.service.CategoriasGastosService;
 
-public class CategoriasGastosView extends BorderPane {
+public final class CategoriasGastosView extends BorderPane {
 
     private final CategoriasGastosService service;
 

@@ -11,7 +11,7 @@ import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
 
-public class PanelHistorialStock extends VBox {
+public final class PanelHistorialStock extends VBox {
 
     public PanelHistorialStock(
         String categoria,

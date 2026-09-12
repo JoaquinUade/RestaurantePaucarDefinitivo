@@ -23,7 +23,7 @@ import paucar.config.Responsive;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 
-public class SemanalClientes extends BorderPane {
+public final class SemanalClientes extends BorderPane {
 
     private final VentasBackend backend;
     private LocalDate inicioSemana;

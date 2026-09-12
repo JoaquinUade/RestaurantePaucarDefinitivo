@@ -112,7 +112,7 @@ public class TablaSemanalDebe {
         TableColumn<Venta, String> colTipo = new TableColumn<>("Tipo de pago");/*Crea una columna llamada
                                                                                                    colTipo*/
         colTipo.setCellValueFactory(fila -> {/*define el contenido de colTipo */
-            TipoDePago estado = (TipoDePago) fila.getValue().getEstado();/*obtiene el estado */
+            TipoDePago estado = fila.getValue().getEstado();/*obtiene el estado */
 
             String texto;
 

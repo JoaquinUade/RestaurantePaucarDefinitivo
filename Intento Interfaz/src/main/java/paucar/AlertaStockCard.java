@@ -2,11 +2,10 @@ package paucar;
 
 
 import paucar.config.Responsive;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class AlertaStockCard extends VBox {
+public final class AlertaStockCard extends VBox {
 
     public AlertaStockCard(
             String producto,

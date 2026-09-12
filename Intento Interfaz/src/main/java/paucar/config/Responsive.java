@@ -143,10 +143,10 @@ public final class Responsive {
                 altoDiseno = altoActual;
                 guardarDiseno();
             }
-        } catch (Exception e) {
-            // Si algo falla, se siguen usando los valores por defecto.
-            System.err.println("Responsive: no se pudo leer la configuracion de pantalla: " + e);
-        }
+        } catch (java.io.IOException e) {
+    System.err.println(
+        "Responsive: no se pudo leer la configuracion de pantalla: " + e);
+}
     }
 
     private static void guardarDiseno() {
@@ -157,7 +157,7 @@ public final class Responsive {
             try (var out = Files.newBufferedWriter(archivoConfig())) {
                 p.store(out, "Resolucion de diseno de la interfaz (auto-generado, no editar)");
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
             // No crítico: si no se puede guardar, se sigue con los valores por defecto.
             System.err.println("Responsive: no se pudo guardar la configuracion de pantalla: " + e);
         }

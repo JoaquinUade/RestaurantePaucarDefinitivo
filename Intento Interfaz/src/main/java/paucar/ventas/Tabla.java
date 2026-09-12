@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 import com.uade.tpo.demo.entity.Venta;
 
 @SuppressWarnings("unused")
-public class Tabla extends VBox {
+public final class Tabla extends VBox {
 
     private final TableView<Venta> tabla = new TableView<>();
 
@@ -467,8 +467,6 @@ public class Tabla extends VBox {
                         Alert.AlertType.ERROR,
                         "No se pudo guardar la venta"
                 ).showAndWait();
-
-                return;
             }
         } catch (NumberFormatException ex) {
 

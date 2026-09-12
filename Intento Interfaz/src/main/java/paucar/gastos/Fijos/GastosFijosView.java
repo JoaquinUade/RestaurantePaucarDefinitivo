@@ -21,7 +21,7 @@ import paucar.config.Responsive;
 import paucar.service.EmpleadoService;
 import paucar.service.GastosFijosService;
 
-public class GastosFijosView extends VBox {
+public final class GastosFijosView extends VBox {
 
     private final GastosFijosService service;
     private final EmpleadoService empleadoService;

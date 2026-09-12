@@ -3,6 +3,7 @@ package paucar.admin.empresasClientes;
 
 import java.util.List;
 
+import com.uade.tpo.demo.entity.Cliente;
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
@@ -19,18 +20,18 @@ import paucar.config.Responsive;
 import paucar.resumen.Resumen;
 import paucar.service.ClientesService;
 
-public class EmpresasClientes extends BorderPane {
+public final class EmpresasClientes extends BorderPane {
 
     private final ClientesService clientesService;
 
     private final TablaEmpresasClientes panelClientes;
     private final TablaEmpresasClientes panelEmpresas;
 
-    private final ListView<String> listaClientes;
-    private final ListView<String> listaEmpresas;
+    private final ListView<Cliente> listaClientes;
+    private final ListView<Cliente> listaEmpresas;
 
-    private List<String> clientesOriginal;
-    private List<String> empresasOriginal;
+    private List<Cliente> clientesOriginal = List.of();
+    private List<Cliente> empresasOriginal = List.of();
 
 private final Resumen resumen;
 
@@ -79,11 +80,11 @@ private final Resumen resumen;
                                                                        y reaccioná automáticamente */
             String texto = newVal.toLowerCase();/*lo vuelve minuscula */
 
-            List<String> clientesFiltrados = clientesOriginal.stream().filter(c
-                    -> c.toLowerCase().contains(texto)).toList();/*Filtra la lista de clientes y se queda solo con
+            List<Cliente> clientesFiltrados = clientesOriginal.stream().filter(c
+                    -> c.getNombre().toLowerCase().contains(texto)).toList();/*Filtra la lista de clientes y se queda solo con
                                                        los que coinciden con lo que escribió el usuario */
-            List<String> empresasFiltradas = empresasOriginal.stream()
-                    .filter(e -> e.toLowerCase().contains(texto))
+            List<Cliente> empresasFiltradas = empresasOriginal.stream()
+                    .filter(e -> e.getNombre().toLowerCase().contains(texto))
                     .toList();
 
             listaClientes.getItems().setAll(clientesFiltrados);/*Reemplaza los elementos de la lista visual
@@ -118,13 +119,21 @@ private final Resumen resumen;
     }
 
     private void cargarDatos() {
-        clientesOriginal
-                = clientesService.obtenerNombresPorTipo(
-                        TipoCliente.CLIENTE);
-
-        empresasOriginal
-                = clientesService.obtenerNombresPorTipo(
-                        TipoCliente.EMPRESA);
+        List<Cliente> todos;
+        try {
+            todos = clientesService.obtenerClientesParaAdministracion();
+        } catch (IllegalStateException e) {
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
+            return;
+        }
+        clientesOriginal = todos.stream().filter(c -> c.getTipoCliente() == TipoCliente.CLIENTE)
+                .sorted(java.util.Comparator.comparing(
+        (Cliente c) -> c.getNombre(),
+        String.CASE_INSENSITIVE_ORDER)).toList();
+        empresasOriginal = todos.stream().filter(c -> c.getTipoCliente() == TipoCliente.EMPRESA)
+                .sorted(java.util.Comparator.comparing(
+        (Cliente c) -> c.getNombre(),
+        String.CASE_INSENSITIVE_ORDER)).toList();
 
         listaClientes.getItems().setAll(clientesOriginal);/*Carga todos los clientes en la lista visual */
         listaEmpresas.getItems().setAll(empresasOriginal);
@@ -160,7 +169,7 @@ private final Resumen resumen;
         });
 
         btnEditar.setOnAction(e -> {
-            String seleccionado = obtenerSeleccionado();
+            Cliente seleccionado = obtenerSeleccionado();
 
             if (seleccionado == null) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione un elemento").showAndWait();
@@ -172,7 +181,7 @@ private final Resumen resumen;
                                                        no, es EMPRESA */
 
             Object[] resultado = DialogEmpresasClientes
-                    .abrirDialogEditar(seleccionado, tipo, null);/*Abre el diálogo de editar y guarda los datos que
+                    .abrirDialogEditar(seleccionado.getNombre(), tipo, seleccionado.getPeriodicidadPago());/*Abre el diálogo de editar y guarda los datos que
                                                        ingresó el usuario en un arreglo */
 
             if (resultado != null) {
@@ -180,13 +189,13 @@ private final Resumen resumen;
                 TipoCliente nuevoTipo = (TipoCliente) resultado[1];/*obtiene el nuevo tipo */
                 TipoPeriodicidad nuevaPeriodicidad = (TipoPeriodicidad) resultado[2];
 
-                clientesService.editarCliente(seleccionado, nuevoNombre, nuevoTipo, nuevaPeriodicidad);/*Actualiza el cliente/empresa
+                clientesService.editarCliente(seleccionado.getNombre(), nuevoNombre, nuevoTipo, nuevaPeriodicidad);/*Actualiza el cliente/empresa
                                                                                     con los nuevos datos */
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla */
             }
         });
         btnEliminar.setOnAction(e -> {
-            String seleccionado = obtenerSeleccionado();
+            Cliente seleccionado = obtenerSeleccionado();
 
             if (seleccionado == null) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione un elemento").showAndWait();
@@ -195,7 +204,7 @@ private final Resumen resumen;
 
             if (DialogEmpresasClientes.confirmarEliminacion()) {/*Si el usuario confirma la eliminación*/
 
-                clientesService.eliminarCliente(seleccionado);/*elimina el cliente o empresa */
+                clientesService.eliminarCliente(seleccionado.getNombre());/*elimina el cliente o empresa */
 
                 cargarDatos();/*Vuelve a cargar los datos y actualiza las listas en pantalla  */
             }
@@ -204,20 +213,8 @@ private final Resumen resumen;
                                                               los botones*/
     }
 
-    private String obtenerSeleccionado() {
-
-        String seleccionado = null;
-
-        if (listaClientes.getSelectionModel().getSelectedItem() != null) {
-            seleccionado = listaClientes.getSelectionModel().getSelectedItem();
-        } else if (listaEmpresas.getSelectionModel().getSelectedItem() != null) {
-            seleccionado = listaEmpresas.getSelectionModel().getSelectedItem();
-        }
-
-        if (seleccionado != null && seleccionado.contains(" - ")) {
-            return seleccionado.split(" - ")[0].trim();
-        }
-
-        return seleccionado;
+    private Cliente obtenerSeleccionado() {
+        Cliente seleccionado = listaClientes.getSelectionModel().getSelectedItem();
+        return seleccionado != null ? seleccionado : listaEmpresas.getSelectionModel().getSelectedItem();
     }
 }

@@ -25,13 +25,13 @@ import paucar.service.CategoriasGastosService;
 import paucar.service.ClientesService;
 import paucar.service.EmpleadoService;
 
-public class Admin extends BorderPane {
+public final class Admin extends BorderPane {
 
     private final AdminService adminService;
     private final ClientesService clientesService;
     private final CategoriasGastosService categoriaService;
     private final EmpleadoService empleadoService;
-    private Resumen resumen;
+    private final Resumen resumen;
 
     public Admin(AdminService adminService, ClientesService clientesService,
             CategoriasGastosService categoriaService, EmpleadoService empleadoService, Resumen resumen) {
@@ -58,7 +58,7 @@ public class Admin extends BorderPane {
         grid.setPadding(Responsive.insets(40));/* Establece el relleno del GridPane */
         grid.setHgap(Responsive.pe(20));
         grid.setVgap(Responsive.pe(20));
-        
+
         Button btnPlatos = crearTarjeta("PLATOS", "/img/platos.png");/*Crea un botón con una tarjeta para los
                                                                                        platos*/
         Button btnEmpresasClientes = crearTarjeta("EMPRESAS / CLIENTES", "/img/empresas clientes.png");
@@ -133,7 +133,8 @@ public class Admin extends BorderPane {
 
         dialogo.getDialogPane().setContent(formulario);
         dialogo.showAndWait().ifPresent(opcion -> {
-            String error = null;
+            String error;
+
             if (opcion == cambiar) {
                 error = PasswordManager.cambiarConContrasenaActual(
                         actual.getText(), nueva.getText(), confirmacion.getText());

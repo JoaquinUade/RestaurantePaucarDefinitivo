@@ -31,7 +31,7 @@ public class GastosServiceImpl implements GastosService {
         gasto.setFecha(LocalDateTime.now());
         gasto.setDia(LocalDate.now().getDayOfWeek()
                     .getDisplayName(TextStyle.FULL, 
-                    new Locale("es", "ES")));
+                    Locale.of("es", "ES")));
         return gastosRepository.save(gasto);
     }
 
@@ -60,7 +60,7 @@ public class GastosServiceImpl implements GastosService {
                 gasto.setObservacion(gastosActualizado.getObservacion());
                 gasto.setDia(gastosActualizado.getFecha().getDayOfWeek()
                             .getDisplayName(TextStyle.FULL, 
-                            new Locale("es", "ES")));
+                            Locale.of("es", "ES")));
             }
             
             return gastosRepository.save(gasto);

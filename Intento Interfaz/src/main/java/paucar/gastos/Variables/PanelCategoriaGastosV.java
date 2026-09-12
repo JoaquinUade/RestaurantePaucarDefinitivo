@@ -13,7 +13,7 @@ import com.uade.tpo.demo.entity.GastosVariables;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class PanelCategoriaGastosV extends VBox {
+public final class PanelCategoriaGastosV extends VBox {
 
     public PanelCategoriaGastosV(String nombreCategoria, List<GastosVariables> gastos,
                                 Consumer<GastosVariables> onSelect) {

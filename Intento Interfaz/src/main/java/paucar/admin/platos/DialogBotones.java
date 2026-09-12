@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import com.uade.tpo.demo.entity.Categoria;
 import com.uade.tpo.demo.entity.Producto;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;

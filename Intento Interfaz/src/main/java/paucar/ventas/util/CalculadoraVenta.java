@@ -56,7 +56,8 @@ public final class CalculadoraVenta {
 
                         total += subtotal;
 
-                    } catch (Exception ex) {
+                    } catch (NumberFormatException ex) {
+                        System.err.println("Error al parsear la cantidad: " + ex.getMessage());
                     }
                 }
             }

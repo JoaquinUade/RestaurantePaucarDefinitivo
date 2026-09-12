@@ -8,7 +8,6 @@ import com.uade.tpo.demo.entity.Producto;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -21,7 +20,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import paucar.service.AdminService;
 
-public class Platos extends BorderPane {
+public final class Platos extends BorderPane {
 
     private final AdminService adminService;
     private GridPane filaSeleccionada;

@@ -8,17 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 import javafx.scene.Scene;
 
 /**
  * Carga las hojas de estilo de la app y, si la pantalla actual no es la
- * pantalla de diseño (1366 x 768), escala automáticamente todos los
- * valores en píxeles (font-size, padding, radios, min/pref/max, etc.)
- * usando {@link Responsive}, para que la interfaz se vea igual en
- * cualquier pantalla.
+ * pantalla de diseño (1366 x 768), escala automáticamente todos los valores en
+ * píxeles (font-size, padding, radios, min/pref/max, etc.) usando
+ * {@link Responsive}, para que la interfaz se vea igual en cualquier pantalla.
  */
 public class CssLoader {
 
@@ -34,15 +32,21 @@ public class CssLoader {
         "/gastos.css"
     };
 
-    /** Propiedades cuyo valor es un ancho (escalan por X). */
+    /**
+     * Propiedades cuyo valor es un ancho (escalan por X).
+     */
     private static final Set<String> PROPS_X = Set.of(
             "-fx-min-width", "-fx-pref-width", "-fx-max-width");
 
-    /** Propiedades cuyo valor es un alto (escalan por Y). */
+    /**
+     * Propiedades cuyo valor es un alto (escalan por Y).
+     */
     private static final Set<String> PROPS_Y = Set.of(
             "-fx-min-height", "-fx-pref-height", "-fx-max-height");
 
-    /** Propiedades uniformes (escalan con la escala mínima). */
+    /**
+     * Propiedades uniformes (escalan con la escala mínima).
+     */
     private static final Set<String> PROPS_U = Set.of(
             "-fx-font-size",
             "-fx-padding",
@@ -55,7 +59,10 @@ public class CssLoader {
             "-fx-translate-x",
             "-fx-translate-y");
 
-    /** Detecta un número (con signo opcional y decimales) seguido de "px" opcional. */
+    /**
+     * Detecta un número (con signo opcional y decimales) seguido de "px"
+     * opcional.
+     */
     private static final Pattern NUMERO = Pattern.compile("(-?\\d+(?:\\.\\d+)?)(px)?");
 
     private static final List<Path> temporales = new ArrayList<>();
@@ -72,14 +79,15 @@ public class CssLoader {
 
                 if (escalaNecesaria()) {
                     scene.getStylesheets().add(
-                            guardarTemporal(archivo, escalarCss(css)));
+                            guardarTemporal(escalarCss(css)));
                 } else {
                     // Pantalla de diseño: usamos el CSS original tal cual.
                     scene.getStylesheets().add(
                             CssLoader.class.getResource(archivo).toExternalForm());
                 }
-            } catch (Exception e) {
-                System.err.println("No se pudo aplicar el estilo " + archivo + ": " + e);
+            } catch (IOException | RuntimeException e) {
+                System.err.println("No se pudo aplicar el estilo "
+                        + archivo + ": " + e);
             }
         }
     }
@@ -99,7 +107,7 @@ public class CssLoader {
         }
     }
 
-    private static String guardarTemporal(String nombre, String contenido) throws IOException {
+    private static String guardarTemporal(String contenido) throws IOException {
         Path tmp = Files.createTempFile(
                 Path.of(System.getProperty("java.io.tmpdir")),
                 "paucar_css_", ".css");
@@ -112,7 +120,7 @@ public class CssLoader {
                 for (Path p : temporales) {
                     try {
                         Files.deleteIfExists(p);
-                    } catch (Exception ignorado) {
+                    } catch (IOException | RuntimeException e) {
                         // No crítico.
                     }
                 }
@@ -123,8 +131,8 @@ public class CssLoader {
     }
 
     /**
-     * Escala los valores numéricos de las propiedades conocidas,
-     * dejando intactos colores y efectos.
+     * Escala los valores numéricos de las propiedades conocidas, dejando
+     * intactos colores y efectos.
      */
     private static String escalarCss(String css) {
         final StringBuilder out = new StringBuilder(css.length() + 64);

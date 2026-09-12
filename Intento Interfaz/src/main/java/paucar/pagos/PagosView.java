@@ -24,7 +24,7 @@ import paucar.service.ClientesService;
 import paucar.service.PagosService;
 import paucar.service.VentasBackend;
 
-public class PagosView extends BorderPane {
+public final class PagosView extends BorderPane {
 
     private final PagosService service;
     private final ClientesService clientesService;

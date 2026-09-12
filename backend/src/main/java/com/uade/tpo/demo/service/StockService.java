@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
-import com.uade.tpo.demo.entity.GastosVariables;
 import com.uade.tpo.demo.entity.HistorialStock;
 
 public interface StockService {

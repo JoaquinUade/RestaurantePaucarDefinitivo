@@ -4,14 +4,13 @@ package paucar.admin.categoriasgastos;
 import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.CategoriaGastoVariable;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class TablaCategoriasGastos extends VBox {
+public final class TablaCategoriasGastos extends VBox {
 
     private final ListView<CategoriaGastoVariable> lista;
 

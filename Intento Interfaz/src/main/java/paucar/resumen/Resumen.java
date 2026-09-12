@@ -28,7 +28,7 @@ import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
 import paucar.service.VentasBackend;
 
-public class Resumen extends BorderPane {
+public final class Resumen extends BorderPane {
 
     private final VentasBackend backend;
     private final ClientesService clientesService;

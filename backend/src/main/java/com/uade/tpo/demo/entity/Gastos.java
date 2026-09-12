@@ -48,7 +48,7 @@ public class Gastos {
         this.fecha = fecha;
         this.dia = fecha.getDayOfWeek()
                        .getDisplayName(TextStyle.FULL, 
-                       new Locale("es", "ES"));
+                       Locale.of("es", "ES"));
     }
 
     public Long getIdGasto() {

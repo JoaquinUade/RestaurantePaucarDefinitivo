@@ -8,7 +8,6 @@ import java.util.List;
 import com.uade.tpo.demo.entity.Empleado;
 import com.uade.tpo.demo.entity.dto.GastoIndividualRequest;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;

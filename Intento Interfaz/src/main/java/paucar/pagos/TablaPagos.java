@@ -17,7 +17,7 @@ import paucar.config.Responsive;
 import paucar.service.PagosService;
 import paucar.shared.MonedaUtils;
 
-public class TablaPagos extends VBox {
+public final class TablaPagos extends VBox {
 
     private final TableView<PagoEmpresa> tabla;
     private final Runnable onEstadoCambiado;
@@ -33,7 +33,6 @@ public class TablaPagos extends VBox {
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        
         // Empresa
         TableColumn<PagoEmpresa, String> colEmpresa
                 = new TableColumn<>("Empresa");
@@ -191,8 +190,8 @@ public class TablaPagos extends VBox {
 
                         service.modificar(pago.getId(), pago);
 
-                        if (onEstadoCambiado != null) {
-                            onEstadoCambiado.run();
+                        if (TablaPagos.this.onEstadoCambiado != null) {
+                            TablaPagos.this.onEstadoCambiado.run();
                         }
                     }
                 });

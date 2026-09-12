@@ -13,7 +13,7 @@ import com.uade.tpo.demo.entity.GastosIndividuales;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class PanelGastosIndividuales extends VBox {
+public final class PanelGastosIndividuales extends VBox {
 
     public PanelGastosIndividuales(
             String nombreEmpleado,

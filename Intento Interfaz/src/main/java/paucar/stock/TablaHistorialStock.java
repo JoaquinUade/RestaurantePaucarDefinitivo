@@ -23,7 +23,7 @@ import paucar.service.StockService;
 import paucar.stock.aumentoydisminucion.DialogRestarStock;
 import paucar.stock.aumentoydisminucion.DialogSumarStock;
 
-public class TablaHistorialStock extends VBox {
+public final class TablaHistorialStock extends VBox {
 
     public TablaHistorialStock(
             List<Stock> stocks,

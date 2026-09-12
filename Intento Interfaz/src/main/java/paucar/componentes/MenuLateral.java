@@ -8,7 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import paucar.config.Responsive;
 
-public class MenuLateral extends VBox {
+public final class MenuLateral extends VBox {
 
     private final Button btnVentas;
     private final Button btnResumen;

@@ -28,7 +28,7 @@ import paucar.service.VentasBackend;
 import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 
-public class MensualGeneral extends BorderPane {
+public final class MensualGeneral extends BorderPane {
 
     private final VentasBackend ventasBackend;/*variable que guarda la instancia del backend de ventas */
     private final GastosVariablesService gastosVariablesService;

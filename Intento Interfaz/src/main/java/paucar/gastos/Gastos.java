@@ -2,7 +2,6 @@ package paucar.gastos;
 
 
 import paucar.config.Responsive;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -19,7 +18,7 @@ import paucar.service.GastosFijosService;
 import paucar.service.GastosIndividualesService;
 import paucar.service.GastosVariablesService;
 
-public class Gastos extends BorderPane {
+public final class Gastos extends BorderPane {
 
     private final GastosVariablesService gastosVService;
     private final CategoriasGastosService categoriasService;

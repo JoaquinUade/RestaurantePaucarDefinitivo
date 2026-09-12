@@ -2,7 +2,6 @@ package paucar.admin.empleados;
 
 
 import paucar.config.Responsive;
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;

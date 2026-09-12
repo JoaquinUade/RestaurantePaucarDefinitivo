@@ -27,7 +27,7 @@ import paucar.service.GastosVariablesService;
 import paucar.service.StockService;
 import paucar.shared.FechaUtils;
 
-public class StockView extends BorderPane {
+public final class StockView extends BorderPane {
 
     private final StockService service;
     private final CategoriasGastosService categoriasService;
@@ -170,10 +170,10 @@ public class StockView extends BorderPane {
         List<Stock> stocks = service.obtenerTodos();
         LocalDate fechaSeleccionada = filtroFecha.getValue();
 
+        // Los productos siguen vigentes después del mes en que se crearon.
+        LocalDate finDelMes = fechaSeleccionada.withDayOfMonth(fechaSeleccionada.lengthOfMonth());
         stocks = stocks.stream()
-                .filter(s -> s.getFecha() != null
-                && s.getFecha().getMonth() == fechaSeleccionada.getMonth()
-                && s.getFecha().getYear() == fechaSeleccionada.getYear())
+                .filter(s -> s.getFecha() == null || !s.getFecha().isAfter(finDelMes))
                 .toList();
 
         if (stocks.isEmpty()) {

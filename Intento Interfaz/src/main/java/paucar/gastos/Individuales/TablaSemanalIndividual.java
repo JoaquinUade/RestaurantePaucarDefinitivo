@@ -15,7 +15,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import paucar.config.Responsive;
 
-public class TablaSemanalIndividual extends VBox {
+public final class TablaSemanalIndividual extends VBox {
 
     public TablaSemanalIndividual(List<GastosIndividuales> gastos, Consumer<GastosIndividuales> onSelect) {
 

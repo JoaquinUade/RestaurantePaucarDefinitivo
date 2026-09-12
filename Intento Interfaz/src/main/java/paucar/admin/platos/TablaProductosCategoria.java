@@ -8,7 +8,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;

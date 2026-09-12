@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import paucar.config.Responsive;
 import paucar.shared.MonedaUtils;
 
-public class TablaMensualFijos extends VBox {
+public final class TablaMensualFijos extends VBox {
 
     public TablaMensualFijos(List<GastosFijos> gastos,
             Consumer<GastosFijos> onSelect,

@@ -29,7 +29,7 @@ public class VentaDTO {
         this.fecha = fecha;
         this.dia = fecha.getDayOfWeek()
                        .getDisplayName(TextStyle.FULL, 
-                       new Locale("es", "ES"));
+                       Locale.of("es", "ES"));
         this.nombreCliente = nombreCliente;
         this.descripcion = descripcion;
         this.monto = monto;

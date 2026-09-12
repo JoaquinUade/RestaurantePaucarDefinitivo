@@ -1,10 +1,8 @@
 package paucar.pagos;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.uade.tpo.demo.entity.EstadoPago;
@@ -29,9 +27,6 @@ import paucar.service.ClientesService;
 import paucar.service.VentasBackend;
 
 public class DialogPagos {
-
-    private static final DateTimeFormatter FECHA
-            = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private DialogPagos() {
     }
@@ -70,10 +65,10 @@ public class DialogPagos {
 
     // ===== FORMULARIO (crear y editar) =====
     private static PagoEmpresa abrirFormulario(
-        List<String> empresas,
-        ClientesService clientesService,
-        VentasBackend ventasBackend,
-        PagoEmpresa original) {
+            List<String> empresas,
+            ClientesService clientesService,
+            VentasBackend ventasBackend,
+            PagoEmpresa original) {
 
         boolean edicion = original != null;
 
@@ -123,100 +118,100 @@ public class DialogPagos {
         comboEstado.setMaxWidth(Double.MAX_VALUE);
 
         TextField txtObservacion = new TextField();
-comboSempras.setOnAction(e -> {
+        comboSempras.setOnAction(e -> {
 
-    String empresa = comboSempras.getValue();
+            String empresa = comboSempras.getValue();
 
-    if (empresa != null && empresa.contains(" - ")) {
-        empresa = empresa.substring(0, empresa.indexOf(" - "));
-    }
+            if (empresa != null && empresa.contains(" - ")) {
+                empresa = empresa.substring(0, empresa.indexOf(" - "));
+            }
 
-    if (empresa == null || empresa.isBlank()) {
-        txtMonto.clear();
-        return;
-    }
+            if (empresa == null || empresa.isBlank()) {
+                txtMonto.clear();
+                return;
+            }
 
-    BigDecimal total;
+            BigDecimal total;
 
-    if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+            if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
 
-        total = ventasBackend.calcularDebeSemanal(
-                empresa,
-                fecha.getValue());
+                total = ventasBackend.calcularDebeSemanal(
+                        empresa,
+                        fecha.getValue());
 
-    } else {
+            } else {
 
-        total = ventasBackend.calcularDebeMensual(
-                empresa,
-                fecha.getValue().getMonthValue(),
-                fecha.getValue().getYear());
-    }
+                total = ventasBackend.calcularDebeMensual(
+                        empresa,
+                        fecha.getValue().getMonthValue(),
+                        fecha.getValue().getYear());
+            }
 
-    txtMonto.setText(total.toPlainString());
-});
-fecha.setOnAction(e -> {
+            txtMonto.setText(total.toPlainString());
+        });
+        fecha.setOnAction(e -> {
 
-    String empresa = comboSempras.getValue();
+            String empresa = comboSempras.getValue();
 
-if (empresa != null && empresa.contains(" - ")) {
-    empresa = empresa.substring(0, empresa.indexOf(" - "));
-}
+            if (empresa != null && empresa.contains(" - ")) {
+                empresa = empresa.substring(0, empresa.indexOf(" - "));
+            }
 
-    if (empresa == null || empresa.isBlank()) {
-        return;
-    }
+            if (empresa == null || empresa.isBlank()) {
+                return;
+            }
 
-    BigDecimal total;
+            BigDecimal total;
 
-if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+            if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
 
-    total = ventasBackend.calcularDebeSemanal(
-            empresa,
-            fecha.getValue());
+                total = ventasBackend.calcularDebeSemanal(
+                        empresa,
+                        fecha.getValue());
 
-} else {
+            } else {
 
-    total = ventasBackend.calcularDebeMensual(
-            empresa,
-            fecha.getValue().getMonthValue(),
-            fecha.getValue().getYear());
-}
+                total = ventasBackend.calcularDebeMensual(
+                        empresa,
+                        fecha.getValue().getMonthValue(),
+                        fecha.getValue().getYear());
+            }
 
-    txtMonto.setText(total.toPlainString());
-});
-comboPer.setOnAction(e -> {
+            txtMonto.setText(total.toPlainString());
+        });
+        comboPer.setOnAction(e -> {
 
-    String empresa = comboSempras.getValue();
+            String empresa = comboSempras.getValue();
 
-    if (empresa != null && empresa.contains(" - ")) {
-        empresa = empresa.substring(0, empresa.indexOf(" - "));
-    }
+            if (empresa != null && empresa.contains(" - ")) {
+                empresa = empresa.substring(0, empresa.indexOf(" - "));
+            }
 
-    if (empresa == null || empresa.isBlank()) {
-        return;
-    }
+            if (empresa == null || empresa.isBlank()) {
+                return;
+            }
 
-    BigDecimal total;
+            BigDecimal total;
 
-    if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
+            if (comboPer.getValue() == TipoPeriodicidad.SEMANAL) {
 
-        total = ventasBackend.calcularDebeSemanal(
-                empresa,
-                fecha.getValue());
+                total = ventasBackend.calcularDebeSemanal(
+                        empresa,
+                        fecha.getValue());
 
-    } else {
+            } else {
 
-        total = ventasBackend.calcularDebeMensual(
-                empresa,
-                fecha.getValue().getMonthValue(),
-                fecha.getValue().getYear());
-    }
+                total = ventasBackend.calcularDebeMensual(
+                        empresa,
+                        fecha.getValue().getMonthValue(),
+                        fecha.getValue().getYear());
+            }
 
-    txtMonto.setText(total.toPlainString());
-});
+            txtMonto.setText(total.toPlainString());
+        });
 
         // ---- Precargar en edición ----
-        if (edicion) {
+        if (original != null) {
             if (original.getNombre() != null) {
                 comboSempras.setValue(original.getNombre());
             }
@@ -279,14 +274,14 @@ comboPer.setOnAction(e -> {
 
             String empresa = comboSempras.getValue();
             if (empresa != null && empresa.contains(" - ")) {
-    empresa = empresa.substring(0, empresa.indexOf(" - "));
-}
+                empresa = empresa.substring(0, empresa.indexOf(" - "));
+            }
             if (empresa == null || empresa.isBlank()) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione una empresa")
                         .showAndWait();
                 return null;
             }
-           
+
             if (comboPer.getValue() == null) {
                 new Alert(Alert.AlertType.WARNING, "Seleccione la periodicidad")
                         .showAndWait();
@@ -325,12 +320,11 @@ comboPer.setOnAction(e -> {
             if (!txtNumeroPago.getText().trim().isEmpty()) {
                 try {
                     pago.setNumeroPago(
-                            Integer.parseInt(txtNumeroPago.getText().trim()));
+                            Integer.valueOf(txtNumeroPago.getText().trim()));
                 } catch (NumberFormatException e) {
                     pago.setNumeroPago(null);
                 }
             }
-
             return pago;
         });
 
@@ -338,53 +332,53 @@ comboPer.setOnAction(e -> {
     }
 
     // ===== ELIMINAR =====
-   public static boolean confirmarLimpiarDatos() {
+    public static boolean confirmarLimpiarDatos() {
 
-    Dialog<Void> dialog = new Dialog<>();
-    dialog.setTitle("Limpiar datos del pago");
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Limpiar datos del pago");
 
-    ButtonType btnEliminar =
-            new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnEliminar
+                = new ButtonType("Eliminar", ButtonBar.ButtonData.OK_DONE);
 
-    dialog.getDialogPane().getButtonTypes()
-            .addAll(btnEliminar, ButtonType.CANCEL);
+        dialog.getDialogPane().getButtonTypes()
+                .addAll(btnEliminar, ButtonType.CANCEL);
 
-    PasswordField txtPass = new PasswordField();
+        PasswordField txtPass = new PasswordField();
 
-    VBox form = new VBox(Responsive.pe(10));
-    if (!SesionPassword.estaAutorizado()) {
-        form.getChildren().addAll(
-                new Label("Contraseña"), txtPass);
-    } else {
-        form.getChildren().add(
-                new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
-    }
-
-    form.setPadding(Responsive.insets(10));
-    dialog.getDialogPane().setContent(form);
-
-    final boolean[] confirmado = {false};
-
-    dialog.setResultConverter(btn -> {
-
-        if (btn == btnEliminar
-                && PasswordManager.verificarConSesion(txtPass.getText())) {
-
-            confirmado[0] = true;
-
-        } else if (btn == btnEliminar) {
-
-            new Alert(Alert.AlertType.ERROR,
-                    "Contraseña incorrecta").showAndWait();
+        VBox form = new VBox(Responsive.pe(10));
+        if (!SesionPassword.estaAutorizado()) {
+            form.getChildren().addAll(
+                    new Label("Contraseña"), txtPass);
+        } else {
+            form.getChildren().add(
+                    new Label("Sesión autorizada. Pulse Eliminar para confirmar la operación."));
         }
 
-        return null;
-    });
+        form.setPadding(Responsive.insets(10));
+        dialog.getDialogPane().setContent(form);
 
-    dialog.showAndWait();
+        final boolean[] confirmado = {false};
 
-    return confirmado[0];
-}
+        dialog.setResultConverter(btn -> {
+
+            if (btn == btnEliminar
+                    && PasswordManager.verificarConSesion(txtPass.getText())) {
+
+                confirmado[0] = true;
+
+            } else if (btn == btnEliminar) {
+
+                new Alert(Alert.AlertType.ERROR,
+                        "Contraseña incorrecta").showAndWait();
+            }
+
+            return null;
+        });
+
+        dialog.showAndWait();
+
+        return confirmado[0];
+    }
 
     // ===== helpers de celdas =====
     private static ListCell<TipoPeriodicidad> celdaPeriodicidad() {

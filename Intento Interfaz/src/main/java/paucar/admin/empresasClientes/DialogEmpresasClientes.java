@@ -5,7 +5,6 @@ import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.TipoCliente;
 import com.uade.tpo.demo.entity.TipoPeriodicidad;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;

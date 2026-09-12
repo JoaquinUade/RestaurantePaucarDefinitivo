@@ -23,7 +23,7 @@ import paucar.config.Responsive;
 import paucar.service.VentasBackend;
 import paucar.shared.MonedaUtils;
 
-public class SemanalEmpresas extends BorderPane {
+public final class SemanalEmpresas extends BorderPane {
 
     private final VentasBackend backend;
 
@@ -86,7 +86,7 @@ public class SemanalEmpresas extends BorderPane {
 
         contenedorTotal.setAlignment(Pos.CENTER_RIGHT);/* Alinea los elementos del contenedor a la derecha */
 
-        Label lblDebe = new Label("Deudas (cualquier fecha)");/*Crea una etiqueta para mostrar el
+        Label lblDebe = new Label("Deudas");/*Crea una etiqueta para mostrar el
                                                                     título de la sección de deudas*/
 
         Button btnPagarDeudas = new Button("Pagar Deudas");

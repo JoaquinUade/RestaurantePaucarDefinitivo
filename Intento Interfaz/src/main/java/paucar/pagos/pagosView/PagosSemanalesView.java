@@ -16,7 +16,7 @@ import paucar.pagos.TablaPagos;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
-public class PagosSemanalesView extends BorderPane {
+public final class PagosSemanalesView extends BorderPane {
 
     private final PagosService service;
 
@@ -36,12 +36,12 @@ private final ClientesService clientesService;
         tablaSemana1 = new TablaPagos(
                 pago -> {
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
 
@@ -57,12 +57,12 @@ private final ClientesService clientesService;
                 pago -> {
 
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
                     if (nuevo != null) {
@@ -77,12 +77,12 @@ private final ClientesService clientesService;
                 pago -> {
 
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
                     if (nuevo != null) {
@@ -100,12 +100,12 @@ private final ClientesService clientesService;
         tablaSemana4 = new TablaPagos(
                 pago -> {
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
                     if (nuevo != null) {
@@ -145,7 +145,7 @@ private final ClientesService clientesService;
         recargar();
     }
 
-    public void recargar() {
+    public final void recargar() {
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()

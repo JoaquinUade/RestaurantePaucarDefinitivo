@@ -48,6 +48,23 @@ public class ClientesService {
         }
     }
 
+    public List<com.uade.tpo.demo.entity.Cliente> obtenerClientesParaAdministracion() {
+        try {
+            var req = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/clientes")).GET().build();
+            var res = http.send(req, HttpResponse.BodyHandlers.ofString());
+            if (res.statusCode() < 200 || res.statusCode() >= 300) {
+                throw new IllegalStateException("No se pudieron cargar los clientes (HTTP " + res.statusCode() + ")");
+            }
+            return TraductorJSON.readValue(res.body(), TraductorJSON.getTypeFactory()
+                    .constructCollectionType(List.class, com.uade.tpo.demo.entity.Cliente.class));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Se interrumpió la carga de clientes", e);
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("No se pudieron cargar los clientes", e);
+        }
+    }
+
     public List<String> obtenerTodosLosClientesMenosMesas() {/*Método que devuelve una lista de nombres que NO
                                                              sean mesas */
 
@@ -67,23 +84,21 @@ public class ClientesService {
 
                 var json = TraductorJSON.readTree(response.body());/*Toma el texto que vino del servidor
                                                                    (normalmente  string JSON) y lo
-                                                                   convierte en un objeto (un árbol JSON) 
+                                                                   convierte en un objeto (un árbol JSON)
                                                                    JSON que podés leer por campos*/
                 var out = new ArrayList<String>();
 
                 if (json.isArray()) {/*Verifica que 'json' sea un vector */
 
                     for (var n : json) {/*Recorre cada elemento del vector */
-                        var nombre = n.hasNonNull("nombre") ? n.get("nombre").asText() : null;/*Si el objeto tiene la clave 'nombre' y no es null 
+                        var nombre = n.hasNonNull("nombre") ? n.get("nombre").asText() : null;/*Si el objeto tiene la clave 'nombre' y no es null
                                                                                                                     entonces obtiene su valor como String sino 'nombre'
                                                                                                                     queda null*/
 
                         var tipo = n.hasNonNull("tipoCliente") ? n.get("tipoCliente").asText() : null;/*si el objeto tiene la clave 'tipoCliente'
                                                                                                                            y no es null lo lee como string, sino 'tipo'
                                                                                                                            queda null */
-                        String periodicidad = n.hasNonNull("periodicidadPago")
-                                ? n.get("periodicidadPago").asText()
-                                : "Sin periodicidad";
+
                         if (nombre != null && !nombre.isBlank()) {/*Filtra: 'nombre' debe existir y NO estar vacío/espacios */
                             if (tipo == null || !tipo.equalsIgnoreCase("MESA")) {/*Si 'tipo' es null O distinto de "MESA" */
                                 out.add(nombre.trim());/*entonces agrega el 'nombre' (sin espacios extremos) a la lista */
@@ -250,10 +265,6 @@ public class ClientesService {
                                 ? n.get("tipoCliente").asText()
                                 : null;
 
-                        String periodicidad = n.hasNonNull("periodicidadPago")
-                                ? n.get("periodicidadPago").asText()
-                                : "Sin periodicidad";
-
                         if (nombre != null && !nombre.isBlank()) {
                             if (tipoStr == null) {
                                 out.add(nombre.trim());
@@ -265,9 +276,6 @@ public class ClientesService {
                 } else if (json.isObject()) {
                     String nombre = json.hasNonNull("nombre") ? json.get("nombre").asText() : null;
                     String tipoStr = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText() : null;
-                    String periodicidad = json.hasNonNull("periodicidadPago")
-                            ? json.get("periodicidadPago").asText()
-                            : "Sin periodicidad";
 
                     if (nombre != null && !nombre.isBlank()) {
                         if (tipoStr == null || tipoStr.equalsIgnoreCase(tipo.name())) {
@@ -300,9 +308,7 @@ public class ClientesService {
                     for (var n : json) {
                         String nombre = n.hasNonNull("nombre") ? n.get("nombre").asText() : null;
                         String tipoStr = n.hasNonNull("tipoCliente") ? n.get("tipoCliente").asText() : null;
-                        String periodicidad = n.hasNonNull("periodicidadPago")
-                                ? n.get("periodicidadPago").asText()
-                                : "Sin periodicidad";
+
 
                         if (nombre != null && !nombre.isBlank() && tipoStr != null
                                 && tipoStr.equalsIgnoreCase(tipo.name())) {
@@ -312,9 +318,6 @@ public class ClientesService {
                 } else if (json.isObject()) {
                     String nombre = json.hasNonNull("nombre") ? json.get("nombre").asText() : null;
                     String tipoStr = json.hasNonNull("tipoCliente") ? json.get("tipoCliente").asText() : null;
-                    String periodicidad = json.hasNonNull("periodicidadPago")
-                            ? json.get("periodicidadPago").asText()
-                            : "Sin periodicidad";
 
                     if (nombre != null && !nombre.isBlank() && tipoStr != null
                             && tipoStr.equalsIgnoreCase(tipo.name())) {
@@ -379,7 +382,7 @@ public class ClientesService {
                 System.err.println("No se encontró el cliente");
                 return;
             }
-            
+
             var json = TraductorJSON.createObjectNode()
                     .put("nombre", nuevoNombre)
                     .put("tipoCliente", tipo.name());
@@ -395,7 +398,7 @@ public class ClientesService {
                     .build();
 
             var res = http.send(req, HttpResponse.BodyHandlers.ofString());
-            
+
             if (res.statusCode() != 200) {
                 System.err.println("Error al editar: " + res.statusCode());
             }
@@ -453,9 +456,9 @@ public List<String> obtenerNombresPagables() {
                     .toList();
         }
 
-    } catch (Exception e) {
-        System.err.println(e.getMessage());
-    }
+    } catch (java.io.IOException | InterruptedException e) {
+    System.err.println(e.getMessage());
+}
 
     return List.of();
 }

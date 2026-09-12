@@ -16,7 +16,7 @@ import paucar.pagos.TablaPagos;
 import paucar.service.ClientesService;
 import paucar.service.PagosService;
 
-public class PagosQuincenalesView extends BorderPane {
+public final class PagosQuincenalesView extends BorderPane {
 
     private final PagosService service;
     private LocalDate fecha = LocalDate.now();
@@ -34,11 +34,11 @@ public class PagosQuincenalesView extends BorderPane {
                 pago -> {
 
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
                     if (nuevo != null) {
@@ -53,12 +53,12 @@ public class PagosQuincenalesView extends BorderPane {
                 pago -> {
 
                     List<String> empresas
-                    = clientesService.obtenerNombresPagables();
+                    = this.clientesService.obtenerNombresPagables();
 
                     PagoEmpresa nuevo
                     = DialogPagos.mostrarEditar(
                             empresas,
-                            clientesService,
+                            this.clientesService,
                             null,
                             pago);
                     if (nuevo != null) {
@@ -98,7 +98,7 @@ public class PagosQuincenalesView extends BorderPane {
         recargar();
     }
 
-    public void recargar() {
+    public final void recargar() {
 
         List<PagoEmpresa> pagos = service.obtenerTodos()
                 .stream()

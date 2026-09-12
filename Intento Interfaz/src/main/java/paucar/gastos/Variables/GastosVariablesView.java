@@ -21,7 +21,7 @@ import paucar.config.Responsive;
 import paucar.service.CategoriasGastosService;
 import paucar.service.GastosVariablesService;
 
-public class GastosVariablesView extends VBox {
+public final class GastosVariablesView extends VBox {
 
     private final GastosVariablesService service;
     private final CategoriasGastosService categoriasService;

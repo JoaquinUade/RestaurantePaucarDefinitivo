@@ -31,7 +31,7 @@ import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 import paucar.ventas.Tabla;
 
-public class SemanalGeneral extends BorderPane {
+public final class SemanalGeneral extends BorderPane {
 
     private final TableView<VentaResumenDiarioDTO> tablaTotalSemanal = new TableView<>();
 

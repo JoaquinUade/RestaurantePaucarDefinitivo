@@ -41,6 +41,7 @@ public class Aplicacion extends Application {
 
     private Ventas vistaVentas;
     private Resumen vistaResumen;
+    @SuppressWarnings("unused")
     private Gastos vistaGastos;
     private StockView vistaStock;
     private PagosView vistaPagos;
@@ -321,7 +322,7 @@ public class Aplicacion extends Application {
                 HttpResponse<Void> response = HttpCompartido.getHttpClient()
                         .send(request, HttpResponse.BodyHandlers.discarding());
                 return response.statusCode() == 200;
-            } catch (Exception ignored) {
+            } catch (java.io.IOException | InterruptedException ignored) {
                 return false;
             }
         }).thenAccept(conectado -> Platform.runLater(() -> {

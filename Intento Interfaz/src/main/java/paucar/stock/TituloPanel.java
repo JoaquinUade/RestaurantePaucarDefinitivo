@@ -2,7 +2,7 @@ package paucar.stock;
 
 import javafx.scene.control.Label;
 
-public class TituloPanel extends Label {
+public final class TituloPanel extends Label {
 
     public TituloPanel(String texto) {
 

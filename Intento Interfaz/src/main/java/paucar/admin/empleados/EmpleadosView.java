@@ -4,7 +4,6 @@ package paucar.admin.empleados;
 import paucar.config.Responsive;
 import com.uade.tpo.demo.entity.Empleado;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import paucar.service.EmpleadoService;
 
-public class EmpleadosView extends BorderPane {
+public final class EmpleadosView extends BorderPane {
 
     private final EmpleadoService service;
     private final TablaEmpleados panel;

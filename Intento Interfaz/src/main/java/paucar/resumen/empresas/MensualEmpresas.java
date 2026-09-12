@@ -21,7 +21,7 @@ import paucar.service.VentasBackend;
 import paucar.shared.LocaleUtils;
 import paucar.shared.MonedaUtils;
 
-public class MensualEmpresas extends BorderPane {
+public final class MensualEmpresas extends BorderPane {
 
     private final VentasBackend backend;
 
