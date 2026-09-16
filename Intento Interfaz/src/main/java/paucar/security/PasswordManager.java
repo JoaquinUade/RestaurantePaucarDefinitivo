@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.util.prefs.Preferences;
 
 import org.mindrot.jbcrypt.BCrypt;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 /** Maneja la contraseña sin guardarla ni mostrarla en texto plano. */
@@ -17,7 +18,7 @@ public final class PasswordManager {
     private static final Preferences PREFERENCIAS
             = Preferences.userNodeForPackage(PasswordManager.class);
     private static final Dotenv DOTENV = Dotenv.configure()
-            .directory("../../")
+            .directory("../")
             .ignoreIfMissing()
             .load();
     private static final String PIN_RECUPERACION = DOTENV.get("RECOVERY_PIN");
