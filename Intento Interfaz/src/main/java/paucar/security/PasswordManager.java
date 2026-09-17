@@ -15,14 +15,24 @@ public final class PasswordManager {
     private static final int MAX_INTENTOS_PIN = 5;
     private static final long BLOQUEO_PIN_MS = 5 * 60 * 1000L;
 
-    private static final Preferences PREFERENCIAS
-            = Preferences.userNodeForPackage(PasswordManager.class);
-    private static final Dotenv DOTENV = Dotenv.configure()
-            .directory("../")
-            .ignoreIfMissing()
-            .load();
-    private static final String PIN_RECUPERACION = DOTENV.get("RECOVERY_PIN");
+    private static final java.nio.file.Path CONFIG = java.nio.file.Path.of(System.getProperty("paucar.config.dir"), "admin.properties");
+    private static final java.util.Properties CONFIGURACION = cargarConfiguracion();
+    private static final String PIN_RECUPERACION = CONFIGURACION.getProperty("recovery.pin.hash");
 
+    private static java.util.Properties cargarConfiguracion() {
+        java.util.Properties config = new java.util.Properties();
+        try (java.io.Reader reader = java.nio.file.Files.newBufferedReader(CONFIG)) { config.load(reader); }
+        catch (java.io.IOException e) { throw new IllegalStateException("No se pudo leer la configuración de acceso.", e); }
+        return config;
+    }
+    private static void guardarHash(String hash) {
+        CONFIGURACION.setProperty(CLAVE_HASH, hash);
+        try {
+            java.nio.file.Path temporal = CONFIG.resolveSibling("admin.properties.tmp");
+            try (java.io.Writer writer = java.nio.file.Files.newBufferedWriter(temporal)) { CONFIGURACION.store(writer, "Acceso Restaurante Paucar"); }
+            java.nio.file.Files.move(temporal, CONFIG, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (java.io.IOException e) { throw new IllegalStateException("No se pudo guardar la contraseña.", e); }
+    }
     private static int intentosPinFallidos;
     private static long pinBloqueadoHasta;
 
@@ -93,7 +103,7 @@ public final class PasswordManager {
             return error;
         }
 
-        PREFERENCIAS.put(CLAVE_HASH, BCrypt.hashpw(nueva, BCrypt.gensalt(12)));
+        guardarHash(BCrypt.hashpw(nueva, BCrypt.gensalt(12)));
         SesionPassword.autorizar();
         return null;
     }
@@ -117,26 +127,11 @@ public final class PasswordManager {
     }
 
     private static boolean coincidePin(String pin) {
-        return pin != null && PIN_RECUPERACION != null
-                && MessageDigest.isEqual(
-                pin.getBytes(StandardCharsets.UTF_8),
-                PIN_RECUPERACION.getBytes(StandardCharsets.UTF_8));
+        return pin != null && PIN_RECUPERACION != null && BCrypt.checkpw(pin, PIN_RECUPERACION);
     }
-
     private static synchronized String obtenerHash() {
-        String hashGuardado = PREFERENCIAS.get(CLAVE_HASH, null);
-        if (hashGuardado != null && !hashGuardado.isBlank()) {
-            return hashGuardado;
-        }
-
-        String passwordInicial = DOTENV.get("ADMIN_PASSWORD");
-        if (passwordInicial == null || passwordInicial.isBlank()) {
-            throw new IllegalStateException(
-                    "No se encontró una contraseña inicial de administrador.");
-        }
-
-        String hashInicial = BCrypt.hashpw(passwordInicial, BCrypt.gensalt(12));
-        PREFERENCIAS.put(CLAVE_HASH, hashInicial);
-        return hashInicial;
+        String hash = CONFIGURACION.getProperty(CLAVE_HASH);
+        if (hash == null || hash.isBlank()) throw new IllegalStateException("Falta configurar el administrador.");
+        return hash;
     }
 }

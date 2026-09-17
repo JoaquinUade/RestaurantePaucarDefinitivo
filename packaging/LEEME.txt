@@ -1,0 +1,52 @@
+RESTAURANTE PAUCAR — ACTUALIZACIONES AUTOMÁTICAS
+
+REQUISITOS EN LA LAPTOP
+Windows 10/11 de 64 bits y MySQL Server iniciado.
+No requiere instalar JDK, JRE, Maven ni un editor. Java viene incluido.
+Abrí RestaurantePaucar.exe y configurá tu usuario y contraseña de MySQL.
+Usa la base daina y prepara las tablas iniciales si no existen.
+La contraseña de administrador y el PIN del restaurante son independientes
+de la contraseña de MySQL y se eligen al primer inicio.
+
+CÓMO SE ACTUALIZA
+Al abrir el EXE busca la última versión publicada en el repositorio:
+https://github.com/JoaquinUade/RestaurantePaucarDefinitivo/releases
+Si encuentra una superior, la descarga, verifica su integridad y la abre.
+No interrumpe una sesión de trabajo: comprueba al siguiente inicio.
+Podés pulsar «Abrir versión instalada» para omitir la búsqueda o descarga.
+Sin Internet utiliza la última versión válida que ya tengas.
+
+Seguí abriendo el mismo EXE o acceso directo. El archivo de entrada puede
+conservar su fecha original: las versiones nuevas se guardan y ejecutan
+automáticamente desde %LOCALAPPDATA%\RestaurantePaucar\actualizaciones.
+Nunca necesita reemplazar un EXE que está abierto ni pedir permisos de administrador.
+
+DATOS Y CONFIGURACIÓN
+El actualizador no cambia la contraseña ni copia o borra daina.
+Los datos permanecen en MySQL de la laptop.
+La configuración sigue en %LOCALAPPDATA%\RestaurantePaucar\config.
+Copiar el EXE a otra laptop no copia ni sincroniza las ventas.
+Las versiones antiguas se conservan en el disco.
+
+ACTIVACIÓN EN GITHUB (UNA SOLA VEZ)
+El repositorio debe contener los archivos de esta entrega, incluido
+.github/workflows/publicar-windows.yml, y tener GitHub Actions habilitado.
+Una vez incorporados en main, cada cambio del código dispara una compilación.
+Sólo cuando las pruebas y la compilación terminan correctamente se publica
+el EXE y su manifiesto de actualización juntos en Releases.
+También se puede iniciar desde Actions > Publicar Restaurante Paucar para Windows.
+La publicación requiere permiso de escritura de contenido para el workflow.
+El repositorio y sus Releases deben permanecer públicos para que las laptops
+descarguen las versiones sin almacenar credenciales de GitHub.
+
+Importante: guardar un cambio sólo en tu computadora no publica una versión.
+Debe subirse a main y terminar correctamente la compilación de GitHub.
+El EXE anterior (1.1) debe sustituirse una vez por este EXE (1.2) para activar
+la búsqueda de actualizaciones. Después ya no hay que descargarlo manualmente.
+
+DESARROLLO
+packaging/build-windows.ps1 compila y empaqueta desde el código fuente.
+packaging/test-updater.ps1 verifica actualizaciones válidas, fallos de red,
+cancelaciones, archivos dañados, versiones y conservación de configuración.
+Los cambios futuros de estructura de tablas necesitan una migración compatible;
+actualizar el EXE por sí solo no transforma columnas existentes.
