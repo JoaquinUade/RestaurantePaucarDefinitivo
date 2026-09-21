@@ -89,6 +89,7 @@ public final class Tabla extends VBox {
         });
 
         VBox.setVgrow(tabla, Priority.ALWAYS);
+        
         getChildren().addAll(tabla, btnEditar, btnEliminar);
     }
 

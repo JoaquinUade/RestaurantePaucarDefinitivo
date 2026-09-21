@@ -1,6 +1,5 @@
 package paucar.pagos;
 
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import com.uade.tpo.demo.entity.TipoPeriodicidad;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,7 +27,8 @@ public final class PagosView extends BorderPane {
     private final PagosService service;
     private final ClientesService clientesService;
     private final VentasBackend ventasBackend;
-    private final DatePicker filtroFecha;
+    private final ComboBox<String> comboMes = new ComboBox<>();
+    private final ComboBox<Integer> comboAnio = new ComboBox<>();
     private final Label lblTotal = new Label();
     private PagoEmpresa seleccionado;
 
@@ -39,7 +38,6 @@ public final class PagosView extends BorderPane {
     private PagosPeriodicidadView vistaConsumo;
 
     private final ComboBox<String> comboPeriodicidad = new ComboBox<>();
-    
 
     private final BorderPane contenedorResultado
             = new BorderPane();
@@ -53,11 +51,31 @@ public final class PagosView extends BorderPane {
         Label titulo = new Label("Pagos");
         titulo.getStyleClass().add("titulo-xl-blanco");
 
-        
         comboPeriodicidad.getStyleClass().add("combo-agregar");
-        filtroFecha = new DatePicker(LocalDate.now());
-        filtroFecha.getStyleClass().add("date-agregar");
-        filtroFecha.setOnAction(e -> recargar());
+        comboMes.getItems().addAll(
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+);
+comboMes.getStyleClass().add("combo-agregar");
+comboMes.getSelectionModel().select(
+    LocalDate.now().getMonthValue() - 1
+);
+
+comboAnio.getItems().addAll(
+    2024, 2025, 2026, 2027, 2028
+);
+comboAnio.getStyleClass().add("combo-agregar");
+comboAnio.setValue(LocalDate.now().getYear());
 
         lblTotal.getStyleClass().add("titulo-xl-blanco");
 
@@ -86,7 +104,8 @@ public final class PagosView extends BorderPane {
         btnFiltrar.setOnAction(e -> aplicarFiltro());
 
         HBox topBar = new HBox(Responsive.pe(10),
-                filtroFecha,
+                comboMes,
+                comboAnio,
                 comboPeriodicidad,
                 btnFiltrar,
                 titulo,
@@ -192,10 +211,20 @@ public final class PagosView extends BorderPane {
     }
 
     private void aplicarFiltro() {
-        if (filtroFecha.getValue() == null || comboPeriodicidad.getValue() == null) {
-            contenedorResultado.setCenter(null);
-            return;
-        }
+
+        LocalDate fechaSeleccionada = LocalDate.of(
+        comboAnio.getValue(),
+        comboMes.getSelectionModel().getSelectedIndex() + 1,
+        1
+);
+
+        if (comboMes.getValue() == null
+        || comboAnio.getValue() == null
+        || comboPeriodicidad.getValue() == null) {
+
+    contenedorResultado.setCenter(null);
+    return;
+}
 
         switch (comboPeriodicidad.getValue()) {
 
@@ -208,7 +237,7 @@ public final class PagosView extends BorderPane {
                             TipoPeriodicidad.MENSUAL);
                 }
 
-                vistaMensual.actualizarFecha(filtroFecha.getValue());
+                vistaMensual.actualizarFecha(fechaSeleccionada);
 
                 contenedorResultado.setCenter(vistaMensual);
             }
@@ -221,7 +250,7 @@ public final class PagosView extends BorderPane {
 
                 }
 
-                vistaSemanal.actualizarFecha(filtroFecha.getValue());
+                vistaSemanal.actualizarFecha(fechaSeleccionada);
 
                 contenedorResultado.setCenter(vistaSemanal);
             }
@@ -232,7 +261,7 @@ public final class PagosView extends BorderPane {
                     vistaQuincenal = new PagosQuincenalesView(service, clientesService);
                 }
 
-                vistaQuincenal.actualizarFecha(filtroFecha.getValue());
+                vistaQuincenal.actualizarFecha(fechaSeleccionada);
                 contenedorResultado.setCenter(vistaQuincenal);
             }
 
@@ -245,7 +274,7 @@ public final class PagosView extends BorderPane {
                             TipoPeriodicidad.CONSUMOVARIOSDIAS);
                 }
 
-                vistaConsumo.actualizarFecha(filtroFecha.getValue());
+                vistaConsumo.actualizarFecha(fechaSeleccionada);
 
                 contenedorResultado.setCenter(vistaConsumo);
             }

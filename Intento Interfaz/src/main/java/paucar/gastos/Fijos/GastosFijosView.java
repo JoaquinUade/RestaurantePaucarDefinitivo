@@ -1,6 +1,5 @@
 package paucar.gastos.Fijos;
 
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,7 +9,7 @@ import com.uade.tpo.demo.entity.dto.GastoFijoRequest;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -28,25 +27,40 @@ public final class GastosFijosView extends VBox {
     private final VBox contenedor = new VBox(Responsive.pe(15));
     private final Label mensajeSinDatos = new Label(
             "No hay gastos fijos ingresados para mostrar en este período.");
-    private final DatePicker filtroFecha;
     private GastosFijos gastoSeleccionado;
+    private final ComboBox<String> comboMes;
 
     public GastosFijosView(GastosFijosService service, EmpleadoService empleadoService) {
 
         this.service = service;
         this.empleadoService = empleadoService;
 
-        // ✅ FILTRO POR MES
-        filtroFecha = new DatePicker(LocalDate.now());
-        filtroFecha.setPromptText("Filtrar por mes");
-        filtroFecha.getStyleClass().add("date-agregar");
+        comboMes = new ComboBox<>();
+
+        comboMes.getItems().addAll(
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+        );
+
+        comboMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+        comboMes.getStyleClass().add("combo-agregar");
 
         // ✅ BOTÓN FILTRAR
         Button btnFiltrar = new Button("Filtrar");
         btnFiltrar.getStyleClass().add("btn-filtrar");
 
         btnFiltrar.setOnAction(e -> {
-            recargar(filtroFecha.getValue());
+            recargar();
         });
 
         // ✅ BOTÓN AGREGAR (luego lo conectamos)
@@ -66,7 +80,7 @@ public final class GastosFijosView extends VBox {
 
             if (req != null) {
                 service.crear(req);
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
         btnEditar.setOnAction(e -> {
@@ -93,7 +107,7 @@ public final class GastosFijosView extends VBox {
                         editado
                 );
 
-                recargar(filtroFecha.getValue());
+                recargar();
             }
 
             if (editado != null) {
@@ -101,7 +115,7 @@ public final class GastosFijosView extends VBox {
                         gastoSeleccionado.getIdGastoFijo(),
                         editado
                 );
-                recargar(filtroFecha.getValue());
+                recargar();
             }
 
         });
@@ -111,7 +125,14 @@ public final class GastosFijosView extends VBox {
         Label titulo = new Label("Gastos Fijos");
         titulo.getStyleClass().add("subtitulo-mid-blanco");
         // ✅ FILA SUPERIOR
-        HBox filaSuperior = new HBox(Responsive.pe(10), filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
+        HBox filaSuperior = new HBox(
+                Responsive.pe(10),
+                comboMes,
+                btnFiltrar,
+                titulo,
+                spacer,
+                btnAgregar
+        );
         HBox barraBotones = crearBarraBotones();
         barraBotones.setPadding(Responsive.insets(0));
 
@@ -133,24 +154,19 @@ public final class GastosFijosView extends VBox {
         getChildren().add(fondo);
 
         // ✅ CARGA INICIAL
-        recargar(filtroFecha.getValue());
+        recargar();
     }
 
-    private void recargar(LocalDate fechaFiltro) {
+    private void recargar() {
 
         contenedor.getChildren().clear();
-
         List<GastosFijos> gastos = service.obtenerTodos();
 
-        // ✅ FILTRAR POR MES
-        if (fechaFiltro != null) {
-            gastos = gastos.stream()
-                    .filter(g
-                            -> g.getFecha().getMonth() == fechaFiltro.getMonth()
-                    && g.getFecha().getYear() == fechaFiltro.getYear()
-                    )
-                    .toList();
-        }
+        int mesSeleccionado
+                = comboMes.getSelectionModel().getSelectedIndex() + 1;
+        gastos = gastos.stream()
+                .filter(g -> g.getFecha().getMonthValue() == mesSeleccionado)
+                .toList();
         if (gastos.isEmpty()) {
             contenedor.getChildren().add(mensajeSinDatos);
             return;
@@ -173,18 +189,18 @@ public final class GastosFijosView extends VBox {
                 = new TablaMensualFijos(personales, g -> {
                     gastoSeleccionado = g;
                 }, true);
-Label labelGastosFijos = new Label();
-labelGastosFijos.getStyleClass().add("card-header");
-labelGastosFijos.setText("Gastos fijos");
-labelGastosFijos.setMaxWidth(Double.MAX_VALUE);
+        Label labelGastosFijos = new Label();
+        labelGastosFijos.getStyleClass().add("card-header");
+        labelGastosFijos.setText("Gastos fijos");
+        labelGastosFijos.setMaxWidth(Double.MAX_VALUE);
 
-Label labelPagosPersonal = new Label();
-labelPagosPersonal.getStyleClass().add("card-header");
-labelPagosPersonal.setText("Pagos al personal");
-labelPagosPersonal.setMaxWidth(Double.MAX_VALUE);
+        Label labelPagosPersonal = new Label();
+        labelPagosPersonal.getStyleClass().add("card-header");
+        labelPagosPersonal.setText("Pagos al personal");
+        labelPagosPersonal.setMaxWidth(Double.MAX_VALUE);
 
-VBox bloqueGenerales = new VBox(Responsive.pe(0), labelGastosFijos, tablaGenerales);
-VBox bloquePersonal = new VBox(Responsive.pe(0), labelPagosPersonal, tablaPersonal);
+        VBox bloqueGenerales = new VBox(Responsive.pe(0), labelGastosFijos, tablaGenerales);
+        VBox bloquePersonal = new VBox(Responsive.pe(0), labelPagosPersonal, tablaPersonal);
 // ✅ contenedor horizontal
         HBox fila = new HBox(Responsive.pe(20), bloquePersonal, bloqueGenerales);
 
@@ -231,7 +247,7 @@ VBox bloquePersonal = new VBox(Responsive.pe(0), labelPagosPersonal, tablaPerson
                         gastoSeleccionado.getIdGastoFijo(),
                         editado
                 );
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
 
@@ -249,7 +265,7 @@ VBox bloquePersonal = new VBox(Responsive.pe(0), labelPagosPersonal, tablaPerson
                 service.eliminar(
                         gastoSeleccionado.getIdGastoFijo()
                 );
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
 

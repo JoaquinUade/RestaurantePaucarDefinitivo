@@ -10,7 +10,7 @@ import com.uade.tpo.demo.entity.GastosIndividuales;
 import com.uade.tpo.demo.entity.dto.GastoIndividualRequest;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -25,7 +25,7 @@ public final class GastosIndividualesView extends VBox {
 
     private final GastosIndividualesService service;
     private GastosIndividuales gastoSeleccionado;
-    private final DatePicker filtroFecha;
+    private final ComboBox<String> comboMes;
     private final EmpleadoService empleadoService;
 
     private final HBox contenedor = new HBox(Responsive.pe(20));
@@ -37,9 +37,28 @@ public final class GastosIndividualesView extends VBox {
         this.service = service;
         this.empleadoService = empleadoService;
 
-        filtroFecha = new DatePicker(LocalDate.now());
-        filtroFecha.getStyleClass().add("date-agregar");
-        filtroFecha.setPromptText("Filtrar por mes");
+        comboMes = new ComboBox<>();
+
+        comboMes.getItems().addAll(
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+        );
+
+        comboMes.getSelectionModel().select(
+                LocalDate.now().getMonthValue() - 1
+        );
+
+        comboMes.getStyleClass().add("combo-agregar");
 
         Button btnAgregar = new Button("+ Agregar Gasto");
         btnAgregar.getStyleClass().add("btn-agregar");
@@ -53,13 +72,13 @@ public final class GastosIndividualesView extends VBox {
 
             if (req != null) {
                 service.crear(req);
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
 
         Button btnFiltrar = new Button("Filtrar");
         btnFiltrar.getStyleClass().add("btn-filtrar");
-        btnFiltrar.setOnAction(e -> recargar(filtroFecha.getValue()));
+        btnFiltrar.setOnAction(e -> recargar());
 
         HBox barraBotones = crearBarraBotones();
         barraBotones.setPadding(Responsive.insets(0));
@@ -89,13 +108,13 @@ public final class GastosIndividualesView extends VBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label titulo = new Label("Gastos Individuales");
         titulo.getStyleClass().add("subtitulo-mid-blanco");
-        HBox top = new HBox(Responsive.pe(10), filtroFecha, btnFiltrar, titulo, spacer, btnAgregar);
+        HBox top = new HBox(Responsive.pe(10), comboMes,btnFiltrar, titulo, spacer, btnAgregar);
 
         fondo.getChildren().addAll(top, scroll, barraBotones);
 
         getChildren().add(fondo);
 
-        recargar(filtroFecha.getValue());
+        recargar();
     }
 
     private HBox crearBarraBotones() {
@@ -129,7 +148,7 @@ public final class GastosIndividualesView extends VBox {
                         gastoSeleccionado.getIdGastoIndividual(),
                         editado
                 );
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
 
@@ -146,27 +165,25 @@ public final class GastosIndividualesView extends VBox {
                 service.eliminar(
                         gastoSeleccionado.getIdGastoIndividual()
                 );
-                recargar(filtroFecha.getValue());
+                recargar();
             }
         });
 
         return new HBox(Responsive.pe(10), btnEditar, btnEliminar);
     }
 
-    private void recargar(LocalDate fechaFiltro) {
+    private void recargar() {
 
         contenedor.getChildren().clear();
 
         List<GastosIndividuales> gastos = service.obtenerTodos();
 
-        if (fechaFiltro != null) {
-            gastos = gastos.stream()
-                    .filter(g
-                            -> g.getFecha().getMonth() == fechaFiltro.getMonth()
-                    && g.getFecha().getYear() == fechaFiltro.getYear()
-                    )
-                    .toList();
-        }
+        int mesSeleccionado
+                = comboMes.getSelectionModel().getSelectedIndex() + 1;
+
+        gastos = gastos.stream()
+                .filter(g -> 
+                    g.getFecha().getMonthValue() == mesSeleccionado).toList();
         if (gastos.isEmpty()) {
             contenedor.getChildren().add(mensajeSinDatos);
             return;

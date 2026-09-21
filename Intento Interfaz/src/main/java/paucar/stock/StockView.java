@@ -13,7 +13,7 @@ import com.uade.tpo.demo.entity.Stock;
 import com.uade.tpo.demo.entity.dto.StockRequest;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -36,7 +36,8 @@ public final class StockView extends BorderPane {
     private final HBox contenedorCategorias = new HBox(Responsive.pe(20));
     private final Label mensajeSinDatos = new Label(
             "No hay stocks ingresados para mostrar en este período.");
-    private DatePicker filtroFecha;
+    private final ComboBox<String> comboMes = new ComboBox<>();
+private final ComboBox<Integer> comboAnio = new ComboBox<>();
     private Label lblFecha = new Label();
     private final Consumer<Stock> onSelect;
 
@@ -63,12 +64,37 @@ public final class StockView extends BorderPane {
         btnEditar.getStyleClass().add("btn-editar");
         Button btnEliminar = new Button("Eliminar");
         btnEliminar.getStyleClass().add("btn-eliminar");
-        filtroFecha = new DatePicker(LocalDate.now());
-        filtroFecha.getStyleClass().add("date-agregar");
-        filtroFecha.setOnAction(e -> {
-            actualizarFecha();
-            recargar();
-        });
+        Button btnFiltrar = new Button("Filtrar");
+btnFiltrar.getStyleClass().add("btn-filtrar");
+
+btnFiltrar.setOnAction(e -> {
+    actualizarFecha();
+    recargar();
+});
+        comboMes.getItems().addAll(
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+);
+comboMes.getStyleClass().add("combo-agregar");
+comboMes.getSelectionModel().select(
+        LocalDate.now().getMonthValue() - 1
+);
+
+comboAnio.getItems().addAll(
+        2024, 2025, 2026, 2027, 2028
+);
+comboAnio.getStyleClass().add("combo-agregar");
+comboAnio.setValue(LocalDate.now().getYear());
 
         btnAgregar.setOnAction(e -> {
 
@@ -152,7 +178,7 @@ public final class StockView extends BorderPane {
         fondo.setSpacing(Responsive.pe(15));
 
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
-        HBox topBar = new HBox(Responsive.pe(10), filtroFecha, lblFecha, spacerTop, btnAgregar);
+        HBox topBar = new HBox(Responsive.pe(10), comboMes, comboAnio, btnFiltrar, lblFecha, spacerTop, btnAgregar);
         HBox barraBotones = new HBox(Responsive.pe(10), btnEditar, btnEliminar);
 
         topBar.setPadding(Responsive.insets(10));
@@ -168,7 +194,11 @@ public final class StockView extends BorderPane {
         contenedorCategorias.getChildren().clear();
 
         List<Stock> stocks = service.obtenerTodos();
-        LocalDate fechaSeleccionada = filtroFecha.getValue();
+        LocalDate fechaSeleccionada = LocalDate.of(
+        comboAnio.getValue(),
+        comboMes.getSelectionModel().getSelectedIndex() + 1,
+        1
+);
 
         // Los productos siguen vigentes después del mes en que se crearon.
         LocalDate finDelMes = fechaSeleccionada.withDayOfMonth(fechaSeleccionada.lengthOfMonth());
@@ -215,8 +245,12 @@ public final class StockView extends BorderPane {
 
         lblFecha.setText(
                 FechaUtils.formatearTitulo(
-                        filtroFecha.getValue()
-                )
+        LocalDate.of(
+                comboAnio.getValue(),
+                comboMes.getSelectionModel().getSelectedIndex() + 1,
+                1
+        )
+)
         );
 
         lblFecha.getStyleClass().add("titulo-xl-blanco");
