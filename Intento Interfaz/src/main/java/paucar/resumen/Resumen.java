@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -41,12 +40,9 @@ public final class Resumen extends BorderPane {
                                                                    * "Mensual" y "Semanal"
      */
 
-    private final DatePicker pickerFecha = new DatePicker();/*
-                                                             * DatePicker es un componente que permite al usuario
-                                                             * seleccionar una fecha, aqui es para que el usuario
-                                                             * elija la fecha base para mostrar el resumen mensual
-                                                             * o semanal
-     */
+    private final ComboBox<String> comboMes = new ComboBox<>();
+    private final ComboBox<Integer> comboAnio = new ComboBox<>();
+    private final ComboBox<String> comboSemana = new ComboBox<>();
 
     private final BorderPane contenedorResultado = new BorderPane();/*
                                                                      * BorderPane es un layout que divide la ventana
@@ -104,8 +100,47 @@ public final class Resumen extends BorderPane {
         tipoResumen.getStyleClass().add("combo-agregar");
         tipoResumen.setValue("General");
 
-        pickerFecha.setValue(LocalDate.now());/* establece la fecha actual por default */
-        pickerFecha.getStyleClass().add("date-agregar");
+        comboMes.getItems().addAll(
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+        );
+
+        comboMes.setValue(comboMes.getItems().get(LocalDate.now().getMonthValue() - 1));
+
+        for (int anio = 2020; anio <= 2035; anio++) {
+            comboAnio.getItems().add(anio);
+        }
+
+        comboAnio.setValue(LocalDate.now().getYear());
+
+        comboMes.getStyleClass().add("combo-agregar");
+        comboAnio.getStyleClass().add("combo-agregar");
+
+        comboSemana.getItems().addAll(
+                "Semana 1",
+                "Semana 2",
+                "Semana 3",
+                "Semana 4",
+                "Semana 5"
+        );
+
+        comboSemana.setValue("Semana 1");
+
+        comboSemana.getStyleClass().add("combo-agregar");
+
+        /* oculto inicialmente porque arrancamos en mensual */
+        comboSemana.setVisible(false);
+        comboSemana.setManaged(false);
     }
 
     private Node crearBarraFiltros() {
@@ -126,13 +161,22 @@ public final class Resumen extends BorderPane {
         btnExcel.getStyleClass().add("btn-agregar");
         btnExcel.setOnAction(e -> exportarExcel());
 
-        pickerFecha.setOnAction(e -> aplicarFiltros());
-        ResumenTipo.setOnAction(e -> aplicarFiltros());
+        comboMes.setOnAction(e -> aplicarFiltros());
+        comboAnio.setOnAction(e -> aplicarFiltros());
+        ResumenTipo.setOnAction(e -> {
+            boolean esSemanal = "Semanal".equals(ResumenTipo.getValue());
+            comboSemana.setVisible(esSemanal);
+            comboSemana.setManaged(esSemanal);
+            aplicarFiltros();
+        });
         tipoResumen.setOnAction(e -> aplicarFiltros());
+        comboSemana.setOnAction(e -> aplicarFiltros());
 
         HBox barraFiltros = new HBox(Responsive.pe(10),
                 ResumenTipo,
-                pickerFecha,
+                comboSemana,
+                comboMes,
+                comboAnio,
                 tipoResumen,
                 btnVer,
                 btnExcel);/* crea un contenedor horizontal con los filtros */
@@ -147,7 +191,7 @@ public final class Resumen extends BorderPane {
                 btnExcel,
                 new Insets(0, 5, 0, 15)
         );
-      
+
         barraFiltros.setAlignment(Pos.CENTER_LEFT);/* alinea los elementos a la izquierda */
         barraFiltros.setPadding(Responsive.insets(10, 10, 10, 10));/* agrega un padding de 10 pixeles al fondo */
 
@@ -184,14 +228,32 @@ public final class Resumen extends BorderPane {
 
     private void aplicarFiltros() {
 
-        String periodo = ResumenTipo.getValue(); // Mensual o Semanal
-        String tipo = tipoResumen.getValue(); // General o Empresas
-        LocalDate fecha = pickerFecha.getValue();
+        String periodo = ResumenTipo.getValue();
+        String tipo = tipoResumen.getValue();
 
-        if (fecha == null || periodo == null || tipo == null) {
+        if (comboAnio.getValue() == null
+                || comboMes.getValue() == null
+                || periodo == null
+                || tipo == null) {
+
             contenedorResultado.setCenter(null);
             return;
         }
+
+        LocalDate fecha;
+
+if ("Semanal".equals(periodo)) {
+
+    fecha = calcularFechaSemanal();
+
+} else {
+
+    fecha = LocalDate.of(
+            comboAnio.getValue(),
+            comboMes.getSelectionModel().getSelectedIndex() + 1,
+            1
+    );
+}
 
         switch (periodo) {
 
@@ -215,20 +277,30 @@ public final class Resumen extends BorderPane {
 
                         contenedorResultado.setCenter(vistaMensualGeneral);
                     }
+
                     case "Empresas" -> {
                         if (vistaMensualEmpresas == null) {
-                            vistaMensualEmpresas = new MensualEmpresas(backend, anio, mes);
+                            vistaMensualEmpresas = new MensualEmpresas(
+                                    backend,
+                                    anio,
+                                    mes);
                         } else {
                             vistaMensualEmpresas.actualizarFecha(fecha);
                         }
+
                         contenedorResultado.setCenter(vistaMensualEmpresas);
                     }
+
                     case "Clientes" -> {
                         if (vistaMensualClientes == null) {
-                            vistaMensualClientes = new MensualClientes(backend, anio, mes);
+                            vistaMensualClientes = new MensualClientes(
+                                    backend,
+                                    anio,
+                                    mes);
                         } else {
                             vistaMensualClientes.actualizarFecha(fecha);
                         }
+
                         contenedorResultado.setCenter(vistaMensualClientes);
                     }
                 }
@@ -236,29 +308,44 @@ public final class Resumen extends BorderPane {
 
             case "Semanal" -> {
                 switch (tipo) {
+
                     case "General" -> {
                         if (vistaSemanalGeneral == null) {
                             vistaSemanalGeneral
-                                    = new SemanalGeneral(backend, clientesService, fecha);
+                                    = new SemanalGeneral(
+                                            backend,
+                                            clientesService,
+                                            fecha);
                         } else {
                             vistaSemanalGeneral.actualizarFecha(fecha);
                         }
+
                         contenedorResultado.setCenter(vistaSemanalGeneral);
                     }
+
                     case "Empresas" -> {
                         if (vistaSemanalEmpresas == null) {
-                            vistaSemanalEmpresas = new SemanalEmpresas(backend, fecha);
+                            vistaSemanalEmpresas
+                                    = new SemanalEmpresas(
+                                            backend,
+                                            fecha);
                         } else {
                             vistaSemanalEmpresas.actualizarFecha(fecha);
                         }
+
                         contenedorResultado.setCenter(vistaSemanalEmpresas);
                     }
+
                     case "Clientes" -> {
                         if (vistaSemanalClientes == null) {
-                            vistaSemanalClientes = new SemanalClientes(backend, fecha);
+                            vistaSemanalClientes
+                                    = new SemanalClientes(
+                                            backend,
+                                            fecha);
                         } else {
                             vistaSemanalClientes.actualizarFecha(fecha);
                         }
+
                         contenedorResultado.setCenter(vistaSemanalClientes);
                     }
                 }
@@ -268,41 +355,53 @@ public final class Resumen extends BorderPane {
 
     private void exportarExcel() {
 
-        LocalDate fecha = pickerFecha.getValue();
+        if (comboAnio.getValue() == null
+                || comboMes.getValue() == null) {
 
-        if (fecha == null) {/* si no hay una fecha seleccionada, avisa y corta */
             Alert aviso = new Alert(Alert.AlertType.WARNING);
             aviso.setTitle("Falta seleccionar fecha");
             aviso.setHeaderText(null);
-            aviso.setContentText("Seleccioná una fecha para poder generar el Excel.");
+            aviso.setContentText("Seleccioná un mes y un año.");
             aviso.showAndWait();
             return;
         }
 
+        LocalDate fecha = LocalDate.of(
+                comboAnio.getValue(),
+                comboMes.getSelectionModel().getSelectedIndex() + 1,
+                1
+        );
+
         int anio = fecha.getYear();
         int mes = fecha.getMonthValue();
 
-        FileChooser selector = new FileChooser();/* diálogo para elegir dónde guardar el archivo */
+        FileChooser selector = new FileChooser();
         selector.setTitle("Guardar resumen en Excel");
+
         selector.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter(
-                        "Libro de Excel (*.xlsx)", "*.xlsx"));
+                        "Libro de Excel (*.xlsx)",
+                        "*.xlsx"));
+
         selector.setInitialFileName(
-                "Resumen_" + anio + "-" + String.format("%02d", mes) + ".xlsx");
+                "Resumen_" + anio + "-"
+                + String.format("%02d", mes)
+                + ".xlsx");
 
         File destino = selector.showSaveDialog(getScene().getWindow());
 
-        if (destino == null) {/* si el usuario canceló el diálogo, no hace nada */
+        if (destino == null) {
             return;
         }
 
-        /* La generación va en un hilo aparte para no congelar la interfaz,
-           porque hay que pedir datos al backend por HTTP. */
         Task<Boolean> tarea = new Task<>() {
             @Override
             protected Boolean call() {
                 return excelExportService.exportarExcel(
-                        anio, mes, fecha, destino);
+                        anio,
+                        mes,
+                        fecha,
+                        destino);
             }
         };
 
@@ -312,34 +411,45 @@ public final class Resumen extends BorderPane {
             btnExcel.disableProperty().unbind();
 
             if (Boolean.TRUE.equals(tarea.getValue())) {
+
                 Alert exito = new Alert(Alert.AlertType.INFORMATION);
                 exito.setTitle("Exportación exitosa");
                 exito.setHeaderText(null);
                 exito.setContentText(
                         "El Excel se generó correctamente en:\n"
                         + destino.getAbsolutePath());
+
                 exito.showAndWait();
+
             } else {
+
                 Alert error = new Alert(Alert.AlertType.ERROR);
                 error.setTitle("Error");
                 error.setHeaderText(null);
                 error.setContentText(
                         "No se pudo generar el Excel. Revisá que el backend esté corriendo.");
+
                 error.showAndWait();
             }
         });
 
         tarea.setOnFailed(e -> {
+
             btnExcel.disableProperty().unbind();
 
             Throwable ex = tarea.getException();
-            System.err.println("Error exportando Excel: " + ex);
+
+            System.err.println(
+                    "Error exportando Excel: "
+                    + ex);
 
             Alert error = new Alert(Alert.AlertType.ERROR);
             error.setTitle("Error");
             error.setHeaderText(null);
             error.setContentText(
-                    "Ocurrió un error al generar el Excel:\n" + ex.getMessage());
+                    "Ocurrió un error al generar el Excel:\n"
+                    + ex.getMessage());
+
             error.showAndWait();
         });
 
@@ -347,4 +457,20 @@ public final class Resumen extends BorderPane {
         hilo.setDaemon(true);
         hilo.start();
     }
+    private LocalDate calcularFechaSemanal() {
+
+    int anio = comboAnio.getValue();
+
+    int mes =
+            comboMes.getSelectionModel().getSelectedIndex() + 1;
+
+    int semana =
+            comboSemana.getSelectionModel().getSelectedIndex();
+
+    LocalDate primerDiaMes =
+            LocalDate.of(anio, mes, 1);
+
+    return primerDiaMes.plusWeeks(semana);
+}
+
 }

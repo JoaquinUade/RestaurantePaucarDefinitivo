@@ -1,6 +1,5 @@
 package paucar.resumen.clientes.semanal;
 
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,6 +40,7 @@ public final class SemanalClientes extends BorderPane {
     private TableView<Venta> tablaVentasDebe;
 
     private Label lblTotal;
+    private Label lblRangoSemana;
 
     public SemanalClientes(VentasBackend backend, LocalDate fecha) {
         this.backend = backend;
@@ -92,10 +92,12 @@ public final class SemanalClientes extends BorderPane {
     private HBox crearBarraSuperior() {
         comboCliente.setPromptText("Seleccionar cliente");
 
-        Label rangoSemana = new Label("Semana: " + inicioSemana + " a " + finSemana);/*formatea el rango
-                                                                                     que abarca esa semana */
+        lblRangoSemana = new Label("Semana: " + inicioSemana + " a " + finSemana);
 
-        HBox barra = new HBox(Responsive.pe(15), comboCliente, rangoSemana);/*mete en la caja horizontal */
+        HBox barra = new HBox(
+                Responsive.pe(15),
+                comboCliente,
+                lblRangoSemana);
         barra.setAlignment(Pos.CENTER_LEFT);
         barra.setPadding(Responsive.insets(0, 0, 10, 0));
 
@@ -207,7 +209,12 @@ public final class SemanalClientes extends BorderPane {
     public void actualizarFecha(LocalDate fecha) {
         this.inicioSemana = fecha.with(DayOfWeek.MONDAY);
         this.finSemana = fecha.with(DayOfWeek.SUNDAY);
-
+lblRangoSemana.setText(
+        "Semana: "
+        + inicioSemana
+        + " a "
+        + finSemana
+);
         if (clienteSeleccionado != null && !clienteSeleccionado.isBlank()) {/*si cliente seleccionado no 
                                                                             es null y no esta en blanco*/
             cargarVentasSemanalClientes();/*carga las ventas de ese cliente*/
@@ -216,21 +223,21 @@ public final class SemanalClientes extends BorderPane {
 
     public void refrescar() {
 
-    String seleccionado = comboCliente.getValue();
+        String seleccionado = comboCliente.getValue();
 
-    var lista = backend.obtenerClientesPorTipo(
-            TipoCliente.CLIENTE);
+        var lista = backend.obtenerClientesPorTipo(
+                TipoCliente.CLIENTE);
 
-    clientesFiltrados = new FilteredList<>(
-            javafx.collections.FXCollections.observableArrayList(lista),
-            s -> true);
+        clientesFiltrados = new FilteredList<>(
+                javafx.collections.FXCollections.observableArrayList(lista),
+                s -> true);
 
-    comboCliente.setItems(clientesFiltrados);
+        comboCliente.setItems(clientesFiltrados);
 
-    if (seleccionado != null
-            && lista.contains(seleccionado)) {
+        if (seleccionado != null
+                && lista.contains(seleccionado)) {
 
-        comboCliente.setValue(seleccionado);
+            comboCliente.setValue(seleccionado);
+        }
     }
-}
 }

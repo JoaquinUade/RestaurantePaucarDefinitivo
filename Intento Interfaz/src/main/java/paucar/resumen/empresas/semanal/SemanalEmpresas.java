@@ -42,6 +42,7 @@ public final class SemanalEmpresas extends BorderPane {
     private VBox tablaVentasDebe;
 
     private Label lblTotal;
+private Label lblRangoSemana;
 
     public SemanalEmpresas(VentasBackend backend, LocalDate fecha) {
         this.backend = backend;
@@ -112,16 +113,13 @@ public final class SemanalEmpresas extends BorderPane {
                                                                  en el ComboBox cuando no hay ninguna
                                                                  empresa seleccionada*/
 
-        Label rangoSemana = new Label(
-                "Semana: " + inicioSemana + " a " + finSemana);/*Crea una etiqueta que muestra el rango
-                                                                de fechas que se van a mostrar, osea la
-                                                                fecha que fue elegida, toma como rango el
-                                                                lunes de esa semana al domingo*/
+        lblRangoSemana = new Label(
+        "Semana: " + inicioSemana + " a " + finSemana);
 
-        HBox barra = new HBox(Responsive.pe(15), comboEmpresa, rangoSemana);/*Crea una barra horizontal que
-                                                                     contiene el ComboBox para seleccionar
-                                                                     la empresa y el rango de fechas que
-                                                                     mostrara la tabla de ventas*/
+        HBox barra = new HBox(
+        Responsive.pe(15),
+        comboEmpresa,
+        lblRangoSemana);
 
         barra.setAlignment(Pos.CENTER_LEFT);/* Alinea los elementos de la barra a la izquierda */
 
@@ -301,7 +299,12 @@ public final class SemanalEmpresas extends BorderPane {
         this.finSemana = fecha.with(DayOfWeek.SUNDAY);/*Actualiza la fecha de fin de la semana al
                                                        domingo de la semana que corresponde a la fecha
                                                        dada*/
-
+lblRangoSemana.setText(
+        "Semana: "
+        + inicioSemana
+        + " a "
+        + finSemana
+);
         if (empresaSeleccionada != null && !empresaSeleccionada.isBlank()) {/*Si ya hay una empresa seleccionada,
                                                                              recarga las ventas semanales para esa
                                                                              empresa con las nuevas fechas*/
