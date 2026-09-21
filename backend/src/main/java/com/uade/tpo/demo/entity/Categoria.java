@@ -2,20 +2,21 @@ package com.uade.tpo.demo.entity;
 
 
 public enum Categoria {
-    ENTRADA("Entrada"),
     BEBIDA("Bebida"),
-    DESAYUNO("Desayuno"),
-    OTROS("Otros"),
-    GUARNICIONES("Guarniciones"),
-    SANDWICHES("Sandwiches"),
-    POSTRES("Postres"),
-    FAJITAS("Fajitas"),
-    WOKS("Woks"),
-    PASTAS("Pastas"),
-    ENSALADAS("Ensaladas"),
-    MILANESAS("Milanesas"),
-    VINOS("Vinos"),
-    CARNE("Carnes");
+CARNE("Carnes"),
+DESAYUNO("Desayuno"),
+ENSALADAS("Ensaladas"),
+ENTRADA("Entrada"),
+FAJITAS("Fajitas"),
+GUARNICIONES("Guarniciones"),
+MILANESAS("Milanesas"),
+OTROS("Otros"),
+PASTAS("Pastas"),
+POSTRES("Postres"),
+PRINCIPAL("Principal"),
+SANDWICHES("Sandwiches"),
+VINOS("Vinos"),
+WOKS("Woks");
 
     private final String descripcion;
 
