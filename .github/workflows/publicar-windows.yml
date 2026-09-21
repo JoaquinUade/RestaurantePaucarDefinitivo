@@ -1,0 +1,72 @@
+name: Publicar Restaurante Paucar para Windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/src/**'
+      - 'backend/pom.xml'
+      - 'Intento Interfaz/src/**'
+      - 'Intento Interfaz/pom.xml'
+      - 'packaging/**'
+      - '.github/workflows/publicar-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paucar-windows-release
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            backend/pom.xml
+            Intento Interfaz/pom.xml
+      - name: Compilar y verificar
+        shell: pwsh
+        env:
+          VERSION: 1.2.${{ github.run_number }}.${{ github.run_attempt }}
+        run: ./packaging/build-windows.ps1 -Version $env:VERSION -OutputDir "$env:GITHUB_WORKSPACE/release-output"
+      - name: Conservar los archivos de esta compilación
+        uses: actions/upload-artifact@v4
+        with:
+          name: RestaurantePaucar-Windows
+          path: release-output/*
+          if-no-files-found: error
+      - name: Publicar versión completa
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: 1.2.${{ github.run_number }}.${{ github.run_attempt }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = "v$env:VERSION"
+          $notes = "Restaurante Paucar para Windows de 64 bits. Java incluido. Requiere MySQL Server local y utiliza la base daina. Conserva la configuración de conexión. Compilado desde $env:COMMIT."
+          [IO.File]::WriteAllText('release-output/notas.txt', $notes, [Text.UTF8Encoding]::new($false))
+          gh release create $tag release-output/RestaurantePaucar.exe release-output/paucar-update.json release-output/LEEME.txt --repo $env:REPOSITORY --target $env:COMMIT --draft --title "Restaurante Paucar $env:VERSION" --notes-file release-output/notas.txt
+          if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar la publicación.' }
+          $latest = gh release view --repo $env:REPOSITORY --json tagName --jq .tagName 2>$null
+          $makeLatest = $true
+          if ($LASTEXITCODE -eq 0 -and $latest -match '^v(\d+\.\d+\.\d+\.\d+)$') {
+            $makeLatest = [version]$env:VERSION -gt [version]$Matches[1]
+          }
+          gh release edit $tag --repo $env:REPOSITORY --draft=false "--latest=$($makeLatest.ToString().ToLowerInvariant())"
+          if ($LASTEXITCODE -ne 0) { throw 'No se pudo publicar la versión completa.' }
